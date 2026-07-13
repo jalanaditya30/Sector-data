@@ -25,6 +25,17 @@ COLS = ["ltp52", "1D", "1M", "3M", "6M", "1Y", "2Y", "3Y", "5Y"]
 CHUNK = 60            # tickers per yfinance batch
 SUFFIX = ".NS"        # NSE on Yahoo
 
+# Tijori uses short constituent codes that don't always match the NSE symbol
+# Yahoo expects. Map config-ticker -> Yahoo NSE symbol (without .NS suffix).
+# Add an entry here whenever a stock is stuck on stale snapshot data because
+# "<ticker>.NS" 404s on Yahoo. Verify at finance.yahoo.com/quote/<SYMBOL>.NS
+SYMBOL_OVERRIDES = {
+    "EMS": "EMSLIMITED",
+}
+
+def ysymbol(t):
+    return SYMBOL_OVERRIDES.get(t, t) + SUFFIX
+
 def load_config(path="sectors_config.json"):
     return json.load(open(path))
 
@@ -55,9 +66,10 @@ def ret_asof(closes, days_back, today):
 def fetch(tickers):
     """returns {ticker: pandas Series of Close indexed by date}"""
     data = {}
-    ynames = [t + SUFFIX for t in tickers]
-    for i in range(0, len(ynames), CHUNK):
-        batch = ynames[i:i+CHUNK]
+    ymap = {t: ysymbol(t) for t in tickers}     # config ticker -> Yahoo symbol
+    for i in range(0, len(tickers), CHUNK):
+        chunk = tickers[i:i+CHUNK]
+        batch = [ymap[t] for t in chunk]
         for attempt in range(3):
             try:
                 df = yf.download(batch, period="5y", interval="1d",
@@ -69,8 +81,8 @@ def fetch(tickers):
                 time.sleep(3)
         else:
             continue
-        for t in tickers[i:i+CHUNK]:
-            yn = t + SUFFIX
+        for t in chunk:
+            yn = ymap[t]
             try:
                 col = df[yn]["Close"] if len(batch) > 1 else df["Close"]
                 col = col.dropna()
@@ -78,7 +90,7 @@ def fetch(tickers):
                 if len(col): data[t] = col
             except Exception:
                 pass
-        print(f"  fetched {min(i+CHUNK,len(ynames))}/{len(ynames)}", file=sys.stderr)
+        print(f"  fetched {min(i+CHUNK,len(tickers))}/{len(tickers)}", file=sys.stderr)
         time.sleep(1)
     return data
 
@@ -115,13 +127,15 @@ def main():
         rows = []
         for st in s["stocks"]:
             v = stock_vals.get(st["ticker"])
-            if v is None:                       # keep last-known snapshot if live missing
-                v = st.get("snap", {k: None for k in COLS})
+            stale = v is None
+            if stale:                           # live fetch failed: fall back to snapshot,
+                v = st.get("snap", {k: None for k in COLS})  # but flag it as not-live
             d1 = v.get("1D")
             if d1 is not None:
                 up += d1 > 0; down += d1 < 0
             rows.append({"name": st["name"], "ticker": st["ticker"],
-                         "weight": st["weight"], "vals": {k: v.get(k) for k in COLS}})
+                         "weight": st["weight"], "stale": stale,
+                         "vals": {k: v.get(k) for k in COLS}})
         agg = {}
         for k in COLS:
             agg[k] = wavg([(r["vals"][k], r["weight"]) for r in rows])
