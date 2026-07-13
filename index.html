@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sectoral Heatmap · NSE</title>
+<style>
+  :root{
+    --bg:#0b0f14; --panel:#111820; --panel2:#0e141b; --line:#1e2833;
+    --ink:#e8eef4; --dim:#7f8fa0; --dim2:#556270;
+    --accent:#4aa3df; --up:#2fa574; --down:#d85757; --warn:#d9a441;
+    --mono:"JetBrains Mono","SF Mono",ui-monospace,"Cascadia Mono",Menlo,Consolas,monospace;
+    --sans:"Inter",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;font-size:13px}
+  .wrap{max-width:1500px;margin:0 auto;padding:18px 16px 60px}
+  header.top{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+    border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:2px}
+  .brand{font-family:var(--mono);font-weight:600;font-size:15px;letter-spacing:.5px}
+  .brand b{color:var(--accent)}
+  .meta{color:var(--dim);font-family:var(--mono);font-size:11px}
+  .meta .live{color:var(--up)} .meta .snap{color:var(--warn)}
+  .spacer{flex:1}
+  .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  input[type=search]{background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+    font-family:var(--mono);font-size:12px;padding:6px 10px;border-radius:6px;width:190px;outline:none}
+  input[type=search]:focus{border-color:var(--accent)}
+  button.btn{background:var(--panel);border:1px solid var(--line);color:var(--dim);
+    font-family:var(--mono);font-size:11px;padding:6px 10px;border-radius:6px;cursor:pointer}
+  button.btn:hover{color:var(--ink);border-color:var(--dim2)}
+  button.btn:disabled{opacity:.5;cursor:default}
+
+  /* banners */
+  .banner{font-family:var(--mono);font-size:12px;padding:9px 12px;border-radius:6px;margin-top:12px;
+    display:none;align-items:center;gap:10px}
+  .banner.show{display:flex}
+  .banner.warn{background:rgba(217,164,65,.10);border:1px solid rgba(217,164,65,.4);color:#f0d79a}
+  .banner.err {background:rgba(216,87,87,.10);border:1px solid rgba(216,87,87,.45);color:#f2b1b1}
+  .banner .b-act{margin-left:auto;display:flex;gap:8px}
+
+  /* full error / loading state */
+  .state{display:none;margin-top:12px;border:1px solid var(--line);border-radius:8px;
+    padding:48px 24px;text-align:center;font-family:var(--mono)}
+  .state.show{display:block}
+  .state .glyph{font-size:30px;line-height:1}
+  .state.error .glyph{color:var(--down)} .state.loading .glyph{color:var(--dim)}
+  .state h2{font-size:15px;margin:14px 0 6px;font-weight:600;color:var(--ink)}
+  .state p{color:var(--dim);font-size:12px;margin:4px 0;line-height:1.6}
+  .state code{color:var(--accent)}
+  .state .why{color:var(--dim2);font-size:11px;margin-top:14px;max-width:520px;
+    margin-left:auto;margin-right:auto;text-align:left;line-height:1.7}
+  .spin{display:inline-block;animation:sp 1s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+
+  .scroll{overflow:auto;border:1px solid var(--line);border-radius:8px;margin-top:12px;
+    max-height:calc(100vh - 150px);display:none}
+  .scroll.show{display:block}
+  table{border-collapse:separate;border-spacing:0;width:100%;font-family:var(--mono)}
+  thead th{position:sticky;top:0;z-index:5;background:#0c1219;color:var(--dim);
+    font-weight:500;font-size:10.5px;letter-spacing:.4px;text-transform:uppercase;
+    padding:9px 8px;border-bottom:1px solid var(--line);white-space:nowrap;cursor:pointer;user-select:none}
+  thead th.name-col{cursor:default}
+  thead th:hover:not(.name-col){color:var(--ink)}
+  th.sorted{color:var(--accent)} th .car{font-size:9px;opacity:.8}
+  th.num,td.num{text-align:right}
+  .name-col{position:sticky;left:0;z-index:4;text-align:left;min-width:210px}
+  thead th.name-col{z-index:6}
+  tbody td.name-col{background:var(--panel)}
+  tbody tr.stock td.name-col{background:var(--panel2)}
+  td{padding:0;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+  td.num{padding:6px 8px;font-size:12px;white-space:nowrap}
+  tr.sector{cursor:pointer}
+  tr.sector td.name-col{font-weight:600}
+  tr.sector:hover td.name-col{color:#fff}
+  .secname{display:flex;align-items:center;gap:7px;padding:8px 10px}
+  .car0{color:var(--dim);width:9px;display:inline-block;transition:transform .12s}
+  .secname .lbl{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .wbar{display:flex;align-items:center;gap:6px;padding:8px 10px;min-width:120px}
+  .wbar .cnt{font-size:10px;color:var(--dim);width:20px}
+  .wbar .cnt.d{text-align:right;color:var(--down)} .wbar .cnt.u{color:var(--up)}
+  .wbar .track{flex:1;height:7px;border-radius:3px;overflow:hidden;display:flex;background:#0a0e13}
+  .wbar .rd{background:var(--down);opacity:.85} .wbar .gr{background:var(--up);opacity:.85}
+  tr.stock{display:none} tr.stock.open{display:table-row}
+  tr.stock td.name-col .secname{padding-left:26px;font-weight:400;color:var(--dim)}
+  tr.stock td.name-col .tk{color:var(--dim2);font-size:10px;margin-left:auto;padding-left:8px}
+  tr.stock:hover td{filter:brightness(1.12)}
+  td.cell{color:#dfe8f0;text-align:right;padding:6px 8px}
+  .wt{color:var(--dim);font-size:11px}
+  footer{color:var(--dim2);font-family:var(--mono);font-size:11px;margin-top:14px;line-height:1.6}
+  .pill{display:inline-block;padding:1px 6px;border:1px solid var(--line);border-radius:4px;color:var(--dim);font-size:10px}
+  @media (max-width:640px){ .name-col{min-width:150px} td.num{font-size:11px;padding:5px 6px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <span class="brand"><b>◧</b> SECTORAL&nbsp;HEATMAP</span>
+    <span class="meta" id="meta">—</span>
+    <span class="spacer"></span>
+    <div class="controls">
+      <input type="search" id="q" placeholder="filter sector / stock…" autocomplete="off">
+      <button class="btn" id="expandAll">expand all</button>
+      <button class="btn" id="refresh">↻ refresh</button>
+    </div>
+  </header>
+
+  <!-- non-blocking banner: shown when a manual refresh fails but data is already on screen -->
+  <div class="banner warn" id="banner">
+    <span id="bannerMsg"></span>
+    <span class="b-act"><button class="btn" id="bannerRetry">retry</button></span>
+  </div>
+
+  <!-- loading state -->
+  <div class="state loading" id="loading">
+    <div class="glyph spin">↻</div>
+    <h2>Fetching live data…</h2>
+    <p>Pulling <code>data.json</code></p>
+  </div>
+
+  <!-- full error state: no data to show -->
+  <div class="state error" id="error">
+    <div class="glyph">⚠</div>
+    <h2>No live data</h2>
+    <p id="errMsg">Couldn't reach <code>data.json</code>.</p>
+    <p><button class="btn" id="errRetry" style="margin-top:8px">↻ try again</button></p>
+    <div class="why" id="errWhy"></div>
+  </div>
+
+  <div class="scroll" id="scroll">
+    <table id="tbl"><thead><tr id="head"></tr></thead><tbody id="body"></tbody></table>
+  </div>
+
+  <footer>
+    <span class="pill">breadth</span> left/right = constituents down / up on the sorted horizon.
+    &nbsp;·&nbsp; <span class="pill">ltp vs 52wh</span> distance below 52-week high.
+    &nbsp;·&nbsp; click a header to sort · click a sector to expand.
+  </footer>
+</div>
+
+<script>
+const COLNAMES={ltp52:"LTP vs 52WH","1D":"1D","1M":"1M","3M":"3M","6M":"6M","1Y":"1Y","2Y":"2Y","3Y":"3Y","5Y":"5Y"};
+const CLAMP={ltp52:.5,"1D":.03,"1M":.10,"3M":.20,"6M":.30,"1Y":.50,"2Y":.60,"3Y":.80,"5Y":1.0};
+let DATA=null, COLS=[], sortKey="1D", sortDir=-1, expanded=new Set(), allOpen=false;
+
+const $=id=>document.getElementById(id);
+function pct(v){ if(v===null||v===undefined) return "–"; return (v>=0?"+":"")+(v*100).toFixed(1)+"%"; }
+function cellBg(v,key){ if(v===null||v===undefined) return "transparent";
+  let c=CLAMP[key]||.3, t=Math.max(-1,Math.min(1,v/c));
+  if(Math.abs(t)<0.02) return "transparent";
+  let ease=Math.pow(Math.abs(t),0.72), base=[17,24,32];
+  let col=t>0?[47,165,116]:[216,87,87];
+  let m=base.map((b,i)=>Math.round(b+(col[i]-b)*ease*0.9));
+  return `rgb(${m[0]},${m[1]},${m[2]})`; }
+function txtColor(v,key){ if(v===null||v===undefined) return "var(--dim2)";
+  let a=Math.abs(Math.max(-1,Math.min(1,v/(CLAMP[key]||.3)))); return a>0.35?"#f4f9fc":"#cdd8e2"; }
+
+function buildHead(){ const tr=$("head"); tr.innerHTML="";
+  const a=document.createElement("th"); a.className="name-col"; a.textContent="Sector / Constituent"; tr.appendChild(a);
+  const b=document.createElement("th"); b.className="name-col"; b.style.minWidth="130px"; b.textContent="Breadth"; tr.appendChild(b);
+  COLS.forEach(k=>{ const th=document.createElement("th"); th.className="num"+(k===sortKey?" sorted":"");
+    th.innerHTML=COLNAMES[k]+(k===sortKey?` <span class="car">${sortDir<0?"▼":"▲"}</span>`:"");
+    th.onclick=()=>{ if(sortKey===k) sortDir*=-1; else{sortKey=k;sortDir=-1;} render(); }; tr.appendChild(th); }); }
+
+function render(){
+  if(!DATA) return;
+  buildHead();
+  const q=($("q").value||"").toLowerCase().trim(), body=$("body"); body.innerHTML="";
+  let secs=[...DATA.sectors].sort((a,b)=>{ let av=a.agg[sortKey],bv=b.agg[sortKey];
+    if(av==null) av=-Infinity*sortDir; if(bv==null) bv=-Infinity*sortDir; return (av-bv)*sortDir; });
+  let shown=0;
+  for(const s of secs){
+    const secMatch=s.sector.toLowerCase().includes(q);
+    const ms=q?s.stocks.filter(x=>x.name.toLowerCase().includes(q)||(x.ticker||"").toLowerCase().includes(q)):s.stocks;
+    if(q && !secMatch && ms.length===0) continue; shown++;
+    const open=allOpen||expanded.has(s.sector)||(q&&ms.length>0&&!secMatch);
+    const tr=document.createElement("tr"); tr.className="sector";
+    const total=s.up+s.down, upPct=total?(s.up/total*100):50;
+    let c=`<td class="name-col"><div class="secname">
+      <span class="car0" style="transform:rotate(${open?90:0}deg)">▶</span>
+      <span class="lbl">${s.sector.replace(/^TJI\s*/,'')}</span></div></td>
+      <td class="name-col"><div class="wbar"><span class="cnt d">${s.down}</span>
+      <span class="track"><span class="rd" style="width:${100-upPct}%"></span><span class="gr" style="width:${upPct}%"></span></span>
+      <span class="cnt u">${s.up}</span></div></td>`;
+    for(const k of COLS){ const v=s.agg[k]; c+=`<td class="cell num" style="background:${cellBg(v,k)};color:${txtColor(v,k)}">${pct(v)}</td>`; }
+    tr.innerHTML=c; tr.onclick=()=>{ expanded.has(s.sector)?expanded.delete(s.sector):expanded.add(s.sector); render(); };
+    body.appendChild(tr);
+    const list=q&&!secMatch?ms:s.stocks;
+    for(const st of list){ const trs=document.createElement("tr"); trs.className="stock"+(open?" open":"");
+      let cc=`<td class="name-col"><div class="secname"><span class="lbl">${st.name}</span><span class="tk">${st.ticker||""}</span></div></td>
+        <td class="name-col"><div class="wbar"><span class="wt">${st.weight!=null?(st.weight*100).toFixed(1)+"%":""}</span></div></td>`;
+      for(const k of COLS){ const v=st.vals[k]; cc+=`<td class="cell num" style="background:${cellBg(v,k)};color:${txtColor(v,k)}">${pct(v)}</td>`; }
+      trs.innerHTML=cc; body.appendChild(trs); }
+  }
+  const live=DATA.source!=="snapshot";
+  $("meta").innerHTML=`<span class="${live?'live':'snap'}">${live?'● live':'■ bundled snapshot'}</span> · ${DATA.generated_at} · ${shown} sectors`;
+  // amber note only if the served file is the bundled seed (not a real live pull)
+  if(!live) showBanner("warn","Serving the bundled snapshot — run the refresh job for live prices.");
+}
+
+let lastLoadedAt=null;
+function showState(which){ ["loading","error","scroll","banner"].forEach(id=>$(id).classList.remove("show")); if(which) $(which).classList.add("show"); }
+function showBanner(kind,msg){ const b=$("banner"); b.className="banner "+kind+" show"; $("bannerMsg").textContent=msg; }
+function hideBanner(){ $("banner").classList.remove("show"); }
+
+async function load(isManual){
+  const btn=$("refresh"); btn.disabled=true; const prev=btn.textContent; btn.textContent="↻ …";
+  const haveData = !!DATA;
+  if(!haveData) showState("loading");
+  try{
+    const r=await fetch("data.json?_="+Date.now(),{cache:"no-store"});
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    const j=await r.json();
+    if(!j || !Array.isArray(j.sectors)) throw new Error("malformed data.json");
+    DATA=j; COLS=j.columns; lastLoadedAt=new Date();
+    hideBanner(); showState("scroll"); render();
+  }catch(e){
+    if(haveData){
+      // data already on screen: never silently keep stale — flag it loudly, keep showing what we had
+      showState("scroll");
+      showBanner("err",`Refresh failed (${e.message}) at ${new Date().toLocaleTimeString()}. Showing data from ${lastLoadedAt?lastLoadedAt.toLocaleTimeString():'previous load'}.`);
+    }else{
+      // nothing to show: hard error, no stale fallback
+      $("errMsg").innerHTML=`Couldn't load <code>data.json</code> — <b>${e.message}</b>.`;
+      $("errWhy").innerHTML=
+        `likely cause:<br>`+
+        `• opened via <code>file://</code> — browsers block fetch there. Serve over http (<code>python -m http.server</code>) or GitHub Pages.<br>`+
+        `• <code>data.json</code> not generated yet — run <code>python build_heatmap.py</code>, or trigger the GitHub Action.<br>`+
+        `• no network connection.`;
+      showState("error");
+    }
+  }finally{ btn.disabled=false; btn.textContent=prev; }
+}
+
+$("q").oninput=render;
+$("expandAll").onclick=e=>{ allOpen=!allOpen; e.target.textContent=allOpen?"collapse all":"expand all"; render(); };
+$("refresh").onclick=()=>load(true);
+$("errRetry").onclick=()=>load(false);
+$("bannerRetry").onclick=()=>load(true);
+load(false);
+</script>
+</body>
+</html>
