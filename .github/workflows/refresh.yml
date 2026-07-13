@@ -1,7 +1,10 @@
 name: refresh-heatmap
 on:
   schedule:
-    - cron: "20 10 * * 1-5"
+    # NSE trading hours are 09:15-15:30 IST (UTC+5:30) on weekdays.
+    # Hourly at :15 IST from 09:15 to 15:15 (03:45-09:45 UTC), plus a close snapshot at 15:30 IST (10:00 UTC).
+    - cron: "45 3-9 * * 1-5"
+    - cron: "0 10 * * 1-5"
   workflow_dispatch:
 permissions:
   contents: write
