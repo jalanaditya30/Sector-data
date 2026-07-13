@@ -29,12 +29,53 @@ SUFFIX = ".NS"        # NSE on Yahoo
 # Yahoo expects. Map config-ticker -> Yahoo NSE symbol (without .NS suffix).
 # Add an entry here whenever a stock is stuck on stale snapshot data because
 # "<ticker>.NS" 404s on Yahoo. Verify at finance.yahoo.com/quote/<SYMBOL>.NS
+#
+# These were surfaced by validate_symbols.py. Each maps a Tijori code to the
+# current NSE symbol on Yahoo (renames / brand-vs-legal-name mismatches).
 SYMBOL_OVERRIDES = {
-    "EMS": "EMSLIMITED",
+    "EMS":         "EMSLIMITED",   # EMS Ltd
+    "MACROTECH":   "LODHA",        # Macrotech Developers -> Lodha
+    "VIL":         "IDEA",         # Vodafone Idea
+    "GAVL":        "GODREJAGRO",   # Godrej Agrovet
+    "GMDC":        "GMDCLTD",      # Gujarat Mineral Development Corp
+    "CARE":        "CARERATING",   # CARE Ratings
+    "SAMMAAN":     "SAMMAANCAP",   # Sammaan Capital (ex-Indiabulls Housing)
+    "MUTHOTCAP":   "MUTHOOTCAP",   # Muthoot Capital Services
+    "PRISMJOHN":   "PRSMJOHNSN",   # Prism Johnson
+    "GALAXY":      "GALAXYSURF",   # Galaxy Surfactants
+    "DLINK":       "DLINKINDIA",   # D-Link India
+    "EASEMYTRP":   "EASEMYTRIP",   # Easy Trip Planners
+    "HAPPISTMND":  "HAPPSTMNDS",   # Happiest Minds Technologies
+    "SURAYROSHNI": "SURYAROSNI",   # Surya Roshni (Tijori typo + NSE spelling)
+    "DAAWAT":      "LTFOODS",      # LT Foods (Daawat brand)
+    "FORBESLTD":   "FORBESCO",     # Forbes & Company
+    "WAAREE":      "WAAREEENER",   # Waaree Energies
 }
 
-def ysymbol(t):
-    return SYMBOL_OVERRIDES.get(t, t) + SUFFIX
+# Constituents that have been DELISTED / MERGED and have no live Yahoo symbol
+# any more (insolvency, absorbed into another listed entity). These will stay
+# on their bundled snapshot no matter what and are candidates to prune from
+# sectors_config.json. Listed here for reference only — not queried differently.
+DELISTED = {
+    "RELCAPITAL",  # Reliance Capital — insolvency, delisted
+    "SREINFRA",    # SREI Infrastructure Finance — insolvency, delisted
+    "SICAL",       # Sical Logistics — insolvency
+    "JPASSOCIAT",  # Jaiprakash Associates — insolvency, suspended
+    "CIGNITITEC",  # Cigniti Technologies — acquired by Coforge, delisted
+    "SHRIRAMCIT",  # Shriram City Union — merged into Shriram Finance
+    "UJJIVAN",     # Ujjivan Financial — merged into Ujjivan SFB (UJJIVANSFB)
+    "EQUITAS",     # Equitas Holdings — merged into Equitas SFB (EQUITASBNK)
+    "SANGHIIND",   # Sanghi Industries — merged into Ambuja Cements
+    "UDAICEMENT",  # Udaipur Cement — merged into JK Cement
+}
+
+SUFFIXES = (".NS", ".BO")     # Yahoo exchanges to try: NSE first, then BSE
+
+def ybase(t):
+    return SYMBOL_OVERRIDES.get(t, t)
+
+def ysymbol(t, suffix=SUFFIX):
+    return ybase(t) + suffix
 
 def load_config(path="sectors_config.json"):
     return json.load(open(path))
@@ -63,13 +104,11 @@ def ret_asof(closes, days_back, today):
     if prev == 0 or pd.isna(prev) or pd.isna(last): return None
     return float(last / prev - 1.0)
 
-def fetch(tickers):
-    """returns {ticker: pandas Series of Close indexed by date}"""
-    data = {}
-    ymap = {t: ysymbol(t) for t in tickers}     # config ticker -> Yahoo symbol
+def _fetch_pass(tickers, suffix, data):
+    """download `tickers` on one exchange suffix; fill resolved series into data"""
     for i in range(0, len(tickers), CHUNK):
         chunk = tickers[i:i+CHUNK]
-        batch = [ymap[t] for t in chunk]
+        batch = [ybase(t) + suffix for t in chunk]
         for attempt in range(3):
             try:
                 df = yf.download(batch, period="5y", interval="1d",
@@ -77,12 +116,12 @@ def fetch(tickers):
                                  progress=False, threads=True)
                 break
             except Exception as e:
-                print(f"  batch {i} retry {attempt}: {e}", file=sys.stderr)
+                print(f"  {suffix} batch {i} retry {attempt}: {e}", file=sys.stderr)
                 time.sleep(3)
         else:
             continue
         for t in chunk:
-            yn = ymap[t]
+            yn = ybase(t) + suffix
             try:
                 col = df[yn]["Close"] if len(batch) > 1 else df["Close"]
                 col = col.dropna()
@@ -90,8 +129,19 @@ def fetch(tickers):
                 if len(col): data[t] = col
             except Exception:
                 pass
-        print(f"  fetched {min(i+CHUNK,len(tickers))}/{len(tickers)}", file=sys.stderr)
+        print(f"  {suffix} fetched {min(i+CHUNK,len(tickers))}/{len(tickers)}", file=sys.stderr)
         time.sleep(1)
+
+def fetch(tickers):
+    """returns {ticker: pandas Series of Close}. Tries NSE, then BSE for the
+    misses (many Tijori small/microcaps are BSE-only)."""
+    data = {}
+    remaining = list(tickers)
+    for suffix in SUFFIXES:
+        if not remaining: break
+        print(f"exchange {suffix}: {len(remaining)} tickers", file=sys.stderr)
+        _fetch_pass(remaining, suffix, data)
+        remaining = [t for t in remaining if t not in data]
     return data
 
 def compute_stock(closes, today):
