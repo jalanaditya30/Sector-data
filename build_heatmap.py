@@ -29,8 +29,44 @@ SUFFIX = ".NS"        # NSE on Yahoo
 # Yahoo expects. Map config-ticker -> Yahoo NSE symbol (without .NS suffix).
 # Add an entry here whenever a stock is stuck on stale snapshot data because
 # "<ticker>.NS" 404s on Yahoo. Verify at finance.yahoo.com/quote/<SYMBOL>.NS
+#
+# These were surfaced by validate_symbols.py. Each maps a Tijori code to the
+# current NSE symbol on Yahoo (renames / brand-vs-legal-name mismatches).
 SYMBOL_OVERRIDES = {
-    "EMS": "EMSLIMITED",
+    "EMS":         "EMSLIMITED",   # EMS Ltd
+    "MACROTECH":   "LODHA",        # Macrotech Developers -> Lodha
+    "VIL":         "IDEA",         # Vodafone Idea
+    "GAVL":        "GODREJAGRO",   # Godrej Agrovet
+    "GMDC":        "GMDCLTD",      # Gujarat Mineral Development Corp
+    "CARE":        "CARERATING",   # CARE Ratings
+    "SAMMAAN":     "SAMMAANCAP",   # Sammaan Capital (ex-Indiabulls Housing)
+    "MUTHOTCAP":   "MUTHOOTCAP",   # Muthoot Capital Services
+    "PRISMJOHN":   "PRSMJOHNSN",   # Prism Johnson
+    "GALAXY":      "GALAXYSURF",   # Galaxy Surfactants
+    "DLINK":       "DLINKINDIA",   # D-Link India
+    "EASEMYTRP":   "EASEMYTRIP",   # Easy Trip Planners
+    "HAPPISTMND":  "HAPPSTMNDS",   # Happiest Minds Technologies
+    "SURAYROSHNI": "SURYAROSNI",   # Surya Roshni (Tijori typo + NSE spelling)
+    "DAAWAT":      "LTFOODS",      # LT Foods (Daawat brand)
+    "FORBESLTD":   "FORBESCO",     # Forbes & Company
+    "WAAREE":      "WAAREEENER",   # Waaree Energies
+}
+
+# Constituents that have been DELISTED / MERGED and have no live Yahoo symbol
+# any more (insolvency, absorbed into another listed entity). These will stay
+# on their bundled snapshot no matter what and are candidates to prune from
+# sectors_config.json. Listed here for reference only — not queried differently.
+DELISTED = {
+    "RELCAPITAL",  # Reliance Capital — insolvency, delisted
+    "SREINFRA",    # SREI Infrastructure Finance — insolvency, delisted
+    "SICAL",       # Sical Logistics — insolvency
+    "JPASSOCIAT",  # Jaiprakash Associates — insolvency, suspended
+    "CIGNITITEC",  # Cigniti Technologies — acquired by Coforge, delisted
+    "SHRIRAMCIT",  # Shriram City Union — merged into Shriram Finance
+    "UJJIVAN",     # Ujjivan Financial — merged into Ujjivan SFB (UJJIVANSFB)
+    "EQUITAS",     # Equitas Holdings — merged into Equitas SFB (EQUITASBNK)
+    "SANGHIIND",   # Sanghi Industries — merged into Ambuja Cements
+    "UDAICEMENT",  # Udaipur Cement — merged into JK Cement
 }
 
 def ysymbol(t):
