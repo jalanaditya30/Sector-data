@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sectoral Heatmap · NSE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#0b0f14; --panel:#111820; --panel2:#0e141b; --line:#1e2833;
@@ -194,7 +197,7 @@ function render(){
       trs.innerHTML=cc; body.appendChild(trs); }
   }
   const live=DATA.source!=="snapshot";
-  $("meta").innerHTML=`<span class="${live?'live':'snap'}">${live?'● live':'■ bundled snapshot'}</span> · ${DATA.generated_at} · ${shown} sectors`;
+  $("meta").innerHTML=`<span class="${live?'live':'snap'}">${live?'● live':'■ bundled snapshot'}</span> · <b>Last updated:</b> ${DATA.generated_at} · ${shown} sectors`;
   // amber note only if the served file is the bundled seed (not a real live pull)
   if(!live) showBanner("warn","Serving the bundled snapshot — run the refresh job for live prices.");
 }

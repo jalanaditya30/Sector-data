@@ -11,8 +11,11 @@ Run:  python build_heatmap.py
 Out:  data.json   (consumed by index.html)
 """
 import json, time, sys, datetime as dt
+from zoneinfo import ZoneInfo
 import pandas as pd
 import yfinance as yf
+
+IST = ZoneInfo("Asia/Kolkata")
 
 HORIZONS = {          # calendar-day lookback per column
     "1D": 1, "1M": 30, "3M": 91, "6M": 182,
@@ -126,7 +129,7 @@ def main():
                             "up": up, "down": down, "n": len(rows), "stocks": rows})
 
     data = {
-        "generated_at": dt.datetime.now().strftime("%Y-%m-%d %H:%M IST") + " · yfinance EOD/delayed",
+        "generated_at": dt.datetime.now(IST).strftime("%Y-%m-%d %H:%M IST") + " · yfinance EOD/delayed",
         "source": "yfinance",
         "columns": COLS,
         "missing": missing,
