@@ -10,7 +10,7 @@ Constituents: sectors_config.json  (extracted from the Tijori export;
 Run:  python build_heatmap.py
 Out:  data.json   (consumed by index.html)
 """
-import json, time, sys, datetime as dt
+import json, math, time, sys, datetime as dt
 from zoneinfo import ZoneInfo
 import pandas as pd
 import yfinance as yf
@@ -70,6 +70,10 @@ DELISTED = {
 }
 
 SUFFIXES = (".NS", ".BO")     # Yahoo exchanges to try: NSE first, then BSE
+STALE_DAYS = 10               # series whose last close is older than this are
+                              # treated as unresolved (delisted names on BSE
+                              # keep old history; a "1D" between two 2023
+                              # closes must not masquerade as live data)
 
 def ybase(t):
     return SYMBOL_OVERRIDES.get(t, t)
@@ -123,7 +127,10 @@ def _fetch_pass(tickers, suffix, data):
         for t in chunk:
             yn = ybase(t) + suffix
             try:
-                col = df[yn]["Close"] if len(batch) > 1 else df["Close"]
+                # yfinance returns MultiIndex columns or flat columns depending
+                # on version/input shape — detect, don't guess from batch size
+                col = df[yn]["Close"] if isinstance(df.columns, pd.MultiIndex) \
+                      else df["Close"]
                 col = col.dropna()
                 col.index = pd.to_datetime(col.index).tz_localize(None)
                 if len(col): data[t] = col
@@ -146,17 +153,25 @@ def fetch(tickers):
 
 def compute_stock(closes, today):
     vals = {k: ret_asof(closes, d, today) for k, d in HORIZONS.items()}
-    hi = float(closes[closes.index >= pd.Timestamp(today - dt.timedelta(days=365))].max()) \
-         if len(closes) else None
-    last = float(closes.iloc[-1]) if len(closes) else None
+    # 52w high: window can be empty (history that stops >1y ago) and .max()
+    # of an empty series is NaN — NaN is truthy, and one NaN in the output
+    # makes data.json invalid JSON and blanks the whole page. Guard it.
+    hi = last = None
+    if len(closes):
+        w = closes[closes.index >= pd.Timestamp(today - dt.timedelta(days=365))]
+        if len(w):
+            m = w.max()
+            if not pd.isna(m): hi = float(m)
+        if not pd.isna(closes.iloc[-1]): last = float(closes.iloc[-1])
     vals["ltp52"] = (last / hi - 1.0) if (hi and last and hi > 0) else None
     return vals
 
 def wavg(pairs):
-    """weighted average over (value, weight) skipping None; renormalise"""
+    """weighted average over (value, weight) skipping None/non-finite; renormalise"""
     num = den = 0.0
     for v, w in pairs:
         if v is None or w is None: continue
+        if not (math.isfinite(v) and math.isfinite(w)): continue
         num += v * w; den += w
     return (num / den) if den > 0 else None
 
@@ -165,7 +180,16 @@ def main():
     tickers = all_tickers(cfg)
     print(f"tickers: {len(tickers)}", file=sys.stderr)
     prices = fetch(tickers)
-    today = dt.date.today()
+    today = dt.datetime.now(IST).date()
+    # drop series that stopped trading (delisted names resolved on BSE with
+    # years-old history) — they must fall back to snapshot + stale flag, not
+    # present ancient closes as live returns
+    cutoff = pd.Timestamp(today - dt.timedelta(days=STALE_DAYS))
+    dead = [t for t, s in prices.items() if s.index[-1] < cutoff]
+    for t in dead: del prices[t]
+    if dead:
+        print(f"dropped {len(dead)} dead series (last close >{STALE_DAYS}d old): "
+              f"{', '.join(sorted(dead)[:15])}{'…' if len(dead) > 15 else ''}", file=sys.stderr)
     missing = [t for t in tickers if t not in prices]
     print(f"resolved {len(prices)}/{len(tickers)}  missing:{len(missing)}", file=sys.stderr)
 
@@ -199,7 +223,9 @@ def main():
         "missing": missing,
         "sectors": out_sectors,
     }
-    json.dump(data, open("data.json", "w"), separators=(",", ":"))
+    # allow_nan=False: if a NaN ever slips through the guards above, fail the
+    # job loudly here instead of publishing invalid JSON that blanks the site
+    json.dump(data, open("data.json", "w"), separators=(",", ":"), allow_nan=False)
     print(f"wrote data.json  ({len(out_sectors)} sectors, {len(missing)} tickers unresolved)")
 
 if __name__ == "__main__":
