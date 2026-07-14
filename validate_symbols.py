@@ -31,10 +31,12 @@ def resolved_in_batch(tickers, suffix):
     except Exception as e:
         print(f"  batch error: {e}", file=sys.stderr)
         return ok
+    import pandas as pd
     for t in tickers:
         yn = ybase(t) + suffix
         try:
-            col = (df[yn]["Close"] if len(batch) > 1 else df["Close"]).dropna()
+            col = (df[yn]["Close"] if isinstance(df.columns, pd.MultiIndex)
+                   else df["Close"]).dropna()
             if len(col): ok.add(t)
         except Exception:
             pass

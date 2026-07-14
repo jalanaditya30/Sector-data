@@ -177,7 +177,8 @@ function render(){
   buildHead();
   const q=($("q").value||"").toLowerCase().trim(), body=$("body"); body.innerHTML="";
   let secs=[...DATA.sectors].sort((a,b)=>{ let av=a.agg[sortKey],bv=b.agg[sortKey];
-    if(av==null) av=-Infinity*sortDir; if(bv==null) bv=-Infinity*sortDir; return (av-bv)*sortDir; });
+    // sectors with no data always sort LAST regardless of direction
+    if(av==null) av=Infinity*sortDir; if(bv==null) bv=Infinity*sortDir; return (av-bv)*sortDir; });
   let shown=0;
   for(const s of secs){
     const secMatch=s.sector.toLowerCase().includes(q);
@@ -249,6 +250,15 @@ $("refresh").onclick=()=>load(true);
 $("errRetry").onclick=()=>load(false);
 $("bannerRetry").onclick=()=>load(true);
 load(false);
+
+// auto-refresh: the bot commits fresh data.json hourly during market hours,
+// so re-pull every 10 min while the tab is visible, and immediately when the
+// tab regains focus after being away >5 min. Otherwise an open tab would show
+// the first load's numbers forever.
+setInterval(()=>{ if(!document.hidden) load(false); }, 10*60*1000);
+document.addEventListener("visibilitychange", ()=>{
+  if(!document.hidden && lastLoadedAt && Date.now()-lastLoadedAt.getTime()>5*60*1000) load(false);
+});
 </script>
 </body>
 </html>
