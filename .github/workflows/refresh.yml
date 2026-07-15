@@ -10,6 +10,12 @@ on:
     - cron: "50 3-9 * * 1-5"    # 09:20-15:20 IST
     - cron: "5 4-10 * * 1-5"    # 09:35-15:35 IST
   workflow_dispatch:
+  # external pinger hook: POST https://api.github.com/repos/<owner>/<repo>/dispatches
+  # with body {"event_type":"refresh"} and a PAT that has contents:write.
+  # Lets a free scheduler like cron-job.org guarantee hourly refreshes even
+  # when GitHub's own cron skips a slot.
+  repository_dispatch:
+    types: [refresh]
 permissions:
   contents: write
 # never let two refreshes run at once — overlapping runs race on git push
