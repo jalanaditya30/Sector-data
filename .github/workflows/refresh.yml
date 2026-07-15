@@ -1,10 +1,14 @@
 name: refresh-heatmap
 on:
   schedule:
-    # Hourly at :35 IST from 09:35 to 15:35 on weekdays (IST = UTC+5:30, so
-    # 04:05-10:05 UTC). GitHub queues cron in UTC and may delay a run by
-    # 5-15 min under load, so treat these as "on/around" times, not exact.
-    - cron: "5 4-10 * * 1-5"
+    # Target: hourly refresh 09:35-15:35 IST on weekdays (IST = UTC+5:30).
+    # GitHub's scheduler is best-effort and skips individual slots outright
+    # (observed ~50-75% skip rate on this repo), so schedule TWO independent
+    # slots per hour — :20 and :35 IST — to raise the odds that every hour
+    # gets at least one refresh. Runs are idempotent and serialized by the
+    # concurrency group below, so a double-fire is harmless.
+    - cron: "50 3-9 * * 1-5"    # 09:20-15:20 IST
+    - cron: "5 4-10 * * 1-5"    # 09:35-15:35 IST
   workflow_dispatch:
 permissions:
   contents: write
