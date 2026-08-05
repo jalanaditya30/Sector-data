@@ -52,7 +52,7 @@ label.chk:hover{color:var(--ink)}
 .wrap{padding:18px 22px 48px}
 /* No overflow:hidden here either — it would also capture the sticky header.
    Corners are rounded on the corner cells instead of clipped. */
-table{border-collapse:separate;border-spacing:0;width:100%;min-width:880px;
+table{border-collapse:separate;border-spacing:0;width:100%;min-width:1080px;
   background:var(--card);border:1px solid var(--line);border-radius:12px;
   box-shadow:var(--shadow)}
 thead th:first-child{border-top-left-radius:11px}
@@ -75,11 +75,12 @@ tbody tr:nth-child(even){background:var(--zebra)}
 tbody tr:hover{background:var(--hover)}
 tbody tr:last-child td{border-bottom:none}
 .sym{font-weight:700;letter-spacing:.01em;font-size:13.5px}
-/* ticker kept alongside the company name — needed to act on a row */
-.tkr{margin-left:7px;font-size:10.5px;font-weight:600;letter-spacing:.05em;
-  color:var(--dim);background:var(--bg);border:1px solid var(--line);
-  padding:1px 5px;border-radius:4px;vertical-align:1px;
-  font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+/* relative volume: is the move backed by participation? */
+.rv{font-weight:700;font-variant-numeric:tabular-nums}
+.rv-hi{color:var(--accent)}
+.rv-mid{color:var(--dim)}
+.rv-lo{color:var(--faint)}
+.rv-na{color:var(--faint)}
 thead th:first-child,tbody td:first-child{min-width:305px;white-space:normal}
 td.price{font-weight:600}
 .pos{color:var(--up)} .neg{color:var(--down)} .zero{color:var(--faint)}
@@ -98,6 +99,7 @@ th[data-k=s5]{opacity:.62}
 .st-up{color:var(--up);background:var(--upsoft);border-color:#b9e3cd}
 .st-down{color:var(--down);background:var(--downsoft);border-color:#f6c9c4}
 .st-turn{color:#8a5a00;background:#fdf3dd;border-color:#efd9a4}
+.st-cool{color:var(--dim);background:var(--bg);border-color:var(--line2);font-style:italic}
 .st-flat{color:var(--dim);background:var(--bg);border-color:var(--line2)}
 
 /* flags */
@@ -106,7 +108,7 @@ th[data-k=s5]{opacity:.62}
   border:1px solid currentColor;opacity:.85}
 .f-gap{color:#8a5a00} .f-thin{color:var(--faint)}
 
-/* ---------- the 10-session bar chart ---------- */
+/* ---------- the 15-session bar chart ---------- */
 .spark{position:relative;display:flex;gap:3px;height:46px;align-items:stretch;
   width:max-content}
 /* one continuous band behind the most recent 5 sessions, not per-bar stripes */
@@ -115,7 +117,7 @@ th[data-k=s5]{opacity:.62}
 /* zero line sits above the band so it stays visible across the whole strip */
 .zline{position:absolute;left:0;right:0;top:calc(50% - .5px);height:1px;
   background:var(--line2);z-index:1}
-.col{position:relative;width:13px;z-index:2}
+.col{position:relative;width:11px;z-index:2}
 .col b{position:absolute;left:1px;right:1px;border-radius:2px}
 .col b.u{bottom:50%;background:var(--up)}
 .col b.d{top:50%;background:var(--down)}
@@ -153,7 +155,7 @@ th[data-k=s5]{opacity:.62}
 
 /* Below the table's natural width, allow horizontal scroll. The sticky header
    is released here because a scroll container would capture it anyway. */
-@media(max-width:940px){
+@media(max-width:1140px){
   .wrap{overflow-x:auto}
   th{position:static}
 }
@@ -186,14 +188,15 @@ th[data-k=s5]{opacity:.62}
   <thead><tr>
     <th class="l" data-k="name" data-label="company">company</th>
     <th data-k="last" data-label="price ₹">price ₹</th>
+    <th data-k="s15" data-label="15d score">15d score</th>
     <th data-k="s10" data-label="10d score">10d score</th>
     <th data-k="s5" data-label="5d score">5d score</th>
-    <th data-k="eff" data-label="consistency">consistency</th>
+    <th data-k="eff" data-label="consistency 15d">consistency 15d</th>
     <th class="l" data-k="state" data-label="state">state</th>
-    <th data-k="total" data-label="10d %">10d %</th>
-    <th data-k="max_dd" data-label="max dd">max dd</th>
+    <th data-k="total" data-label="15d %">15d %</th>
+    <th data-k="rvol" data-label="volume">volume</th>
     <th class="l nosort">
-      <div class="sparkhead"><span>last 10 sessions</span>
+      <div class="sparkhead"><span>last 15 sessions</span>
         <span class="sparkkey"><i class="kbar u"></i>up<i class="kbar d"></i>down</span>
       </div>
     </th>
@@ -205,8 +208,14 @@ th[data-k=s5]{opacity:.62}
   <h3>How to read this</h3>
   <p><b>Score</b> = annualised log drift × consistency², where <b>consistency</b> is the
      efficiency ratio (net move ÷ total distance travelled, 0–1). A high score means the
-     move was both meaningful <i>and</i> travelled in a straight line.</p>
-  <p><b>Last 10 sessions</b> — one bar per trading day, oldest on the left. Bars rise above
+     move was both meaningful <i>and</i> travelled in a straight line. The <b>15-session
+     window is the ranking window</b> and supplies the consistency shown; 10d and 5d are
+     confirmation only.</p>
+  <p><b>volume</b> — relative volume: median turnover of the last 5 sessions ÷ the 20
+     sessions before them. <b>Above 1.5×</b> money is arriving as the trend runs;
+     <b>below 0.8×</b> the move is happening on fading interest, which is the weaker
+     setup. A clean trend on shrinking volume deserves suspicion.</p>
+  <p><b>last 15 sessions</b> — one bar per trading day, oldest on the left. Bars rise above
      the centre line on up days and fall below it on down days; bar <b>height</b> is the size
      of that day's move (topping out around ±2.5%). The <b>shaded</b> block on the right is the
      most recent 5 sessions — the window that drives the <i>turning</i> call. Hover any bar
@@ -215,30 +224,37 @@ th[data-k=s5]{opacity:.62}
     <div><span class="state st-up">trending up</span> clean, established rise</div>
     <div><span class="state st-down">trending down</span> clean, established fall</div>
     <div><span class="state st-turn">turning up / down</span> last 5 sessions flipped hard</div>
+    <div><span class="state st-cool">cooling up / down</span> 15d intact, 10d rolled over</div>
     <div><span class="state st-flat">choppy</span> no consistent direction</div>
   </div>
   <p>The <b>5d score is dimmed on purpose</b> — five points cannot support a reliable ranking,
-     so it only feeds the turn call. <b>Sort on 10d score.</b> Flags:
+     so it only feeds the turn call. <b>Sort on 15d score.</b> Flags:
      <code>GAP</code> a single session moved &gt;15% · <code>THIN</code> median turnover
      under ₹1cr · <code>STALE</code> too many unchanged closes.</p>
+  <p><b>Treat consistency ≥ 0.75 as your real bar.</b> At 15 sessions the built-in 0.45 gate
+     still lets roughly 18% of pure noise through — about 130 of 752 names. At 0.75 that
+     falls to under 2%.</p>
 </div>
 
 <script>
-let DATA=null, sortKey="s10", sortDir=-1;
+let DATA=null, sortKey="s15", sortDir=-1;
 
 const cls  = v => v>0.001 ? "pos" : v<-0.001 ? "neg" : "zero";
 const w    = (r,n) => r.windows[n] ? r.windows[n].score : null;
-const eff  = r => r.windows["10"] ? r.windows["10"].eff : 0;
+const eff  = r => r.windows["15"] ? r.windows["15"].eff : 0;
 const fmt  = v => v===null ? "—" : v.toFixed(0);
 const sign = v => (v>0?"+":"") + v.toFixed(2);
 const rupee = v => v==null ? "—"
   : v.toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
 // rows scanned before names.csv existed have no `name` — fall back to the ticker
 const nameOf = r => r.name || r.symbol;
+// relative volume: >=1.5x money arriving, <=0.8x fading interest
+const rvolCls = v => v==null ? "rv-na" : v>=1.5 ? "rv-hi" : v<=0.8 ? "rv-lo" : "rv-mid";
 
 // map a state string to its pill class
 function stateCls(s){
   if(s.startsWith("turning")) return "st-turn";
+  if(s.startsWith("cooling")) return "st-cool";   // trend intact but middle leg rolled over
   if(s.endsWith("up"))   return "st-up";
   if(s.endsWith("down")) return "st-down";
   return "st-flat";
@@ -248,7 +264,7 @@ function stateCls(s){
 // Most NSE sessions move 0.5-2%, so saturate at 2.5% — a 4% cap left the
 // typical day as an unreadable stub.
 const CAP = 2.5;      // % move at which a bar reaches full height
-const CW = 13, CGAP = 3, SHORT_N = 5;   // must match .col width / .spark gap in CSS
+const CW = 11, CGAP = 3, SHORT_N = 5;   // must match .col width / .spark gap in CSS
 function strip(r){
   const n = r.daily.length;
   const bars = r.daily.map((v,i)=>{
@@ -290,8 +306,8 @@ function render(){
     (!q || r.symbol.includes(q) || nameOf(r).toUpperCase().includes(q))
     && !(noGap && r.gappy) && !(noThin && r.thin));
 
-  const key = r => ({s10:w(r,10), s5:w(r,5), eff:eff(r), name:nameOf(r)}[sortKey])
-                   ?? r[sortKey];
+  const key = r => ({s15:w(r,15), s10:w(r,10), s5:w(r,5), eff:eff(r),
+                     name:nameOf(r)}[sortKey]) ?? r[sortKey];
   rows.sort((a,b)=>{
     const x=key(a), y=key(b);
     if(typeof x==="string") return x.localeCompare(y)*sortDir*-1;
@@ -300,18 +316,20 @@ function render(){
 
   document.querySelector("tbody").innerHTML = rows.map(r=>`
     <tr>
-      <td class="l"><span class="sym">${nameOf(r)}</span><span class="tkr">${r.symbol}</span>${
+      <td class="l"><span class="sym">${nameOf(r)}</span>${
         r.gappy?'<span class="flag f-gap">GAP</span>':''}${
         r.thin?'<span class="flag f-thin">THIN</span>':''}${
         r.stale?'<span class="flag f-thin">STALE</span>':''}</td>
       <td class="price num">${rupee(r.last)}</td>
+      <td class="score num ${cls(w(r,15))}">${fmt(w(r,15))}</td>
       <td class="score num ${cls(w(r,10))}">${fmt(w(r,10))}</td>
       <td class="score num short ${cls(w(r,5))}">${fmt(w(r,5))}</td>
       <td><span class="meter"><span class="num">${eff(r).toFixed(2)}</span>
         <span class="mbar"><b style="width:${(eff(r)*100).toFixed(0)}%"></b></span></span></td>
       <td class="l"><span class="state ${stateCls(r.state)}">${r.state}</span></td>
       <td class="num ${cls(r.total)}">${sign(r.total)}</td>
-      <td class="num ${r.max_dd < -0.05 ? "neg" : "zero"}">${r.max_dd.toFixed(1)}</td>
+      <td class="num"><span class="rv ${rvolCls(r.rvol)}">${
+        r.rvol==null ? "—" : r.rvol.toFixed(2)+"×"}</span></td>
       <td class="l">${strip(r)}</td>
     </tr>`).join("");
 
@@ -321,15 +339,17 @@ function render(){
   // headline counts across everything scored, not just the filtered view
   const tally = DATA.rows.reduce((a,r)=>{
     if(r.state.startsWith("turning")) a.turn++;
+    else if(r.state.startsWith("cooling")) a.cool++;
     else if(r.state==="trending up") a.up++;
     else if(r.state==="trending down") a.down++;
     else a.chop++;
     return a;
-  },{up:0,down:0,turn:0,chop:0});
+  },{up:0,down:0,turn:0,cool:0,chop:0});
   document.getElementById("chips").innerHTML =
     `<span class="chip up">${tally.up} trending up</span>` +
     `<span class="chip down">${tally.down} trending down</span>` +
     `<span class="chip">${tally.turn} turning</span>` +
+    `<span class="chip">${tally.cool} cooling</span>` +
     `<span class="chip">${tally.chop} choppy</span>`;
 }
 
@@ -377,7 +397,7 @@ fetch("trend.json?t="+Date.now())
     document.getElementById("meta").textContent =
       `${d.windows.join("/")}-session windows · ${d.resolved}/${d.requested} resolved · ${built}`;
     // mark the default sort column
-    const th0 = document.querySelector('th[data-k="s10"]');
+    const th0 = document.querySelector('th[data-k="s15"]');
     th0.classList.add("sorted");
     th0.textContent = th0.dataset.label + " ↓";
     render();

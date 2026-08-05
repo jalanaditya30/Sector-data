@@ -11,9 +11,12 @@ Live at: https://jalanaditya30.github.io/Sector-data/trend/
     eff   = efficiency ratio: |net move| / sum(|daily moves|), 0..1
     score = drift x eff^2
 
-Computed over 10 and 5 sessions. Both inputs use a winsorised log path
-(daily moves capped at 6%); displayed moves are uncapped. The 10-session window
-is the trend and the sort key; the 5-session window is a short-term turn signal only.
+Computed over **15, 10 and 5 sessions**. Both inputs use a winsorised log path
+(daily moves capped at 6%); displayed moves are uncapped.
+
+The **15-session window** is the trend, supplies the consistency figure and is the
+sort key. The 10-session window is confirmation only (flags a trend that is cooling).
+The 5-session window flags a turn and is never a sort key.
 
 ## Why efficiency ratio, not R-squared
 
@@ -22,12 +25,18 @@ trials — and that false-positive rate does not decay with window length (any r
 walk regressed on time looks trendy). Efficiency ratio on identical input reads 0.16
 median, 0% above 0.8 at n=30.
 
-| n  | R2 noise (med / %>0.8) | ER noise (med / %>0.8) |
-|----|------|------|
-| 5  | 0.53 / 24.8% | 0.48 / 23.8% |
-| 14 | 0.45 / 15.7% | 0.24 / 1.3%  |
-| 30 | 0.44 / 14.5% | 0.16 / 0.0%  |
-| 60 | 0.43 / 14.5% | 0.11 / 0.0%  |
+Share of **driftless random walks** (pure noise, 20k trials) that clear the
+consistency gate — i.e. the false-positive rate, measured on the current code:
+
+| n  | eff median | % eff > 0.45 | % eff > 0.75 | false trends per 752 names @0.45 |
+|----|-----|-----|-----|-----|
+| 5  | 0.48 | 52.7% | 27.2% | ~396 |
+| 10 | 0.30 | 29.8% | 6.4%  | ~221 |
+| 15 | 0.24 | 18.3% | 1.7%  | ~134 |
+| 30 | 0.16 | 5.0%  | 0.1%  | ~38  |
+
+This is why 15 is the ranking window, and why **you should treat consistency ≥ 0.75
+as the real bar** rather than the built-in 0.45 gate.
 
 ## Why the 5-session column is dimmed
 
@@ -37,8 +46,9 @@ but is **not a sort key**; it feeds only the turn call in `state`.
 
 ## States
 
-`trending up/down` — established on the 10-session window
+`trending up/down` — established on the 15-session window
 `turning up/down` — established, but the 5-session window flipped sign with conviction
+`cooling up/down` — 15 sessions still intact, but the 10-session leg has rolled over
 `choppy` — consistency below 0.45, or no meaningful direction
 
 Gated on consistency, not score magnitude: a shallow but very clean decline is a
@@ -80,5 +90,16 @@ NSE's own, coverage thins on microcaps. Verify against NSE before acting on a nu
 
 ## Knobs (trend_scan.py)
 
-`WINDOWS` [10,5] · `RANK_WINDOW` 10 · `WINSOR_PCT` 6.0 · `GAP_FLAG_PCT` 15.0
-`MIN_TURNOVER_CR` 1.0 · `TREND_MIN_EFF` 0.45 · `TURN_MIN_SCORE` 25.0 · `BATCH` 40
+`WINDOWS` [15,10,5] · `RANK_WINDOW` 15 · `MID_WINDOW` 10 · `SHORT_WINDOW` 5
+`WINSOR_PCT` 6.0 · `GAP_FLAG_PCT` 15.0 · `MIN_TURNOVER_CR` 1.0 · `TREND_MIN_EFF` 0.45
+`TURN_MIN_SCORE` 25.0 · `RVOL_RECENT` 5 · `RVOL_BASE` 20 · `BATCH` 40
+
+## Volume
+
+`volume` is **relative volume**: median turnover of the last 5 sessions divided by the
+median of the 20 sessions before them. Turnover (price x volume), not share count, so it
+is comparable across stocks; medians so one block deal cannot set the level.
+
+Above **1.5x** money is arriving as the trend runs. Below **0.8x** the move is happening
+on fading interest — a clean trend on shrinking volume deserves suspicion. This is a
+confirmation column, not a filter: it never changes the score or the state.
