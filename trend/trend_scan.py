@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-trend_scan.py — ranks NSE stocks by trend quality across two lookback windows.
+trend_scan.py — ranks NSE stocks by trend quality across three lookback windows.
 
     drift = OLS slope of ln(close) on session number, x252x100  (annualised, log terms)
     eff   = efficiency ratio: |net move| / sum(|daily moves|), 0..1
@@ -15,9 +15,17 @@ does NOT decay with window length (spurious regression against time). Efficiency
 ratio on the same input reads 0.16 median with 0% above 0.8 at n=30. It also
 correctly zeroes an up-then-reverse path, which R-squared fits as a tidy line.
 
+Windows are 15 / 10 / 5 sessions. The 15-session window sets the trend, supplies
+the consistency figure and is the sort key; 10 flags a trend that is cooling; 5 flags
+a turn.
+
 Why the 5-session window is not rankable: at n=5 every consistency measure collapses
 (pure noise reads ~0.48, a real trend ~0.90). It is emitted as a direction/turn
-signal against the 10-session window, never as a sort key.
+signal only, never as a sort key.
+
+Measured on driftless random walks, the share of pure noise clearing the
+consistency gate falls sharply with window length: 53% at n=5, 30% at n=10,
+18% at n=15. That is why 15 is the ranking window.
 
 Data source: Yahoo Finance via yfinance (server-side, no CORS). EOD.
 Output     : trend.json
@@ -38,10 +46,15 @@ import yfinance as yf
 # Config
 # ----------------------------------------------------------------------------
 
-WINDOWS = [10, 5]          # sessions; first is the default ranking window
-RANK_WINDOW = 10
+WINDOWS = [15, 10, 5]      # sessions; first is the default ranking window
+RANK_WINDOW = 15           # sets the trend, the consistency shown, and the sort
+MID_WINDOW = 10            # confirmation only — flags a trend that is cooling
 SHORT_WINDOW = 5           # signal only, never a sort key
-FETCH_DAYS = "2mo"         # only need max(WINDOWS)+1 sessions; keep a holiday buffer
+# need max(WINDOWS)+1 closes for the fit and RVOL_RECENT+RVOL_BASE for volume
+FETCH_DAYS = "3mo"
+RVOL_RECENT = 5            # sessions in the "now" leg of relative volume
+RVOL_BASE = 20             # sessions in the baseline leg
+TURNOVER_LOOKBACK = 20     # sessions for the median turnover liquidity floor
 BENCHMARK = "^NSEI"
 WINSOR_PCT = 6.0           # daily cap applied before fitting (display stays raw)
 GAP_FLAG_PCT = 15.0        # single session beyond this = event, not trend
@@ -108,9 +121,35 @@ def window_stats(closes: np.ndarray, n: int):
     }
 
 
-def max_drawdown_pct(closes: np.ndarray) -> float:
-    peak = np.maximum.accumulate(closes)
-    return float(((closes / peak - 1.0).min()) * 100.0)
+def turnover_series(df: pd.DataFrame):
+    """Daily traded value in Rs crore, over the WHOLE frame passed in.
+
+    Turnover (price x volume), not share count: comparable across stocks and
+    unaffected by a share price that moved during the window.
+    """
+    if "Volume" not in df:
+        return None
+    tv = (df["Close"] * df["Volume"]).dropna()
+    return (tv / 1e7) if len(tv) else None
+
+
+def relative_volume(turnover):
+    """Is the move being backed by participation?
+
+        rvol = median turnover of the last RVOL_RECENT sessions
+             / median turnover of the RVOL_BASE sessions before those
+
+    Above ~1.5 means money is arriving as the trend runs; below ~0.8 means the
+    move is happening on fading interest, which is the weaker setup. Medians
+    (not means) so one block deal cannot set the level.
+    """
+    if turnover is None or len(turnover) < RVOL_RECENT + RVOL_BASE:
+        return None
+    recent = float(turnover.iloc[-RVOL_RECENT:].median())
+    base = float(turnover.iloc[-(RVOL_RECENT + RVOL_BASE):-RVOL_RECENT].median())
+    if base <= 0:
+        return None
+    return recent / base
 
 
 def classify(win: dict) -> str:
@@ -121,10 +160,13 @@ def classify(win: dict) -> str:
     |score| > 50 and wrongly called shallow-but-clean movers "choppy" — exactly the
     names a plain percent-change sort already buries, and the reason this tool exists.
 
-    The 10-session window sets the trend and is the sort key; the 5-session window is
-    used only for a sign flip with conviction (a "turn"), never as a rank.
+    The 15-session window sets the trend, supplies the consistency shown, and is the
+    sort key. The 5-session window can only flag a TURN (a recent flip with
+    conviction). The 10-session window sits between them and flags COOLING — the
+    trend is intact over 15 sessions but the middle leg has already rolled over.
     """
     lo = win.get(str(RANK_WINDOW))
+    mid = win.get(str(MID_WINDOW))
     sh = win.get(str(SHORT_WINDOW))
     if lo is None:
         return "no data"
@@ -135,6 +177,9 @@ def classify(win: dict) -> str:
 
     if sh is not None and abs(sh["score"]) > TURN_MIN_SCORE and (sh["score"] > 0) != up:
         return "turning up" if sh["score"] > 0 else "turning down"
+
+    if mid is not None and abs(mid["score"]) > TURN_MIN_SCORE and (mid["score"] > 0) != up:
+        return "cooling up" if up else "cooling down"
 
     return "trending up" if up else "trending down"
 
@@ -164,11 +209,13 @@ def analyse(symbol: str, df: pd.DataFrame, bench_ret: float | None,
     total = (closes[-1] / closes[0] - 1.0) * 100.0
     stale_frac = float((np.abs(daily) < 0.001).mean())
 
-    turnover_cr = None
-    if "Volume" in frame:
-        tv = (frame["Close"] * frame["Volume"]).dropna().tail(20)
-        if len(tv):
-            turnover_cr = float(tv.median()) / 1e7
+    # Volume is measured on the FULL history, not `frame`: the price windows only
+    # need 16 closes, but relative volume needs 25 sessions of baseline. Reading
+    # it off `frame` silently truncated the median to the window length.
+    turnover = turnover_series(df)
+    turnover_cr = (float(turnover.iloc[-TURNOVER_LOOKBACK:].median())
+                   if turnover is not None and len(turnover) else None)
+    rvol = relative_volume(turnover)
 
     up_days = int((daily > 0).sum())
     biggest = float(np.abs(daily).max())
@@ -183,10 +230,10 @@ def analyse(symbol: str, df: pd.DataFrame, bench_ret: float | None,
         "rel": round(total - bench_ret, 2) if bench_ret is not None else None,
         "up_days": up_days,
         "down_days": longest - up_days,
-        "max_dd": round(max_drawdown_pct(closes[1:]), 2),
         "biggest_move": round(biggest, 2),
         "gappy": bool(biggest > GAP_FLAG_PCT),
         "turnover_cr": round(turnover_cr, 2) if turnover_cr is not None else None,
+        "rvol": round(rvol, 2) if rvol is not None else None,
         "thin": bool(turnover_cr is not None and turnover_cr < MIN_TURNOVER_CR),
         "stale": bool(stale_frac > MAX_STALE_FRAC),
         "last": round(float(closes[-1]), 2),
@@ -268,14 +315,15 @@ def main():
         print("unresolved (fix the ticker or drop it):\n  " + ", ".join(failed))
 
     print("\n" + f"{'symbol':<15}" + "".join(f"{str(n)+'d':>8}" for n in WINDOWS) +
-          f"{'eff':>7}{'state':>15}  flags")
+          f"{'eff':>7}{'rvol':>7}{'state':>15}  flags")
     for r in rows:
         cells = "".join(f"{r['windows'][str(n)]['score']:>8.0f}"
                         if str(n) in r["windows"] else f"{'-':>8}" for n in WINDOWS)
         flags = " ".join(f for f, on in (("GAP", r["gappy"]), ("THIN", r["thin"]),
                                          ("STALE", r["stale"])) if on)
+        rv = f"{r['rvol']:>7.2f}" if r["rvol"] is not None else f"{'-':>7}"
         print(f"{r['symbol']:<15}{cells}{r['windows'][str(RANK_WINDOW)]['eff']:>7.2f}"
-              f"{r['state']:>15}  {flags}")
+              f"{rv}{r['state']:>15}  {flags}")
 
 
 if __name__ == "__main__":
