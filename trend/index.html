@@ -181,6 +181,7 @@ th[data-k=s5]{opacity:.62}
          aria-label="Filter by company name or ticker">
   <label class="chk"><input type="checkbox" id="hideGap" checked> hide gap-driven</label>
   <label class="chk"><input type="checkbox" id="hideThin" checked> hide illiquid</label>
+  <label class="chk" title="Keep only moves that diverge from the index: ahead of Nifty for an up-trend, behind it for a down-trend."><input type="checkbox" id="beatNifty" checked> beating nifty</label>
   <span class="meta" id="count"></span>
 </div>
 
@@ -227,13 +228,19 @@ th[data-k=s5]{opacity:.62}
     <div><span class="state st-cool">cooling up / down</span> 15d intact, 10d rolled over</div>
     <div><span class="state st-flat">choppy</span> no consistent direction</div>
   </div>
+  <p><b>beating nifty</b> — on by default. A stock can look like a clean trend while merely
+     riding the index. This keeps only moves that diverge from it: <b>ahead</b> of Nifty for an
+     up-trend, <b>behind</b> it for a down-trend. Hover any 15d % figure for that stock's
+     margin over the index. (Rows are kept if the index reading is unavailable.)</p>
   <p>The <b>5d score is dimmed on purpose</b> — five points cannot support a reliable ranking,
      so it only feeds the turn call. <b>Sort on 15d score.</b> Flags:
      <code>GAP</code> a single session moved &gt;15% · <code>THIN</code> median turnover
      under ₹1cr · <code>STALE</code> too many unchanged closes.</p>
-  <p><b>Treat consistency ≥ 0.75 as your real bar.</b> At 15 sessions the built-in 0.45 gate
-     still lets roughly 18% of pure noise through — about 130 of 752 names. At 0.75 that
-     falls to under 2%.</p>
+  <p><b>The consistency gate is 0.75.</b> It was 0.45, calibrated when the ranking window was
+     30 sessions; at 15 sessions that let roughly 18% of pure noise through — about 130 false
+     trend badges per 752 names. At 0.75 that falls to about 1.7%, roughly 12 names. The cost
+     is that some genuine but untidy trends now read <i>choppy</i> — the right trade for a
+     screen whose job is to narrow the list.</p>
 </div>
 
 <script>
@@ -248,6 +255,15 @@ const rupee = v => v==null ? "—"
   : v.toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
 // rows scanned before names.csv existed have no `name` — fall back to the ticker
 const nameOf = r => r.name || r.symbol;
+// Is the move stock-specific, or just the market carrying it? An up-trend has to be
+// ahead of Nifty; a down-trend has to be behind it. Rows with no benchmark reading
+// are kept — a failed index fetch must not silently empty the board.
+function beatsMarket(r){
+  if(r.rel==null) return true;
+  const s = w(r,15);
+  if(s==null || Math.abs(s) < 1e-9) return r.rel > 0;
+  return s > 0 ? r.rel > 0 : r.rel < 0;
+}
 // relative volume: >=1.5x money arriving, <=0.8x fading interest
 const rvolCls = v => v==null ? "rv-na" : v>=1.5 ? "rv-hi" : v<=0.8 ? "rv-lo" : "rv-mid";
 
@@ -300,11 +316,13 @@ function render(){
   const q = document.getElementById("q").value.trim().toUpperCase();
   const noGap = document.getElementById("hideGap").checked;
   const noThin = document.getElementById("hideThin").checked;
+  const beat = document.getElementById("beatNifty").checked;
 
   // match either the company name or the ticker, so both stay searchable
   let rows = DATA.rows.filter(r =>
     (!q || r.symbol.includes(q) || nameOf(r).toUpperCase().includes(q))
-    && !(noGap && r.gappy) && !(noThin && r.thin));
+    && !(noGap && r.gappy) && !(noThin && r.thin)
+    && !(beat && !beatsMarket(r)));
 
   const key = r => ({s15:w(r,15), s10:w(r,10), s5:w(r,5), eff:eff(r),
                      name:nameOf(r)}[sortKey]) ?? r[sortKey];
@@ -327,7 +345,8 @@ function render(){
       <td><span class="meter"><span class="num">${eff(r).toFixed(2)}</span>
         <span class="mbar"><b style="width:${(eff(r)*100).toFixed(0)}%"></b></span></span></td>
       <td class="l"><span class="state ${stateCls(r.state)}">${r.state}</span></td>
-      <td class="num ${cls(r.total)}">${sign(r.total)}</td>
+      <td class="num ${cls(r.total)}" title="${r.rel==null?"no benchmark"
+        :"vs Nifty "+sign(r.rel)+"%"}">${sign(r.total)}</td>
       <td class="num"><span class="rv ${rvolCls(r.rvol)}">${
         r.rvol==null ? "—" : r.rvol.toFixed(2)+"×"}</span></td>
       <td class="l">${strip(r)}</td>
@@ -365,7 +384,7 @@ document.querySelectorAll("th[data-k]").forEach(th=>{
     render();
   };
 });
-["q","hideGap","hideThin"].forEach(id=>{
+["q","hideGap","hideThin","beatNifty"].forEach(id=>{
   const el=document.getElementById(id);
   el.addEventListener(el.type==="checkbox"?"change":"input", render);
 });
@@ -395,7 +414,9 @@ fetch("trend.json?t="+Date.now())
     const built = d.generated ? `updated ${new Date(d.generated).toLocaleString()}`
                               : "seed — not yet refreshed";
     document.getElementById("meta").textContent =
-      `${d.windows.join("/")}-session windows · ${d.resolved}/${d.requested} resolved · ${built}`;
+      `${d.windows.join("/")}-session windows · ${d.resolved}/${d.requested} resolved`
+      + (d.benchmark_return!=null?` · nifty ${sign(d.benchmark_return)}%`:"")
+      + ` · ${built}`;
     // mark the default sort column
     const th0 = document.querySelector('th[data-k="s15"]');
     th0.classList.add("sorted");

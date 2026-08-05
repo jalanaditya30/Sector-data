@@ -35,8 +35,13 @@ consistency gate — i.e. the false-positive rate, measured on the current code:
 | 15 | 0.24 | 18.3% | 1.7%  | ~134 |
 | 30 | 0.16 | 5.0%  | 0.1%  | ~38  |
 
-This is why 15 is the ranking window, and why **you should treat consistency ≥ 0.75
-as the real bar** rather than the built-in 0.45 gate.
+This is why 15 is the ranking window, and why **`TREND_MIN_EFF` is 0.75**. It was
+0.45, calibrated back when the ranking window was 30 sessions. Measured on the
+current code with the 0.75 gate, **98.3% of pure noise is correctly called
+`choppy`** — only ~1.7% (about 12 of 752 names) still earns a trend label by luck,
+down from ~134. The cost is that some genuine but untidy trends now read `choppy`;
+that is the right trade for a screen whose job is to narrow the list. A clean move
+of even 0.3%/day still scores 76 with eff 1.00 and reads `trending up`.
 
 ## Why the 5-session column is dimmed
 
@@ -49,7 +54,7 @@ but is **not a sort key**; it feeds only the turn call in `state`.
 `trending up/down` — established on the 15-session window
 `turning up/down` — established, but the 5-session window flipped sign with conviction
 `cooling up/down` — 15 sessions still intact, but the 10-session leg has rolled over
-`choppy` — consistency below 0.45, or no meaningful direction
+`choppy` — consistency below 0.75, or no meaningful direction
 
 Gated on consistency, not score magnitude: a shallow but very clean decline is a
 trend, and is exactly what a percent-change sort buries.
@@ -91,7 +96,7 @@ NSE's own, coverage thins on microcaps. Verify against NSE before acting on a nu
 ## Knobs (trend_scan.py)
 
 `WINDOWS` [15,10,5] · `RANK_WINDOW` 15 · `MID_WINDOW` 10 · `SHORT_WINDOW` 5
-`WINSOR_PCT` 6.0 · `GAP_FLAG_PCT` 15.0 · `MIN_TURNOVER_CR` 1.0 · `TREND_MIN_EFF` 0.45
+`WINSOR_PCT` 6.0 · `GAP_FLAG_PCT` 15.0 · `MIN_TURNOVER_CR` 1.0 · `TREND_MIN_EFF` 0.75
 `TURN_MIN_SCORE` 25.0 · `RVOL_RECENT` 5 · `RVOL_BASE` 20 · `BATCH` 40
 
 ## Volume
@@ -103,3 +108,19 @@ is comparable across stocks; medians so one block deal cannot set the level.
 Above **1.5x** money is arriving as the trend runs. Below **0.8x** the move is happening
 on fading interest — a clean trend on shrinking volume deserves suspicion. This is a
 confirmation column, not a filter: it never changes the score or the state.
+
+## Beating Nifty
+
+A stock can trace a flawless straight line and still be doing nothing the index is
+not already doing. The **beating nifty** filter (on by default) keeps only moves that
+diverge from the benchmark: **ahead** of Nifty for an up-trend, **behind** it for a
+down-trend. Hover any `15d %` figure to see that stock's margin over the index.
+
+`rel` in `trend.json` is the stock's 15-session return minus Nifty's over the same
+15 sessions. Rows with no benchmark reading are kept rather than dropped, so a failed
+index fetch cannot silently empty the board.
+
+Worked example: a stock climbing a clean 0.2%/day for 15 sessions is +3.0% with
+consistency 1.00 — it reads `trending up` and ranks well. But if Nifty did +4.5% over
+the same stretch, it *lagged the market*, and the filter removes it. That is beta, not
+a trend worth acting on.
