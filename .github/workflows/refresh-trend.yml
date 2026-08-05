@@ -3,13 +3,31 @@ name: refresh-trend
 # Independent of refresh-heatmap; both can run on the same repo.
 on:
   schedule:
-    - cron: "25 10 * * 1-5"   # ~15:55 IST, Mon-Fri (NSE closes 15:30 IST = 10:00 UTC)
+    # Goal: at least one refresh every hour while NSE is open (09:15-15:30 IST
+    # = 03:45-10:00 UTC). GitHub's cron is best-effort and often skips a slot,
+    # so — like refresh-heatmap — fire TWO independent slots per hour to raise
+    # the odds each hour lands at least one run. Runs are idempotent and
+    # serialised by the concurrency group below, so a double-fire is harmless.
+    - cron: "50 3-9 * * 1-5"    # ~09:20-15:20 IST
+    - cron: "5 4-10 * * 1-5"    # ~09:35-15:35 IST
+    - cron: "25 10 * * 1-5"     # ~15:55 IST — final settled close after the bell
   workflow_dispatch:
+  # External pinger hook so a free scheduler (e.g. cron-job.org) can guarantee
+  # the hourly cadence even when GitHub's own cron skips a slot:
+  #   POST https://api.github.com/repos/<owner>/<repo>/dispatches
+  #   body {"event_type":"refresh-trend"}  with a PAT that has contents:write.
+  repository_dispatch:
+    types: [refresh-trend]
 permissions:
   contents: write
+# never let two refreshes run at once — overlapping runs race on git push
+concurrency:
+  group: refresh-trend
+  cancel-in-progress: false
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

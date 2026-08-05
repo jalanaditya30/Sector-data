@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-trend_scan.py — ranks NSE stocks by trend quality across three lookback windows.
+trend_scan.py — ranks NSE stocks by trend quality across two lookback windows.
 
     drift = OLS slope of ln(close) on session number, x252x100  (annualised, log terms)
     eff   = efficiency ratio: |net move| / sum(|daily moves|), 0..1
@@ -17,7 +17,7 @@ correctly zeroes an up-then-reverse path, which R-squared fits as a tidy line.
 
 Why the 5-session window is not rankable: at n=5 every consistency measure collapses
 (pure noise reads ~0.48, a real trend ~0.90). It is emitted as a direction/turn
-signal against the longer windows, never as a sort key.
+signal against the 10-session window, never as a sort key.
 
 Data source: Yahoo Finance via yfinance (server-side, no CORS). EOD.
 Output     : trend.json
@@ -36,10 +36,10 @@ import yfinance as yf
 # Config
 # ----------------------------------------------------------------------------
 
-WINDOWS = [30, 14, 5]      # sessions; first is the default ranking window
-RANK_WINDOW = 30
+WINDOWS = [10, 5]          # sessions; first is the default ranking window
+RANK_WINDOW = 10
 SHORT_WINDOW = 5           # signal only, never a sort key
-FETCH_DAYS = "6mo"
+FETCH_DAYS = "2mo"         # only need max(WINDOWS)+1 sessions; keep a holiday buffer
 BENCHMARK = "^NSEI"
 WINSOR_PCT = 6.0           # daily cap applied before fitting (display stays raw)
 GAP_FLAG_PCT = 15.0        # single session beyond this = event, not trend
@@ -107,12 +107,10 @@ def classify(win: dict) -> str:
     |score| > 50 and wrongly called shallow-but-clean movers "choppy" — exactly the
     names a plain percent-change sort already buries, and the reason this tool exists.
 
-    The 5-session window is used only for a sign flip with conviction. It is far too
-    noisy to support a "stalling" call, so no such state is emitted; the 14-session
-    window carries that instead.
+    The 10-session window sets the trend and is the sort key; the 5-session window is
+    used only for a sign flip with conviction (a "turn"), never as a rank.
     """
     lo = win.get(str(RANK_WINDOW))
-    mid = win.get("14")
     sh = win.get(str(SHORT_WINDOW))
     if lo is None:
         return "no data"
@@ -123,9 +121,6 @@ def classify(win: dict) -> str:
 
     if sh is not None and abs(sh["score"]) > TURN_MIN_SCORE and (sh["score"] > 0) != up:
         return "turning up" if sh["score"] > 0 else "turning down"
-
-    if mid is not None and abs(mid["score"]) > TURN_MIN_SCORE and (mid["score"] > 0) != up:
-        return "cooling up" if up else "cooling down"
 
     return "trending up" if up else "trending down"
 
