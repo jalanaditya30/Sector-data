@@ -4,6 +4,20 @@ Self-refreshing clone of the Tijori sectoral view. 80 sectors, 1,473 NSE
 constituents, weighted sector aggregates across 1D / 1M / 3M / 6M / 1Y / 2Y / 3Y / 5Y
 plus distance-below-52-week-high and up/down breadth.
 
+## Three independent boards in this repo
+
+Each has its own script, data file, page and refresh workflow — they share nothing
+but the repo.
+
+| board | path | what it answers | refresh |
+|---|---|---|---|
+| **Sectoral Heatmap** | [`/`](https://jalanaditya30.github.io/Sector-data/) | which *sectors* are moving, across 8 horizons | `refresh-heatmap` |
+| **Trend Scanner** | [`/trend/`](https://jalanaditya30.github.io/Sector-data/trend/) | which stocks are moving *cleanly* (drift × consistency², 10/5 sessions) | `refresh-trend` |
+| **Quiet Climbers** | [`/quiet/`](https://jalanaditya30.github.io/Sector-data/quiet/) | which stocks rise *a little, most days, for weeks* (30 sessions, pure counting) | `refresh-quiet` |
+
+Both stock boards scan the same 752-symbol Nifty Total Market universe
+(`trend/universe.txt`, `quiet/universe.txt`).
+
 ## The one thing that matters: the data feed
 
 Rebuilding the *view* is easy — the hard part (curated constituent lists) is already

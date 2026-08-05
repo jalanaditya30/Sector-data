@@ -1,0 +1,50 @@
+name: refresh-quiet
+# Rebuilds quiet/trend.json (the Quiet Climbers board) and commits it.
+# Fully independent of refresh-heatmap and refresh-trend.
+on:
+  schedule:
+    # At least one refresh per hour while NSE is open (09:15-15:30 IST =
+    # 03:45-10:00 UTC). GitHub's cron is best-effort and skips slots, so two
+    # slots per hour are scheduled.
+    #
+    # Minutes are deliberately offset from refresh-trend (which uses :50 and
+    # :05): both jobs pull the same ~752 tickers from Yahoo, and firing them in
+    # the same minute risks rate-limiting each other.
+    - cron: "20 4-10 * * 1-5"   # ~09:50-15:50 IST
+    - cron: "35 4-10 * * 1-5"   # ~10:05-16:05 IST (last one is the settled close)
+  workflow_dispatch:
+  # External pinger hook, so a free scheduler can guarantee the cadence when
+  # GitHub's own cron skips a slot:
+  #   POST https://api.github.com/repos/<owner>/<repo>/dispatches
+  #   body {"event_type":"refresh-quiet"}  with a PAT that has contents:write.
+  repository_dispatch:
+    types: [refresh-quiet]
+permissions:
+  contents: write
+# never let two refreshes run at once — overlapping runs race on git push
+concurrency:
+  group: refresh-quiet
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      # installed inline so this workflow never touches the heatmap's
+      # requirements.txt
+      - run: pip install "yfinance>=0.2.40" "pandas>=2.0" "numpy>=1.24"
+      - name: build
+        working-directory: quiet
+        run: python trend_scan.py universe.txt
+      - name: commit
+        run: |
+          git config user.name  "quiet-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add -f quiet/trend.json
+          git diff --cached --quiet || git commit -m "quiet: refresh $(date -u +%FT%TZ)"
+          # another bot may have pushed while this ran
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
+          git push
