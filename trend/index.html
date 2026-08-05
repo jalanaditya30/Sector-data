@@ -6,9 +6,10 @@
 <title>Trend Scanner — NSE</title>
 <style>
 :root{
-  --bg:#0c0e12; --panel:#12151b; --line:#1e232d; --line2:#2a3140;
-  --ink:#dfe4ec; --dim:#7c8799; --faint:#4d5666;
-  --up:#2ea36b; --down:#d1453b; --flat:#39404e; --accent:#c8a24a;
+  --bg:#f5edda; --panel:#fbf6ea; --line:#e6ddc6; --line2:#d4c8aa;
+  --ink:#2a2721; --dim:#6f6754; --faint:#a99f86;
+  --up:#1f7a45; --down:#c23b2e; --flat:#e7dfca; --accent:#9a6b1a;
+  --hover:#efe6ce;
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);
@@ -37,7 +38,7 @@ th:hover{color:var(--ink)}
 th.sorted{color:var(--accent)}
 td{padding:6px 10px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
 td.l{text-align:left}
-tbody tr:hover{background:#161a22}
+tbody tr:hover{background:var(--hover)}
 .sym{font-weight:600;letter-spacing:.02em}
 td.price{color:var(--ink);font-variant-numeric:tabular-nums}
 .empty{margin:40px auto;max-width:520px;background:var(--panel);
@@ -90,16 +91,15 @@ th[data-k=s5]{opacity:.62}
   <thead><tr>
     <th class="l" data-k="symbol">symbol</th>
     <th data-k="last">price ₹</th>
-    <th data-k="s30">30d ↓</th>
-    <th data-k="s14">14d</th>
+    <th data-k="s10">10d ↓</th>
     <th data-k="s5">5d</th>
     <th data-k="eff">consistency</th>
     <th class="l" data-k="state">state</th>
-    <th data-k="total">30d %</th>
+    <th data-k="total">10d %</th>
     <th data-k="rel">vs nifty</th>
     <th data-k="max_dd">max dd</th>
     <th data-k="turnover_cr">turnover cr</th>
-    <th class="l">day 1 &rarr; 30</th>
+    <th class="l">day 1 &rarr; 10</th>
   </tr></thead>
   <tbody></tbody>
 </table></div>
@@ -107,17 +107,17 @@ th[data-k=s5]{opacity:.62}
 <div class="legend">
   score = annualised log drift &times; consistency&sup2;, where consistency is the efficiency ratio
   (net move &divide; distance travelled). Strip runs oldest (left) to newest (right), shaded by that
-  session's move; the two gaps mark where the 14- and 5-session windows begin.
+  session's move; the gap marks where the 5-session window begins.
   <b>The 5-session column is dimmed on purpose</b> — five points cannot support a reliable
-  ranking, so it feeds only the turn call in <i>state</i>. Sort on 30d or 14d.
+  ranking, so it feeds only the turn call in <i>state</i>. Sort on 10d.
 </div>
 
 <script>
-let DATA=null, sortKey="s30", sortDir=-1;
+let DATA=null, sortKey="s10", sortDir=-1;
 
 const cls = v => v>0.001 ? "pos" : v<-0.001 ? "neg" : "zero";
 const w   = (r,n) => r.windows[n] ? r.windows[n].score : null;
-const eff = r => r.windows["30"] ? r.windows["30"].eff : 0;
+const eff = r => r.windows["10"] ? r.windows["10"].eff : 0;
 const fmt = v => v===null ? "—" : v.toFixed(0);
 const sign = v => (v>0?"+":"") + v.toFixed(2);
 
@@ -125,14 +125,14 @@ const sign = v => (v>0?"+":"") + v.toFixed(2);
 function cellColour(v){
   if(v===null||Math.abs(v)<0.05) return "var(--flat)";
   const a = Math.min(1, Math.abs(v)/4);
-  const o = (0.18 + 0.82*a).toFixed(2);
-  return v>0 ? `rgba(46,163,107,${o})` : `rgba(209,69,59,${o})`;
+  const o = (0.28 + 0.72*a).toFixed(2);           // higher floor so bars read on cream
+  return v>0 ? `rgba(31,122,69,${o})` : `rgba(194,59,46,${o})`;
 }
 
 function strip(r){
   const n=r.daily.length;
   return `<div class="strip">` + r.daily.map((v,i)=>{
-    const edge = (i===n-14||i===n-5) ? " class=\"edge\"" : "";
+    const edge = (i===n-5) ? " class=\"edge\"" : "";
     return `<i${edge} style="background:${cellColour(v)}" title="${r.dates[i]}  ${sign(v)}%"></i>`;
   }).join("") + `</div>`;
 }
@@ -159,7 +159,7 @@ function render(){
   let rows = DATA.rows.filter(r =>
     (!q || r.symbol.includes(q)) && !(noGap && r.gappy) && !(noThin && r.thin));
 
-  const key = r => ({s30:w(r,30), s14:w(r,14), s5:w(r,5), eff:eff(r)}[sortKey]) ?? r[sortKey];
+  const key = r => ({s10:w(r,10), s5:w(r,5), eff:eff(r)}[sortKey]) ?? r[sortKey];
   rows.sort((a,b)=>{
     const x=key(a), y=key(b);
     if(typeof x==="string") return x.localeCompare(y)*sortDir*-1;
@@ -174,8 +174,7 @@ function render(){
         r.stale?'<span class="flag f-thin">STALE</span>':''}</td>
       <td class="price">${r.last==null ? "—" :
         r.last.toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
-      <td class="${cls(w(r,30))}">${fmt(w(r,30))}</td>
-      <td class="${cls(w(r,14))}">${fmt(w(r,14))}</td>
+      <td class="${cls(w(r,10))}">${fmt(w(r,10))}</td>
       <td class="${cls(w(r,5))} short">${fmt(w(r,5))}</td>
       <td>${eff(r).toFixed(2)}<span class="r2bar"><b style="width:${(eff(r)*100).toFixed(0)}%"></b></span></td>
       <td class="l"><span class="state st-${r.state.split(" ")[0]}">${r.state}</span></td>

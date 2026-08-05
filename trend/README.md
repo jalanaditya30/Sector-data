@@ -11,8 +11,9 @@ Live at: https://jalanaditya30.github.io/Sector-data/trend/
     eff   = efficiency ratio: |net move| / sum(|daily moves|), 0..1
     score = drift x eff^2
 
-Computed over 30, 14 and 5 sessions. Both inputs use a winsorised log path
-(daily moves capped at 6%); displayed moves are uncapped.
+Computed over 10 and 5 sessions. Both inputs use a winsorised log path
+(daily moves capped at 6%); displayed moves are uncapped. The 10-session window
+is the trend and the sort key; the 5-session window is a short-term turn signal only.
 
 ## Why efficiency ratio, not R-squared
 
@@ -36,9 +37,8 @@ but is **not a sort key**; it feeds only the turn call in `state`.
 
 ## States
 
-`trending up/down` — established, confirmed by the 14-session window
+`trending up/down` — established on the 10-session window
 `turning up/down` — established, but the 5-session window flipped sign with conviction
-`cooling up/down` — the 14-session window flipped against the 30
 `choppy` — consistency below 0.45, or no meaningful direction
 
 Gated on consistency, not score magnitude: a shallow but very clean decline is a
@@ -49,11 +49,22 @@ trend, and is exactly what a percent-change sort buries.
 `GAP` one session moved >15% · `THIN` median turnover <Rs 1cr · `STALE` too many
 unchanged closes
 
-## Adding stocks
+## Universe
 
-Edit `universe.txt` only. One NSE ticker per line, Yahoo format (`SYMBOL.NS`).
-Blank lines and `#` comments ignored. Unresolved tickers are printed at the end of
-the Actions log, never silently dropped.
+`universe.txt` holds the full **Nifty Total Market** list (~752 NSE symbols),
+one ticker per line in Yahoo format (`SYMBOL.NS`). Blank lines and `#` comments
+ignored. Edit that file to add or drop names; unresolved tickers are printed at
+the end of the Actions log, never silently dropped.
+
+## Refresh cadence
+
+The `refresh-trend` GitHub Action runs **at least hourly while NSE is open**
+(two cron slots per hour, 09:20–15:35 IST on weekdays, to survive GitHub's
+best-effort scheduler skipping a slot), plus a final run at ~15:55 IST for the
+settled close. Intraday, Yahoo's daily bar carries the latest price, so each run
+moves `last` and the day's return. Trigger one on demand from
+**Actions → refresh-trend → Run workflow**, or POST a `refresh-trend`
+`repository_dispatch` from a free external scheduler to guarantee the cadence.
 
 ## Data source
 
@@ -63,5 +74,5 @@ NSE's own, coverage thins on microcaps. Verify against NSE before acting on a nu
 
 ## Knobs (trend_scan.py)
 
-`WINDOWS` [30,14,5] · `RANK_WINDOW` 30 · `WINSOR_PCT` 6.0 · `GAP_FLAG_PCT` 15.0
+`WINDOWS` [10,5] · `RANK_WINDOW` 10 · `WINSOR_PCT` 6.0 · `GAP_FLAG_PCT` 15.0
 `MIN_TURNOVER_CR` 1.0 · `TREND_MIN_EFF` 0.45 · `TURN_MIN_SCORE` 25.0 · `BATCH` 40
