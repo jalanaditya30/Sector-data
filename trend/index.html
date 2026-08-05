@@ -6,82 +6,170 @@
 <title>Trend Scanner — NSE</title>
 <style>
 :root{
-  --bg:#f5edda; --panel:#fbf6ea; --line:#e6ddc6; --line2:#d4c8aa;
-  --ink:#2a2721; --dim:#6f6754; --faint:#a99f86;
-  --up:#1f7a45; --down:#c23b2e; --flat:#e7dfca; --accent:#9a6b1a;
-  --hover:#efe6ce;
+  /* cool, low-glare paper on a soft slate ground — high contrast for long reads */
+  --bg:#eef1f6; --card:#ffffff; --line:#e2e8f1; --line2:#cbd5e4;
+  --ink:#131922; --dim:#5c6879; --faint:#93a0b4;
+  --up:#0f8b4c; --down:#d33d2e; --accent:#2f6fd0;
+  --upsoft:#e7f6ee; --downsoft:#fdeceb;
+  --hover:#f5f8fd; --zebra:#fafcff; --grid:#dbe3ee; --recent:#eff4fb;
+  --shadow:0 1px 2px rgba(19,25,34,.05),0 4px 16px rgba(19,25,34,.06);
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);
-  font:13px/1.45 ui-monospace,"SF Mono",Menlo,Consolas,monospace}
-header{padding:14px 18px;border-bottom:1px solid var(--line);
-  display:flex;flex-wrap:wrap;gap:14px;align-items:baseline;
-  position:sticky;top:0;background:var(--bg);z-index:5}
-h1{margin:0;font-size:15px;font-weight:600;letter-spacing:.14em;text-transform:uppercase}
+  font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.num{font-variant-numeric:tabular-nums;
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+
+/* ---------- header ---------- */
+header{padding:18px 22px 14px;background:var(--card);border-bottom:1px solid var(--line)}
+.hrow{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:baseline}
+h1{margin:0;font-size:17px;font-weight:700;letter-spacing:-.01em}
 h1 span{color:var(--accent)}
-.meta{color:var(--dim);font-size:11px}
-.controls{display:flex;flex-wrap:wrap;gap:8px;padding:10px 18px;
-  border-bottom:1px solid var(--line);align-items:center}
-input[type=search]{background:var(--panel);border:1px solid var(--line2);color:var(--ink);
-  padding:5px 9px;border-radius:3px;font:inherit;width:180px}
-input[type=search]:focus{outline:2px solid var(--accent);outline-offset:1px}
-label.chk{color:var(--dim);cursor:pointer;user-select:none;display:flex;gap:5px;align-items:center}
-label.chk input{accent-color:var(--accent)}
-.wrap{overflow-x:auto;padding-bottom:40px}
-table{border-collapse:collapse;width:100%;min-width:900px}
-th{position:sticky;top:0;background:var(--panel);color:var(--dim);font-weight:500;
-  font-size:11px;letter-spacing:.06em;text-transform:uppercase;
-  padding:8px 10px;text-align:right;border-bottom:1px solid var(--line2);
-  cursor:pointer;white-space:nowrap}
-th:first-child,th.l{text-align:left}
-th:hover{color:var(--ink)}
+.meta{color:var(--dim);font-size:12px}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
+.chip{font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px;
+  border:1px solid var(--line2);color:var(--dim);background:var(--bg)}
+.chip.up{color:var(--up);background:var(--upsoft);border-color:#b9e3cd}
+.chip.down{color:var(--down);background:var(--downsoft);border-color:#f6c9c4}
+
+/* ---------- controls ---------- */
+.controls{display:flex;flex-wrap:wrap;gap:10px 14px;padding:12px 22px;
+  align-items:center;background:var(--card);border-bottom:1px solid var(--line);
+  position:sticky;top:0;z-index:6;box-shadow:var(--shadow)}
+input[type=search]{background:var(--card);border:1px solid var(--line2);color:var(--ink);
+  padding:7px 11px;border-radius:8px;font:inherit;font-size:13px;width:210px}
+input[type=search]:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
+label.chk{color:var(--dim);cursor:pointer;user-select:none;display:flex;gap:6px;
+  align-items:center;font-size:13px}
+label.chk input{accent-color:var(--accent);width:15px;height:15px}
+label.chk:hover{color:var(--ink)}
+
+/* ---------- table ---------- */
+/* No overflow here on wide screens: making .wrap a scroll container would trap
+   the sticky <th> inside it (header detaches from the viewport and covers row 1).
+   Horizontal scrolling is switched on only in the narrow breakpoint below. */
+.wrap{padding:18px 22px 48px}
+/* No overflow:hidden here either — it would also capture the sticky header.
+   Corners are rounded on the corner cells instead of clipped. */
+table{border-collapse:separate;border-spacing:0;width:100%;min-width:880px;
+  background:var(--card);border:1px solid var(--line);border-radius:12px;
+  box-shadow:var(--shadow)}
+thead th:first-child{border-top-left-radius:11px}
+thead th:last-child{border-top-right-radius:11px}
+tbody tr:last-child td:first-child{border-bottom-left-radius:11px}
+tbody tr:last-child td:last-child{border-bottom-right-radius:11px}
+th{background:var(--card);color:var(--dim);font-weight:600;font-size:11px;
+  letter-spacing:.07em;text-transform:uppercase;padding:11px 14px;text-align:right;
+  border-bottom:1px solid var(--line2);cursor:pointer;white-space:nowrap;
+  position:sticky;top:var(--ctrlh,57px);z-index:4}
+th.l{text-align:left}
+th:hover{color:var(--ink);background:var(--hover)}
 th.sorted{color:var(--accent)}
-td{padding:6px 10px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th.nosort{cursor:default}
+th.nosort:hover{color:var(--dim);background:var(--card)}
+td{padding:9px 14px;text-align:right;border-bottom:1px solid var(--line);
+  white-space:nowrap;font-size:13px}
 td.l{text-align:left}
+tbody tr:nth-child(even){background:var(--zebra)}
 tbody tr:hover{background:var(--hover)}
-.sym{font-weight:600;letter-spacing:.02em}
-td.price{color:var(--ink);font-variant-numeric:tabular-nums}
-.empty{margin:40px auto;max-width:520px;background:var(--panel);
-  border:1px solid var(--line2);border-left:3px solid var(--accent);
-  padding:18px 20px;border-radius:3px}
-.empty h2{margin:0 0 8px;font-size:13px;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
-.empty p{margin:6px 0;color:var(--dim);font-size:12px}
-.empty code{color:var(--ink)}
+tbody tr:last-child td{border-bottom:none}
+.sym{font-weight:700;letter-spacing:.01em;font-size:13.5px}
+td.price{font-weight:600}
 .pos{color:var(--up)} .neg{color:var(--down)} .zero{color:var(--faint)}
-.flag{font-size:9px;letter-spacing:.08em;padding:1px 4px;border-radius:2px;
-  border:1px solid currentColor;margin-left:5px;vertical-align:1px}
-.f-gap{color:var(--accent)} .f-thin{color:var(--dim)}
-/* the strip: one cell per session, oldest left */
-.strip{display:flex;gap:1px;height:17px;align-items:stretch}
-.strip i{width:6px;border-radius:1px;background:var(--flat)}
-.r2bar{display:inline-block;width:42px;height:5px;background:var(--line2);
-  border-radius:3px;overflow:hidden;vertical-align:1px;margin-left:6px}
-.r2bar b{display:block;height:100%;background:var(--accent)}
-#err{margin:40px auto;max-width:520px;background:var(--panel);
-  border:1px solid var(--down);border-left-width:3px;padding:18px 20px;border-radius:3px}
-#err h2{margin:0 0 8px;font-size:13px;color:var(--down);letter-spacing:.08em;text-transform:uppercase}
-#err p{margin:6px 0;color:var(--dim);font-size:12px}
-#err code{color:var(--ink)}
-.state{font-size:11px;letter-spacing:.04em}
-.st-trending{color:var(--ink)}
-.st-turning{color:var(--accent);font-weight:600}
-.st-cooling{color:var(--dim)}
-.st-choppy{color:var(--faint)}
-td.short{opacity:.62}
+td.score{font-weight:700}
+td.short{opacity:.55}
 th[data-k=s5]{opacity:.62}
-.strip i.edge{margin-left:5px;box-shadow:-3px 0 0 -1px var(--line2)}
-.legend{padding:10px 18px;color:var(--faint);font-size:11px;border-top:1px solid var(--line)}
-@media(max-width:640px){.controls{gap:6px}input[type=search]{width:120px}}
+
+/* consistency meter */
+.meter{display:inline-flex;align-items:center;gap:8px}
+.mbar{width:52px;height:6px;background:var(--grid);border-radius:99px;overflow:hidden}
+.mbar b{display:block;height:100%;background:var(--accent);border-radius:99px}
+
+/* state pills */
+.state{font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:99px;
+  white-space:nowrap;display:inline-block;border:1px solid transparent}
+.st-up{color:var(--up);background:var(--upsoft);border-color:#b9e3cd}
+.st-down{color:var(--down);background:var(--downsoft);border-color:#f6c9c4}
+.st-turn{color:#8a5a00;background:#fdf3dd;border-color:#efd9a4}
+.st-flat{color:var(--dim);background:var(--bg);border-color:var(--line2)}
+
+/* flags */
+.flag{font-size:9.5px;font-weight:700;letter-spacing:.06em;padding:1px 5px;
+  border-radius:4px;margin-left:6px;vertical-align:1px;
+  border:1px solid currentColor;opacity:.85}
+.f-gap{color:#8a5a00} .f-thin{color:var(--faint)}
+
+/* ---------- the 10-session bar chart ---------- */
+.spark{position:relative;display:flex;gap:3px;height:46px;align-items:stretch;
+  width:max-content}
+/* one continuous band behind the most recent 5 sessions, not per-bar stripes */
+.band{position:absolute;top:-2px;bottom:-2px;background:var(--recent);
+  border-radius:5px;z-index:0}
+/* zero line sits above the band so it stays visible across the whole strip */
+.zline{position:absolute;left:0;right:0;top:calc(50% - .5px);height:1px;
+  background:var(--line2);z-index:1}
+.col{position:relative;width:13px;z-index:2}
+.col b{position:absolute;left:1px;right:1px;border-radius:2px}
+.col b.u{bottom:50%;background:var(--up)}
+.col b.d{top:50%;background:var(--down)}
+.col b.f{top:calc(50% - 1px);height:2px;background:var(--faint);border-radius:1px}
+.col:hover b{filter:brightness(1.15)}
+.sparkhead{display:flex;align-items:center;gap:9px}
+.sparkkey{display:flex;align-items:center;gap:4px;font-size:10px;
+  text-transform:none;letter-spacing:0;font-weight:500;color:var(--faint)}
+.kbar{width:4px;border-radius:1px;display:inline-block}
+.kbar.u{height:9px;background:var(--up)} .kbar.d{height:9px;background:var(--down)}
+
+/* ---------- legend / states ---------- */
+.legend{margin:0 22px 40px;padding:16px 18px;background:var(--card);
+  border:1px solid var(--line);border-radius:12px;color:var(--dim);font-size:12.5px;
+  box-shadow:var(--shadow);max-width:980px}
+.legend h3{margin:0 0 9px;font-size:11px;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--ink)}
+.legend p{margin:0 0 9px}
+.legend p:last-child{margin-bottom:0}
+.legend b{color:var(--ink)}
+.legend code{background:var(--bg);padding:1px 5px;border-radius:4px;font-size:11.5px}
+.lgrid{display:flex;flex-wrap:wrap;gap:8px 16px;margin:10px 0 4px}
+.lgrid div{display:flex;align-items:center;gap:7px;font-size:12px}
+
+/* ---------- empty / error ---------- */
+.empty,#err{margin:40px auto;max-width:560px;background:var(--card);
+  border:1px solid var(--line);border-left:4px solid var(--accent);
+  padding:22px 24px;border-radius:12px;box-shadow:var(--shadow)}
+#err{border-left-color:var(--down)}
+.empty h2,#err h2{margin:0 0 10px;font-size:14px;color:var(--accent);
+  letter-spacing:.04em;text-transform:uppercase}
+#err h2{color:var(--down)}
+.empty p,#err p{margin:7px 0;color:var(--dim);font-size:13px}
+.empty code,#err code{color:var(--ink);background:var(--bg);padding:1px 5px;border-radius:4px}
+
+/* Below the table's natural width, allow horizontal scroll. The sticky header
+   is released here because a scroll container would capture it anyway. */
+@media(max-width:940px){
+  .wrap{overflow-x:auto}
+  th{position:static}
+}
+@media(max-width:700px){
+  header,.controls{padding-left:14px;padding-right:14px}
+  .wrap{padding:12px 14px 40px}
+  .legend{margin:0 14px 32px}
+  input[type=search]{width:100%}
+}
 </style>
 </head>
 <body>
 <header>
-  <h1>Trend <span>Scanner</span></h1>
-  <div class="meta" id="meta">loading…</div>
+  <div class="hrow">
+    <h1>Trend <span>Scanner</span></h1>
+    <div class="meta" id="meta">loading…</div>
+  </div>
+  <div class="chips" id="chips"></div>
 </header>
 
 <div class="controls">
-  <input type="search" id="q" placeholder="filter symbol" aria-label="Filter by symbol">
+  <input type="search" id="q" placeholder="Filter symbol…" aria-label="Filter by symbol">
   <label class="chk"><input type="checkbox" id="hideGap" checked> hide gap-driven</label>
   <label class="chk"><input type="checkbox" id="hideThin" checked> hide illiquid</label>
   <span class="meta" id="count"></span>
@@ -89,52 +177,84 @@ th[data-k=s5]{opacity:.62}
 
 <div class="wrap"><table id="tbl">
   <thead><tr>
-    <th class="l" data-k="symbol">symbol</th>
-    <th data-k="last">price ₹</th>
-    <th data-k="s10">10d ↓</th>
-    <th data-k="s5">5d</th>
-    <th data-k="eff">consistency</th>
-    <th class="l" data-k="state">state</th>
-    <th data-k="total">10d %</th>
-    <th data-k="rel">vs nifty</th>
-    <th data-k="max_dd">max dd</th>
-    <th data-k="turnover_cr">turnover cr</th>
-    <th class="l">day 1 &rarr; 10</th>
+    <th class="l" data-k="symbol" data-label="symbol">symbol</th>
+    <th data-k="last" data-label="price ₹">price ₹</th>
+    <th data-k="s10" data-label="10d score">10d score</th>
+    <th data-k="s5" data-label="5d score">5d score</th>
+    <th data-k="eff" data-label="consistency">consistency</th>
+    <th class="l" data-k="state" data-label="state">state</th>
+    <th data-k="total" data-label="10d %">10d %</th>
+    <th data-k="max_dd" data-label="max dd">max dd</th>
+    <th class="l nosort">
+      <div class="sparkhead"><span>last 10 sessions</span>
+        <span class="sparkkey"><i class="kbar u"></i>up<i class="kbar d"></i>down</span>
+      </div>
+    </th>
   </tr></thead>
   <tbody></tbody>
 </table></div>
 
 <div class="legend">
-  score = annualised log drift &times; consistency&sup2;, where consistency is the efficiency ratio
-  (net move &divide; distance travelled). Strip runs oldest (left) to newest (right), shaded by that
-  session's move; the gap marks where the 5-session window begins.
-  <b>The 5-session column is dimmed on purpose</b> — five points cannot support a reliable
-  ranking, so it feeds only the turn call in <i>state</i>. Sort on 10d.
+  <h3>How to read this</h3>
+  <p><b>Score</b> = annualised log drift × consistency², where <b>consistency</b> is the
+     efficiency ratio (net move ÷ total distance travelled, 0–1). A high score means the
+     move was both meaningful <i>and</i> travelled in a straight line.</p>
+  <p><b>Last 10 sessions</b> — one bar per trading day, oldest on the left. Bars rise above
+     the centre line on up days and fall below it on down days; bar <b>height</b> is the size
+     of that day's move (topping out around ±2.5%). The <b>shaded</b> block on the right is the
+     most recent 5 sessions — the window that drives the <i>turning</i> call. Hover any bar
+     for its date and exact move.</p>
+  <div class="lgrid">
+    <div><span class="state st-up">trending up</span> clean, established rise</div>
+    <div><span class="state st-down">trending down</span> clean, established fall</div>
+    <div><span class="state st-turn">turning up / down</span> last 5 sessions flipped hard</div>
+    <div><span class="state st-flat">choppy</span> no consistent direction</div>
+  </div>
+  <p>The <b>5d score is dimmed on purpose</b> — five points cannot support a reliable ranking,
+     so it only feeds the turn call. <b>Sort on 10d score.</b> Flags:
+     <code>GAP</code> a single session moved &gt;15% · <code>THIN</code> median turnover
+     under ₹1cr · <code>STALE</code> too many unchanged closes.</p>
 </div>
 
 <script>
 let DATA=null, sortKey="s10", sortDir=-1;
 
-const cls = v => v>0.001 ? "pos" : v<-0.001 ? "neg" : "zero";
-const w   = (r,n) => r.windows[n] ? r.windows[n].score : null;
-const eff = r => r.windows["10"] ? r.windows["10"].eff : 0;
-const fmt = v => v===null ? "—" : v.toFixed(0);
+const cls  = v => v>0.001 ? "pos" : v<-0.001 ? "neg" : "zero";
+const w    = (r,n) => r.windows[n] ? r.windows[n].score : null;
+const eff  = r => r.windows["10"] ? r.windows["10"].eff : 0;
+const fmt  = v => v===null ? "—" : v.toFixed(0);
 const sign = v => (v>0?"+":"") + v.toFixed(2);
+const rupee = v => v==null ? "—"
+  : v.toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
 
-// colour a session cell by its move, saturating around +/-4%
-function cellColour(v){
-  if(v===null||Math.abs(v)<0.05) return "var(--flat)";
-  const a = Math.min(1, Math.abs(v)/4);
-  const o = (0.28 + 0.72*a).toFixed(2);           // higher floor so bars read on cream
-  return v>0 ? `rgba(31,122,69,${o})` : `rgba(194,59,46,${o})`;
+// map a state string to its pill class
+function stateCls(s){
+  if(s.startsWith("turning")) return "st-turn";
+  if(s.endsWith("up"))   return "st-up";
+  if(s.endsWith("down")) return "st-down";
+  return "st-flat";
 }
 
+// One bar per session around a zero line: direction by shape, size by height.
+// Most NSE sessions move 0.5-2%, so saturate at 2.5% — a 4% cap left the
+// typical day as an unreadable stub.
+const CAP = 2.5;      // % move at which a bar reaches full height
+const CW = 13, CGAP = 3, SHORT_N = 5;   // must match .col width / .spark gap in CSS
 function strip(r){
-  const n=r.daily.length;
-  return `<div class="strip">` + r.daily.map((v,i)=>{
-    const edge = (i===n-5) ? " class=\"edge\"" : "";
-    return `<i${edge} style="background:${cellColour(v)}" title="${r.dates[i]}  ${sign(v)}%"></i>`;
-  }).join("") + `</div>`;
+  const n = r.daily.length;
+  const bars = r.daily.map((v,i)=>{
+    const flat = Math.abs(v) < 0.05;
+    const h = Math.max(2, Math.min(1, Math.abs(v)/CAP) * 47);   // % of column height
+    const bar = flat ? `<b class="f"></b>`
+                     : `<b class="${v>0?"u":"d"}" style="height:${h.toFixed(1)}%"></b>`;
+    return `<span class="col" title="${r.dates[i]} · ${sign(v)}%">${bar}</span>`;
+  }).join("");
+  // continuous band behind the most recent SHORT_N sessions
+  const k = Math.min(SHORT_N, n);
+  const left = (n-k)*(CW+CGAP) - CGAP/2;
+  const width = k*CW + (k-1)*CGAP + CGAP;
+  const band = `<span class="band" style="left:${Math.max(0,left)}px;width:${width}px"></span>`;
+  return `<div class="spark">${band}<span class="zline"></span>${bars}</div>`;
 }
 
 function render(){
@@ -146,8 +266,8 @@ function render(){
       `<div class="empty"><h2>Awaiting first refresh</h2>
        <p>No scored rows yet. This is the seed state that ships with the repo.</p>
        <p>Run <code>python trend_scan.py universe.txt</code> locally, or let the
-          <code>refresh-trend</code> GitHub Action run after close — it pulls live
-          EOD prices and commits a populated <code>trend.json</code>.</p></div>`;
+          <code>refresh-trend</code> GitHub Action run — it pulls live prices and
+          commits a populated <code>trend.json</code>.</p></div>`;
     document.getElementById("count").textContent = "0 scored";
     return;
   }
@@ -172,21 +292,33 @@ function render(){
         r.gappy?'<span class="flag f-gap">GAP</span>':''}${
         r.thin?'<span class="flag f-thin">THIN</span>':''}${
         r.stale?'<span class="flag f-thin">STALE</span>':''}</td>
-      <td class="price">${r.last==null ? "—" :
-        r.last.toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
-      <td class="${cls(w(r,10))}">${fmt(w(r,10))}</td>
-      <td class="${cls(w(r,5))} short">${fmt(w(r,5))}</td>
-      <td>${eff(r).toFixed(2)}<span class="r2bar"><b style="width:${(eff(r)*100).toFixed(0)}%"></b></span></td>
-      <td class="l"><span class="state st-${r.state.split(" ")[0]}">${r.state}</span></td>
-      <td class="${cls(r.total)}">${sign(r.total)}</td>
-      <td class="${r.rel===null?'zero':cls(r.rel)}">${r.rel===null?'—':sign(r.rel)}</td>
-      <td class="neg">${r.max_dd.toFixed(1)}</td>
-      <td class="zero">${r.turnover_cr===null?'—':r.turnover_cr.toFixed(1)}</td>
+      <td class="price num">${rupee(r.last)}</td>
+      <td class="score num ${cls(w(r,10))}">${fmt(w(r,10))}</td>
+      <td class="score num short ${cls(w(r,5))}">${fmt(w(r,5))}</td>
+      <td><span class="meter"><span class="num">${eff(r).toFixed(2)}</span>
+        <span class="mbar"><b style="width:${(eff(r)*100).toFixed(0)}%"></b></span></span></td>
+      <td class="l"><span class="state ${stateCls(r.state)}">${r.state}</span></td>
+      <td class="num ${cls(r.total)}">${sign(r.total)}</td>
+      <td class="num ${r.max_dd < -0.05 ? "neg" : "zero"}">${r.max_dd.toFixed(1)}</td>
       <td class="l">${strip(r)}</td>
     </tr>`).join("");
 
   document.getElementById("count").textContent =
     `${rows.length} shown of ${DATA.rows.length} scored`;
+
+  // headline counts across everything scored, not just the filtered view
+  const tally = DATA.rows.reduce((a,r)=>{
+    if(r.state.startsWith("turning")) a.turn++;
+    else if(r.state==="trending up") a.up++;
+    else if(r.state==="trending down") a.down++;
+    else a.chop++;
+    return a;
+  },{up:0,down:0,turn:0,chop:0});
+  document.getElementById("chips").innerHTML =
+    `<span class="chip up">${tally.up} trending up</span>` +
+    `<span class="chip down">${tally.down} trending down</span>` +
+    `<span class="chip">${tally.turn} turning</span>` +
+    `<span class="chip">${tally.chop} choppy</span>`;
 }
 
 document.querySelectorAll("th[data-k]").forEach(th=>{
@@ -195,9 +327,9 @@ document.querySelectorAll("th[data-k]").forEach(th=>{
     if(k===sortKey) sortDir*=-1; else {sortKey=k; sortDir=-1;}
     document.querySelectorAll("th[data-k]").forEach(o=>{
       o.classList.toggle("sorted", o===th);
-      o.textContent = o.textContent.replace(/ [↑↓]$/,"");
+      o.textContent = o.dataset.label;
     });
-    th.textContent += sortDir<0 ? " ↓" : " ↑";
+    th.textContent = th.dataset.label + (sortDir<0 ? " ↓" : " ↑");
     render();
   };
 });
@@ -206,12 +338,21 @@ document.querySelectorAll("th[data-k]").forEach(th=>{
   el.addEventListener(el.type==="checkbox"?"change":"input", render);
 });
 
+// The column header parks directly under the sticky controls bar. Measure it
+// rather than hard-coding, so wrapping controls never overlap the header.
+function syncStickyOffset(){
+  const h = document.querySelector(".controls").offsetHeight;
+  document.documentElement.style.setProperty("--ctrlh", h + "px");
+}
+addEventListener("resize", syncStickyOffset);
+syncStickyOffset();
+
 function fail(reason){
   document.querySelector(".wrap").innerHTML =
     `<div id="err"><h2>No data loaded</h2>
      <p>${reason}</p>
-     <p>Run <code>python trend_scan.py</code> to produce <code>trend.json</code>,
-        or wait for the scheduled refresh to commit it.</p></div>`;
+     <p>Run <code>python trend_scan.py universe.txt</code> to produce
+        <code>trend.json</code>, or wait for the scheduled refresh to commit it.</p></div>`;
   document.getElementById("meta").textContent = "no data";
 }
 
@@ -219,12 +360,14 @@ fetch("trend.json?t="+Date.now())
   .then(r=>{ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
   .then(d=>{
     DATA=d;
-    const built = d.generated ? `built ${new Date(d.generated).toLocaleString()}`
+    const built = d.generated ? `updated ${new Date(d.generated).toLocaleString()}`
                               : "seed — not yet refreshed";
     document.getElementById("meta").textContent =
-      `${d.windows.join("/")} sessions · ${d.resolved}/${d.requested} resolved` +
-      (d.benchmark_return!==null?` · nifty ${sign(d.benchmark_return)}%`:"") +
-      ` · ${built}`;
+      `${d.windows.join("/")}-session windows · ${d.resolved}/${d.requested} resolved · ${built}`;
+    // mark the default sort column
+    const th0 = document.querySelector('th[data-k="s10"]');
+    th0.classList.add("sorted");
+    th0.textContent = th0.dataset.label + " ↓";
     render();
   })
   .catch(e=>fail(
