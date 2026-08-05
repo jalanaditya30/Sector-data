@@ -62,7 +62,11 @@ NAMES_FILE = "names.csv"   # Symbol -> Company Name; optional, falls back to tic
 MIN_TURNOVER_CR = 1.0      # median 20d turnover floor, Rs crore
 MAX_STALE_FRAC = 0.30      # share of unchanged closes above which it is untradeable
 TREND_MIN_SCORE = 10.0     # tiny floor, only to confirm a direction exists
-TREND_MIN_EFF = 0.45
+# Consistency gate. Was 0.45, calibrated when the ranking window was 30 sessions.
+# At n=15 that let ~18% of driftless random walks through — about 130 false trend
+# badges per 752 names. 0.75 cuts that to ~1.7% (~12 names) at the cost of calling
+# some genuine-but-untidy trends "choppy", which is the right trade for a screen.
+TREND_MIN_EFF = 0.75
 TURN_MIN_SCORE = 25.0      # short-window score needed to call a turn
 BATCH = 40
 
