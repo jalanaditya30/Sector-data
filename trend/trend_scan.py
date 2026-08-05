@@ -23,8 +23,10 @@ Data source: Yahoo Finance via yfinance (server-side, no CORS). EOD.
 Output     : trend.json
 """
 
+import csv
 import json
 import math
+import os
 import sys
 from datetime import datetime, timezone
 
@@ -43,6 +45,7 @@ FETCH_DAYS = "2mo"         # only need max(WINDOWS)+1 sessions; keep a holiday b
 BENCHMARK = "^NSEI"
 WINSOR_PCT = 6.0           # daily cap applied before fitting (display stays raw)
 GAP_FLAG_PCT = 15.0        # single session beyond this = event, not trend
+NAMES_FILE = "names.csv"   # Symbol -> Company Name; optional, falls back to ticker
 MIN_TURNOVER_CR = 1.0      # median 20d turnover floor, Rs crore
 MAX_STALE_FRAC = 0.30      # share of unchanged closes above which it is untradeable
 TREND_MIN_SCORE = 10.0     # tiny floor, only to confirm a direction exists
@@ -63,6 +66,17 @@ UNIVERSE = [
 # ----------------------------------------------------------------------------
 # Core maths
 # ----------------------------------------------------------------------------
+
+def load_names(path: str = NAMES_FILE) -> dict:
+    """Map bare NSE symbol -> company name. Missing file is not fatal: the UI
+    falls back to the ticker, so a scan still works without it."""
+    if not os.path.exists(path):
+        print(f"  note: {path} not found — rows will carry no company name")
+        return {}
+    with open(path, newline="", encoding="utf-8") as fh:
+        return {r["Symbol"].strip(): r["Company Name"].strip()
+                for r in csv.DictReader(fh) if r.get("Symbol", "").strip()}
+
 
 def winsorise(log_prices: np.ndarray) -> np.ndarray:
     """Rebuild the log path with each daily step capped at +/- WINSOR_PCT."""
@@ -125,7 +139,8 @@ def classify(win: dict) -> str:
     return "trending up" if up else "trending down"
 
 
-def analyse(symbol: str, df: pd.DataFrame, bench_ret: float | None):
+def analyse(symbol: str, df: pd.DataFrame, bench_ret: float | None,
+            names: dict | None = None):
     if df is None or df.empty:
         return None
     df = df.dropna(subset=["Close"])
@@ -160,6 +175,7 @@ def analyse(symbol: str, df: pd.DataFrame, bench_ret: float | None):
 
     return {
         "symbol": symbol.replace(".NS", ""),
+        "name": (names or {}).get(symbol.replace(".NS", "")) or symbol.replace(".NS", ""),
         "windows": windows,
         "score": windows[str(RANK_WINDOW)]["score"],   # default sort key
         "state": classify(windows),
@@ -213,6 +229,9 @@ def main():
 
     print(f"universe: {len(universe)} symbols · windows {WINDOWS} · rank on {RANK_WINDOW}")
 
+    names = load_names()
+    print(f"  {len(names)} company names loaded")
+
     print("benchmark…")
     bench_ret = None
     bench = fetch([BENCHMARK]).get(BENCHMARK)
@@ -226,7 +245,7 @@ def main():
 
     rows, failed = [], []
     for t in universe:
-        r = analyse(t, frames.get(t), bench_ret)
+        r = analyse(t, frames.get(t), bench_ret, names)
         (rows.append(r) if r else failed.append(t))
     rows.sort(key=lambda r: r["score"], reverse=True)
 
