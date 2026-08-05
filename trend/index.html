@@ -39,6 +39,13 @@ td{padding:6px 10px;text-align:right;border-bottom:1px solid var(--line);white-s
 td.l{text-align:left}
 tbody tr:hover{background:#161a22}
 .sym{font-weight:600;letter-spacing:.02em}
+td.price{color:var(--ink);font-variant-numeric:tabular-nums}
+.empty{margin:40px auto;max-width:520px;background:var(--panel);
+  border:1px solid var(--line2);border-left:3px solid var(--accent);
+  padding:18px 20px;border-radius:3px}
+.empty h2{margin:0 0 8px;font-size:13px;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+.empty p{margin:6px 0;color:var(--dim);font-size:12px}
+.empty code{color:var(--ink)}
 .pos{color:var(--up)} .neg{color:var(--down)} .zero{color:var(--faint)}
 .flag{font-size:9px;letter-spacing:.08em;padding:1px 4px;border-radius:2px;
   border:1px solid currentColor;margin-left:5px;vertical-align:1px}
@@ -82,6 +89,7 @@ th[data-k=s5]{opacity:.62}
 <div class="wrap"><table id="tbl">
   <thead><tr>
     <th class="l" data-k="symbol">symbol</th>
+    <th data-k="last">price ₹</th>
     <th data-k="s30">30d ↓</th>
     <th data-k="s14">14d</th>
     <th data-k="s5">5d</th>
@@ -131,6 +139,19 @@ function strip(r){
 
 function render(){
   if(!DATA) return;
+
+  // Valid payload but no scored rows yet — first live refresh has not run.
+  if(!DATA.rows || DATA.rows.length===0){
+    document.querySelector(".wrap").innerHTML =
+      `<div class="empty"><h2>Awaiting first refresh</h2>
+       <p>No scored rows yet. This is the seed state that ships with the repo.</p>
+       <p>Run <code>python trend_scan.py universe.txt</code> locally, or let the
+          <code>refresh-trend</code> GitHub Action run after close — it pulls live
+          EOD prices and commits a populated <code>trend.json</code>.</p></div>`;
+    document.getElementById("count").textContent = "0 scored";
+    return;
+  }
+
   const q = document.getElementById("q").value.trim().toUpperCase();
   const noGap = document.getElementById("hideGap").checked;
   const noThin = document.getElementById("hideThin").checked;
@@ -151,6 +172,8 @@ function render(){
         r.gappy?'<span class="flag f-gap">GAP</span>':''}${
         r.thin?'<span class="flag f-thin">THIN</span>':''}${
         r.stale?'<span class="flag f-thin">STALE</span>':''}</td>
+      <td class="price">${r.last==null ? "—" :
+        r.last.toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
       <td class="${cls(w(r,30))}">${fmt(w(r,30))}</td>
       <td class="${cls(w(r,14))}">${fmt(w(r,14))}</td>
       <td class="${cls(w(r,5))} short">${fmt(w(r,5))}</td>
@@ -197,11 +220,12 @@ fetch("trend.json?t="+Date.now())
   .then(r=>{ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
   .then(d=>{
     DATA=d;
-    const t=new Date(d.generated);
+    const built = d.generated ? `built ${new Date(d.generated).toLocaleString()}`
+                              : "seed — not yet refreshed";
     document.getElementById("meta").textContent =
       `${d.windows.join("/")} sessions · ${d.resolved}/${d.requested} resolved` +
       (d.benchmark_return!==null?` · nifty ${sign(d.benchmark_return)}%`:"") +
-      ` · built ${t.toLocaleString()}`;
+      ` · ${built}`;
     render();
   })
   .catch(e=>fail(
