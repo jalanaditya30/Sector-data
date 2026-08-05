@@ -1,0 +1,29 @@
+name: refresh-trend
+# Rebuilds trend/trend.json from EOD prices and commits it.
+# Independent of refresh-heatmap; both can run on the same repo.
+on:
+  schedule:
+    - cron: "25 10 * * 1-5"   # ~15:55 IST, Mon-Fri (NSE closes 15:30 IST = 10:00 UTC)
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      # installed inline rather than from requirements.txt so this workflow
+      # never touches the heatmap's dependency file
+      - run: pip install "yfinance>=0.2.40" "pandas>=2.0" "numpy>=1.24"
+      - name: build
+        working-directory: trend
+        run: python trend_scan.py universe.txt
+      - name: commit
+        run: |
+          git config user.name  "trend-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add -f trend/trend.json
+          git diff --cached --quiet || git commit -m "trend: refresh $(date -u +%FT%TZ)"
+          git push

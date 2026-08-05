@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trend Scanner — NSE</title>
+<style>
+:root{
+  --bg:#0c0e12; --panel:#12151b; --line:#1e232d; --line2:#2a3140;
+  --ink:#dfe4ec; --dim:#7c8799; --faint:#4d5666;
+  --up:#2ea36b; --down:#d1453b; --flat:#39404e; --accent:#c8a24a;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:13px/1.45 ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+header{padding:14px 18px;border-bottom:1px solid var(--line);
+  display:flex;flex-wrap:wrap;gap:14px;align-items:baseline;
+  position:sticky;top:0;background:var(--bg);z-index:5}
+h1{margin:0;font-size:15px;font-weight:600;letter-spacing:.14em;text-transform:uppercase}
+h1 span{color:var(--accent)}
+.meta{color:var(--dim);font-size:11px}
+.controls{display:flex;flex-wrap:wrap;gap:8px;padding:10px 18px;
+  border-bottom:1px solid var(--line);align-items:center}
+input[type=search]{background:var(--panel);border:1px solid var(--line2);color:var(--ink);
+  padding:5px 9px;border-radius:3px;font:inherit;width:180px}
+input[type=search]:focus{outline:2px solid var(--accent);outline-offset:1px}
+label.chk{color:var(--dim);cursor:pointer;user-select:none;display:flex;gap:5px;align-items:center}
+label.chk input{accent-color:var(--accent)}
+.wrap{overflow-x:auto;padding-bottom:40px}
+table{border-collapse:collapse;width:100%;min-width:900px}
+th{position:sticky;top:0;background:var(--panel);color:var(--dim);font-weight:500;
+  font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+  padding:8px 10px;text-align:right;border-bottom:1px solid var(--line2);
+  cursor:pointer;white-space:nowrap}
+th:first-child,th.l{text-align:left}
+th:hover{color:var(--ink)}
+th.sorted{color:var(--accent)}
+td{padding:6px 10px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+td.l{text-align:left}
+tbody tr:hover{background:#161a22}
+.sym{font-weight:600;letter-spacing:.02em}
+.pos{color:var(--up)} .neg{color:var(--down)} .zero{color:var(--faint)}
+.flag{font-size:9px;letter-spacing:.08em;padding:1px 4px;border-radius:2px;
+  border:1px solid currentColor;margin-left:5px;vertical-align:1px}
+.f-gap{color:var(--accent)} .f-thin{color:var(--dim)}
+/* the strip: one cell per session, oldest left */
+.strip{display:flex;gap:1px;height:17px;align-items:stretch}
+.strip i{width:6px;border-radius:1px;background:var(--flat)}
+.r2bar{display:inline-block;width:42px;height:5px;background:var(--line2);
+  border-radius:3px;overflow:hidden;vertical-align:1px;margin-left:6px}
+.r2bar b{display:block;height:100%;background:var(--accent)}
+#err{margin:40px auto;max-width:520px;background:var(--panel);
+  border:1px solid var(--down);border-left-width:3px;padding:18px 20px;border-radius:3px}
+#err h2{margin:0 0 8px;font-size:13px;color:var(--down);letter-spacing:.08em;text-transform:uppercase}
+#err p{margin:6px 0;color:var(--dim);font-size:12px}
+#err code{color:var(--ink)}
+.state{font-size:11px;letter-spacing:.04em}
+.st-trending{color:var(--ink)}
+.st-turning{color:var(--accent);font-weight:600}
+.st-cooling{color:var(--dim)}
+.st-choppy{color:var(--faint)}
+td.short{opacity:.62}
+th[data-k=s5]{opacity:.62}
+.strip i.edge{margin-left:5px;box-shadow:-3px 0 0 -1px var(--line2)}
+.legend{padding:10px 18px;color:var(--faint);font-size:11px;border-top:1px solid var(--line)}
+@media(max-width:640px){.controls{gap:6px}input[type=search]{width:120px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Trend <span>Scanner</span></h1>
+  <div class="meta" id="meta">loading…</div>
+</header>
+
+<div class="controls">
+  <input type="search" id="q" placeholder="filter symbol" aria-label="Filter by symbol">
+  <label class="chk"><input type="checkbox" id="hideGap" checked> hide gap-driven</label>
+  <label class="chk"><input type="checkbox" id="hideThin" checked> hide illiquid</label>
+  <span class="meta" id="count"></span>
+</div>
+
+<div class="wrap"><table id="tbl">
+  <thead><tr>
+    <th class="l" data-k="symbol">symbol</th>
+    <th data-k="s30">30d ↓</th>
+    <th data-k="s14">14d</th>
+    <th data-k="s5">5d</th>
+    <th data-k="eff">consistency</th>
+    <th class="l" data-k="state">state</th>
+    <th data-k="total">30d %</th>
+    <th data-k="rel">vs nifty</th>
+    <th data-k="max_dd">max dd</th>
+    <th data-k="turnover_cr">turnover cr</th>
+    <th class="l">day 1 &rarr; 30</th>
+  </tr></thead>
+  <tbody></tbody>
+</table></div>
+
+<div class="legend">
+  score = annualised log drift &times; consistency&sup2;, where consistency is the efficiency ratio
+  (net move &divide; distance travelled). Strip runs oldest (left) to newest (right), shaded by that
+  session's move; the two gaps mark where the 14- and 5-session windows begin.
+  <b>The 5-session column is dimmed on purpose</b> — five points cannot support a reliable
+  ranking, so it feeds only the turn call in <i>state</i>. Sort on 30d or 14d.
+</div>
+
+<script>
+let DATA=null, sortKey="s30", sortDir=-1;
+
+const cls = v => v>0.001 ? "pos" : v<-0.001 ? "neg" : "zero";
+const w   = (r,n) => r.windows[n] ? r.windows[n].score : null;
+const eff = r => r.windows["30"] ? r.windows["30"].eff : 0;
+const fmt = v => v===null ? "—" : v.toFixed(0);
+const sign = v => (v>0?"+":"") + v.toFixed(2);
+
+// colour a session cell by its move, saturating around +/-4%
+function cellColour(v){
+  if(v===null||Math.abs(v)<0.05) return "var(--flat)";
+  const a = Math.min(1, Math.abs(v)/4);
+  const o = (0.18 + 0.82*a).toFixed(2);
+  return v>0 ? `rgba(46,163,107,${o})` : `rgba(209,69,59,${o})`;
+}
+
+function strip(r){
+  const n=r.daily.length;
+  return `<div class="strip">` + r.daily.map((v,i)=>{
+    const edge = (i===n-14||i===n-5) ? " class=\"edge\"" : "";
+    return `<i${edge} style="background:${cellColour(v)}" title="${r.dates[i]}  ${sign(v)}%"></i>`;
+  }).join("") + `</div>`;
+}
+
+function render(){
+  if(!DATA) return;
+  const q = document.getElementById("q").value.trim().toUpperCase();
+  const noGap = document.getElementById("hideGap").checked;
+  const noThin = document.getElementById("hideThin").checked;
+
+  let rows = DATA.rows.filter(r =>
+    (!q || r.symbol.includes(q)) && !(noGap && r.gappy) && !(noThin && r.thin));
+
+  const key = r => ({s30:w(r,30), s14:w(r,14), s5:w(r,5), eff:eff(r)}[sortKey]) ?? r[sortKey];
+  rows.sort((a,b)=>{
+    const x=key(a), y=key(b);
+    if(typeof x==="string") return x.localeCompare(y)*sortDir*-1;
+    return ((x??-1e9)-(y??-1e9))*sortDir;
+  });
+
+  document.querySelector("tbody").innerHTML = rows.map(r=>`
+    <tr>
+      <td class="l"><span class="sym">${r.symbol}</span>${
+        r.gappy?'<span class="flag f-gap">GAP</span>':''}${
+        r.thin?'<span class="flag f-thin">THIN</span>':''}${
+        r.stale?'<span class="flag f-thin">STALE</span>':''}</td>
+      <td class="${cls(w(r,30))}">${fmt(w(r,30))}</td>
+      <td class="${cls(w(r,14))}">${fmt(w(r,14))}</td>
+      <td class="${cls(w(r,5))} short">${fmt(w(r,5))}</td>
+      <td>${eff(r).toFixed(2)}<span class="r2bar"><b style="width:${(eff(r)*100).toFixed(0)}%"></b></span></td>
+      <td class="l"><span class="state st-${r.state.split(" ")[0]}">${r.state}</span></td>
+      <td class="${cls(r.total)}">${sign(r.total)}</td>
+      <td class="${r.rel===null?'zero':cls(r.rel)}">${r.rel===null?'—':sign(r.rel)}</td>
+      <td class="neg">${r.max_dd.toFixed(1)}</td>
+      <td class="zero">${r.turnover_cr===null?'—':r.turnover_cr.toFixed(1)}</td>
+      <td class="l">${strip(r)}</td>
+    </tr>`).join("");
+
+  document.getElementById("count").textContent =
+    `${rows.length} shown of ${DATA.rows.length} scored`;
+}
+
+document.querySelectorAll("th[data-k]").forEach(th=>{
+  th.onclick = ()=>{
+    const k = th.dataset.k;
+    if(k===sortKey) sortDir*=-1; else {sortKey=k; sortDir=-1;}
+    document.querySelectorAll("th[data-k]").forEach(o=>{
+      o.classList.toggle("sorted", o===th);
+      o.textContent = o.textContent.replace(/ [↑↓]$/,"");
+    });
+    th.textContent += sortDir<0 ? " ↓" : " ↑";
+    render();
+  };
+});
+["q","hideGap","hideThin"].forEach(id=>{
+  const el=document.getElementById(id);
+  el.addEventListener(el.type==="checkbox"?"change":"input", render);
+});
+
+function fail(reason){
+  document.querySelector(".wrap").innerHTML =
+    `<div id="err"><h2>No data loaded</h2>
+     <p>${reason}</p>
+     <p>Run <code>python trend_scan.py</code> to produce <code>trend.json</code>,
+        or wait for the scheduled refresh to commit it.</p></div>`;
+  document.getElementById("meta").textContent = "no data";
+}
+
+fetch("trend.json?t="+Date.now())
+  .then(r=>{ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+  .then(d=>{
+    DATA=d;
+    const t=new Date(d.generated);
+    document.getElementById("meta").textContent =
+      `${d.windows.join("/")} sessions · ${d.resolved}/${d.requested} resolved` +
+      (d.benchmark_return!==null?` · nifty ${sign(d.benchmark_return)}%`:"") +
+      ` · built ${t.toLocaleString()}`;
+    render();
+  })
+  .catch(e=>fail(
+    location.protocol==="file:"
+      ? "Opened straight from disk, so the page cannot read trend.json. Serve the folder over HTTP instead."
+      : "trend.json is missing or unreadable ("+e.message+")."));
+</script>
+</body>
+</html>
