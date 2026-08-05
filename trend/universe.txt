@@ -1,0 +1,28 @@
+# One NSE ticker per line, Yahoo format (SYMBOL.NS). Blank lines and # comments ignored.
+# Prototype list — replace with your full 500-800 when ready.
+# Any ticker that fails to resolve is listed in the run log, not silently dropped.
+IONEXCHANG.NS
+WABAG.NS
+JASH.NS
+KSB.NS
+KIRLOSBROS.NS
+HITACHIENERGY.NS
+SIEMENS.NS
+ABB.NS
+CGPOWER.NS
+TRANSFORMERS.NS
+SANSERA.NS
+DYNAMATECH.NS
+NRBBEARING.NS
+SCHAEFFLER.NS
+THYROCARE.NS
+LALPATHLAB.NS
+METROPOLIS.NS
+SOLARA.NS
+CAPRIGLOB.NS
+NAUKRI.NS
+RELIANCE.NS
+HDFCBANK.NS
+TCS.NS
+SUNPHARMA.NS
+LT.NS
