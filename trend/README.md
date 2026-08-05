@@ -56,6 +56,12 @@ one ticker per line in Yahoo format (`SYMBOL.NS`). Blank lines and `#` comments
 ignored. Edit that file to add or drop names; unresolved tickers are printed at
 the end of the Actions log, never silently dropped.
 
+`names.csv` maps `Symbol` → `Company Name`, so the board shows *Sansera
+Engineering Ltd.* rather than *SANSERA*. The ticker is still displayed beside the
+name, and the filter box matches either. The file is optional — a symbol missing
+from it (or a missing file) falls back to the bare ticker, so the scan never
+fails over a name.
+
 ## Refresh cadence
 
 The `refresh-trend` GitHub Action runs **at least hourly while NSE is open**

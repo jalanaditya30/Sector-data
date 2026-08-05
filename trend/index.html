@@ -75,6 +75,12 @@ tbody tr:nth-child(even){background:var(--zebra)}
 tbody tr:hover{background:var(--hover)}
 tbody tr:last-child td{border-bottom:none}
 .sym{font-weight:700;letter-spacing:.01em;font-size:13.5px}
+/* ticker kept alongside the company name — needed to act on a row */
+.tkr{margin-left:7px;font-size:10.5px;font-weight:600;letter-spacing:.05em;
+  color:var(--dim);background:var(--bg);border:1px solid var(--line);
+  padding:1px 5px;border-radius:4px;vertical-align:1px;
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+thead th:first-child,tbody td:first-child{min-width:305px;white-space:normal}
 td.price{font-weight:600}
 .pos{color:var(--up)} .neg{color:var(--down)} .zero{color:var(--faint)}
 td.score{font-weight:700}
@@ -169,7 +175,8 @@ th[data-k=s5]{opacity:.62}
 </header>
 
 <div class="controls">
-  <input type="search" id="q" placeholder="Filter symbol…" aria-label="Filter by symbol">
+  <input type="search" id="q" placeholder="Filter company or ticker…"
+         aria-label="Filter by company name or ticker">
   <label class="chk"><input type="checkbox" id="hideGap" checked> hide gap-driven</label>
   <label class="chk"><input type="checkbox" id="hideThin" checked> hide illiquid</label>
   <span class="meta" id="count"></span>
@@ -177,7 +184,7 @@ th[data-k=s5]{opacity:.62}
 
 <div class="wrap"><table id="tbl">
   <thead><tr>
-    <th class="l" data-k="symbol" data-label="symbol">symbol</th>
+    <th class="l" data-k="name" data-label="company">company</th>
     <th data-k="last" data-label="price ₹">price ₹</th>
     <th data-k="s10" data-label="10d score">10d score</th>
     <th data-k="s5" data-label="5d score">5d score</th>
@@ -226,6 +233,8 @@ const fmt  = v => v===null ? "—" : v.toFixed(0);
 const sign = v => (v>0?"+":"") + v.toFixed(2);
 const rupee = v => v==null ? "—"
   : v.toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
+// rows scanned before names.csv existed have no `name` — fall back to the ticker
+const nameOf = r => r.name || r.symbol;
 
 // map a state string to its pill class
 function stateCls(s){
@@ -276,10 +285,13 @@ function render(){
   const noGap = document.getElementById("hideGap").checked;
   const noThin = document.getElementById("hideThin").checked;
 
+  // match either the company name or the ticker, so both stay searchable
   let rows = DATA.rows.filter(r =>
-    (!q || r.symbol.includes(q)) && !(noGap && r.gappy) && !(noThin && r.thin));
+    (!q || r.symbol.includes(q) || nameOf(r).toUpperCase().includes(q))
+    && !(noGap && r.gappy) && !(noThin && r.thin));
 
-  const key = r => ({s10:w(r,10), s5:w(r,5), eff:eff(r)}[sortKey]) ?? r[sortKey];
+  const key = r => ({s10:w(r,10), s5:w(r,5), eff:eff(r), name:nameOf(r)}[sortKey])
+                   ?? r[sortKey];
   rows.sort((a,b)=>{
     const x=key(a), y=key(b);
     if(typeof x==="string") return x.localeCompare(y)*sortDir*-1;
@@ -288,7 +300,7 @@ function render(){
 
   document.querySelector("tbody").innerHTML = rows.map(r=>`
     <tr>
-      <td class="l"><span class="sym">${r.symbol}</span>${
+      <td class="l"><span class="sym">${nameOf(r)}</span><span class="tkr">${r.symbol}</span>${
         r.gappy?'<span class="flag f-gap">GAP</span>':''}${
         r.thin?'<span class="flag f-thin">THIN</span>':''}${
         r.stale?'<span class="flag f-thin">STALE</span>':''}</td>
