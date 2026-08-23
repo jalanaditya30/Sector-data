@@ -35,6 +35,8 @@ h1 span{color:var(--up)}
 .chip.up{color:var(--up);background:var(--upsoft);border-color:#b9e3cd}
 .chip.down{color:var(--down);background:var(--downsoft);border-color:#f6c9c4}
 .chip.gold{color:var(--gold);background:var(--goldsoft);border-color:#efd9a4}
+/* the whole-market figure, shown beside the on-screen one when filters hide rows */
+.chip .of{opacity:.55;font-weight:500;margin:0 4px}
 
 /* ---------- controls ---------- */
 .controls{display:flex;flex-wrap:wrap;gap:10px 14px;padding:12px 22px;
@@ -274,9 +276,12 @@ function render(){
   const q=document.getElementById("q").value.trim().toUpperCase();
   const only=document.getElementById("only").checked;
   const noThin=document.getElementById("hideThin").checked;
-  let rows=DATA.rows.filter(r=>
+  // split out from the verdict toggle so the chips below can count the same
+  // board without "quiet climbs only" zeroing every other verdict by definition
+  const passes=r=>
     (!q||r.symbol.includes(q)||nameOf(r).toUpperCase().includes(q)||(r.isin||"").includes(q))
-    && !(only && r.verdict!=="quiet climb") && !(noThin&&r.thin));
+    && !(noThin&&r.thin);
+  let rows=DATA.rows.filter(r=>passes(r) && !(only && r.verdict!=="quiet climb"));
   rows.sort((a,b)=>{const x=keyOf(a),y=keyOf(b);
     if(typeof x==="string") return x.localeCompare(y)*-dir;
     return ((x??-1e9)-(y??-1e9))*dir;});
@@ -299,13 +304,22 @@ function render(){
   document.getElementById("count").textContent=
     `${rows.length} shown of ${DATA.rows.length} scored`;
 
-  // tally across everything scored, not just the filtered view
-  const t=DATA.rows.reduce((a,r)=>{a[r.verdict]=(a[r.verdict]||0)+1;return a;},{});
+  // The chips count the board as filtered — minus the verdict toggle, which
+  // would otherwise zero every chip but one. Counting everything scored instead
+  // reads as a contradiction: a chip claiming 40 quiet climbs over a table
+  // holding 12, the rest dropped as illiquid. Where rows are hidden, the chip
+  // carries both numbers.
+  const count=rs=>rs.reduce((a,r)=>{a[r.verdict]=(a[r.verdict]||0)+1;return a;},{});
+  const t=count(DATA.rows.filter(passes)), all=count(DATA.rows);
+  const chip=(cls,v)=>{
+    const now=t[v]||0, tot=all[v]||0, hidden=tot-now;
+    return `<span class="chip ${cls}"${hidden?` title="${hidden} more ${v} hidden by the`
+      +` filters above. Untick them to see all ${tot}."`:""}>`
+      +`${now}${hidden?`<span class="of">of ${tot}</span>`:""} ${v}</span>`;
+  };
   document.getElementById("chips").innerHTML=
-    `<span class="chip up">${t["quiet climb"]||0} quiet climb</span>`+
-    `<span class="chip down">${t["quiet slide"]||0} quiet slide</span>`+
-    `<span class="chip gold">${t["one big day"]||0} one big day</span>`+
-    `<span class="chip">${t["no pattern"]||0} no pattern</span>`;
+    chip("up","quiet climb")+chip("down","quiet slide")+
+    chip("gold","one big day")+chip("","no pattern");
 }
 
 document.querySelectorAll("th[data-k]").forEach(th=>th.onclick=()=>{
