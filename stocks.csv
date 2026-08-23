@@ -201,7 +201,6 @@ INE531E01026,Hindustan Copper,HINDCOPPER,513599,HINDCOPPER.NS,Non - Ferrous Meta
 INE180A01020,Max Financial,MFSL,500271,MFSL.NS,Insurance,Life Insurance,1585,54700.69
 INE774D01024,M & M Fin. Serv.,M&MFIN,532720,M&MFIN.NS,Finance,Non Banking Financial Company (NBFC),381.6,53041.3
 INE878B01027,KEI Industries,KEI,517569,KEI.NS,Industrial Products,Cables - Electricals,5527.6,52844.18
-INE0BWS23018,Altius Telecom,,543225,543225.BO,Telecom - Services,Telecom - Infrastructure,173,52720.02
 INE1JAR25012,Knowledge Realty,KRT,544481,KRT.NS,Realty,Real Estate Investment Trusts (REITs),115.99,51434.6
 INE259A01022,Colgate-Palmoliv,COLPAL,500830,COLPAL.NS,Personal Products,Personal Care,1889,51378.09
 INE073K01018,Sona BLW Precis.,SONACOMS,543300,SONACOMS.NS,Auto Components,Auto Components & Equipments,817.6,51009.3
@@ -413,7 +412,6 @@ INE03QK01018,Cohance Life,COHANCE,543064,COHANCE.NS,Pharmaceuticals & Biotechnol
 INE0KXY23015,Vertis Infra.,VERTIS,,VERTIS.NS,Transport Infrastructure,"Road AssetsToll, Annuity, Hybrid-Annuity",117,17666.81
 INE013P01021,OneSource Speci.,ONESOURCE,544292,ONESOURCE.NS,Pharmaceuticals & Biotechnology,Pharmaceuticals,1535,17602.29
 INE548C01032,Emami,EMAMILTD,531162,EMAMILTD.NS,Personal Products,Personal Care,402.6,17573.49
-INE459E01012,IDream Film,,504375,504375.BO,IT - Software,Computers - Software & Consulting,649.5,17572.44
 INE616N01034,Inox India,INOXINDIA,544046,INOXINDIA.NS,Industrial Products,Other Industrial Products,1930.2,17519.17
 INE148I01020,Sammaan Capital,SAMMAANCAP,535789,SAMMAANCAP.NS,Finance,Housing Finance Company,150.52,17483.55
 INE0LXG01040,Ola Electric,OLAELEC,544225,OLAELEC.NS,Automobiles,2/3 Wheelers,37.73,17462.98
@@ -442,7 +440,6 @@ INE03Q201024,Alivus Life,ALIVUS,543322,ALIVUS.NS,Pharmaceuticals & Biotechnology
 INE291A01017,Garware Hi Tech,GRWRHITECH,500655,GRWRHITECH.NS,Industrial Products,Plastic Products - Industrial,7123.5,16549.6
 INE703B01027,Ratnamani Metals,RATNAMANI,520111,RATNAMANI.NS,Industrial Products,Iron & Steel Products,2354.4,16502.46
 INE177H01039,Godawari Power,GPIL,532734,GPIL.NS,Industrial Products,Iron & Steel Products,245.09,16496.94
-INE301O01023,N S D L,,544467,544467.BO,Capital Markets,"Depositories, Clearing Houses and Other Intermediaries",823.95,16479
 INE398R01022,Syngene Intl.,SYNGENE,539268,SYNGENE.NS,Healthcare Services,"Healthcare Research, Analytics & Technology",407.25,16439.43
 INE338H01029,Concord Biotech,CONCORDBIO,543960,CONCORDBIO.NS,Pharmaceuticals & Biotechnology,Pharmaceuticals,1571.3,16438.34
 INE168A01041,J & K Bank,J&KBANK,532209,J&KBANK.NS,Banks,Private Sector Bank,149.01,16408.72
@@ -563,7 +560,6 @@ INE962Y01021,Ircon Intl.,IRCON,541956,IRCON.NS,Construction,Civil Construction,1
 INE0CLI01024,Rategain Travel,RATEGAIN,543417,RATEGAIN.NS,IT - Software,Computers - Software & Consulting,990.05,11728.43
 INE351F01018,JP Power Ven.,JPPOWER,532627,JPPOWER.NS,Power,Power Generation,17.1,11719.41
 INE0NNS01018,NMDC Steel,NSLNISP,543768,NSLNISP.NS,Ferrous Metals,Iron & Steel,39.79,11660.88
-INE713N01013,RRPSemiconductor,,504346,504346.BO,Finance,Other Financial Services,8544.2,11640.62
 INE389H01022,KEC International,KEC,532714,KEC.NS,Construction,Civil Construction,435.95,11604.99
 INE0UIZ01018,Blackbuck,BLACKBUCK,544288,BLACKBUCK.NS,Transport Services,Transport Related Services,634.3,11553.78
 INE112L01020,Metropolis Healt,METROPOLIS,542650,METROPOLIS.NS,Healthcare Services,Healthcare Service Provider,556.95,11550.45
@@ -612,7 +608,6 @@ INE785M01021,PC Jeweller,PCJEWELLER,534809,PCJEWELLER.NS,Consumer Durables,"Gems
 INE050A01025,The Bombay Burmah,BBTC,501425,BBTC.NS,Food Products,Packaged Foods,1427.4,9959.24
 INE183A01024,Finolex Inds.,FINPIPE,500940,FINPIPE.NS,Industrial Products,Plastic Products - Industrial,160.44,9954.93
 INE136B01020,Cyient,CYIENT,532175,CYIENT.NS,IT - Services,IT Enabled Services,892.65,9921.07
-INE0M5S23019,Maple Inf. Trust,,543925,543925.BO,Transport Infrastructure,"Road AssetsToll, Annuity, Hybrid-Annuity",142.9,9836.63
 INE123F01029,MMTC,MMTC,513377,MMTC.NS,Commercial Services & Supplies,Trading & Distributors,65.38,9807
 INE979A01025,Saregama India,SAREGAMA,532163,SAREGAMA.NS,Entertainment,Media & Entertainment,506.55,9766.76
 INE716A01013,Whirlpool India,WHIRLPOOL,500238,WHIRLPOOL.NS,Consumer Durables,Household Appliances,768.5,9750.1
@@ -678,7 +673,6 @@ INE284S01014,SJS Enterprises,SJS,543387,SJS.NS,Auto Components,Auto Components &
 INE621H01010,Religare Enterp.,RELIGARE,532915,RELIGARE.NS,Finance,Investment Company,231.6,7984.03
 INE0LMW01024,Cello World,CELLO,544012,CELLO.NS,Consumer Durables,Houseware,361.45,7983.89
 INE276A01018,Garware Tech.,GARFIBRES,509557,GARFIBRES.NS,Textiles & Apparels,Other Textile Products,802.6,7967.08
-INE899I01028,Symbiotec Pharma,,,,,,,7955.2
 INE099Z01011,Mishra Dhatu Nig,MIDHANI,541195,MIDHANI.NS,Aerospace & Defense,Aerospace & Defense,423.95,7942.28
 INE211R01019,Power Mech Proj.,POWERMECH,539302,POWERMECH.NS,Construction,Civil Construction,2502.4,7911.66
 INE517F01014,Guj Pipavav Port,GPPL,533248,GPPL.NS,Transport Infrastructure,Port & Port services,163.54,7906.18
@@ -710,7 +704,6 @@ INE619B01017,Newgen Software,NEWGEN,540900,NEWGEN.NS,IT - Software,Computers - S
 INE900L01028,M B Agro Prod.,MBAPL,,MBAPL.NS,Fertilizers & Agrochemicals,Fertilizers,169.52,7427.26
 INE07T201019,Restaurant Brand,RBA,543248,RBA.NS,Leisure Services,Restaurants,104.24,7418.96
 INE0LRU01027,Aarti Pharma,AARTIPHARM,543748,AARTIPHARM.NS,Pharmaceuticals & Biotechnology,Pharmaceuticals,816.8,7406.73
-INE16W401027,Augmont Enterpri,,,,,,,7405.23
 INE517B01013,Tata Tele. Mah.,TTML,532371,TTML.NS,Telecom - Services,Telecom - Cellular & Fixed line services,37.78,7385.72
 INE922K01024,INDIA SHELTE FIN,INDIASHLTR,544044,INDIASHLTR.NS,Finance,Housing Finance Company,675.25,7357.98
 INE429E01023,Safari Inds.,SAFARI,523025,SAFARI.NS,Consumer Durables,Plastic Products - Consumer,1496.8,7333.92
@@ -726,7 +719,6 @@ INE00GO01025,Leap India,LEAPIND,544865,LEAPIND.NS,Commercial Services & Supplies
 INE083K01017,Bengal & Assam,BENGALASM,533095,BENGALASM.NS,Finance,Non Banking Financial Company (NBFC),6256,7134.28
 INE789E01012,JK Paper,JKPAPER,532162,JKPAPER.NS,"Paper, Forest & Jute Products",Paper & Paper Products,391.8,7104.07
 INE0LZF01013,Waterways Leisur,CORDELIA,544802,CORDELIA.NS,Leisure Services,"Tour, Travel Related Services",978.4,7083.08
-INE639B01023,Tanfac Inds.,,506854,506854.BO,Chemicals & Petrochemicals,Commodity Chemicals,3318.2,7037.54
 INE855B01025,Rain Industries,RAIN,500339,RAIN.NS,Chemicals & Petrochemicals,Petrochemicals,208.61,7016.6
 INE546C01010,Piccadily Agro,PICCADIL,530305,PICCADIL.NS,Beverages,Breweries & Distilleries,709.8,6996.65
 INE428V01029,Nephrocare Health Services,NEPHROPLUS,544647,NEPHROPLUS.NS,Healthcare Services,Healthcare Service Provider,694.1,6979.8
@@ -750,7 +742,6 @@ INE011E01029,Balu Forge,BALUFORGE,531112,BALUFORGE.NS,Industrial Products,Castin
 INE917M01012,Dilip Buildcon,DBL,540047,DBL.NS,Construction,Civil Construction,414.6,6734.96
 INE050E01027,Balaji Amines,BALAMINES,530999,BALAMINES.NS,Chemicals & Petrochemicals,Specialty Chemicals,2078.2,6733.58
 INE665J01013,V-Mart Retail,VMART,534976,VMART.NS,Retailing,Diversified Retail,838.85,6675.18
-INE867C01010,ASM Technologies,,526433,526433.BO,IT - Software,Computers - Software & Consulting,4575.1,6673.54
 INE024001021,Aeroflex,AEROFLEX,543972,AEROFLEX.NS,Industrial Products,Iron & Steel Products,503,6656.24
 INE647O01011,Aditya Bir. Fas.,ABFRL,535755,ABFRL.NS,Retailing,Speciality Retail,54.35,6633.47
 INE177F01017,Kovai Medical,KOVAI,523323,KOVAI.NS,Healthcare Services,Hospital,6034.5,6601.74
@@ -793,7 +784,6 @@ INE955V01021,Arvind Fashions.,ARVINDFASN,542484,ARVINDFASN.NS,Retailing,Speciali
 INE0NAZ01010,Smartworks Cowor,SMARTWORKS,544447,SMARTWORKS.NS,Commercial Services & Supplies,Diversified Commercial Services,523.25,5984.99
 INE126M01010,Indiabulls,IBULLSLTD,533520,IBULLSLTD.NS,Commercial Services & Supplies,Diversified Commercial Services,25.58,5958.97
 INE0M4D01010,Standard Engineering Technology,SETL,544333,SETL.NS,Industrial Manufacturing,Industrial Products,297.75,5939.86
-INE738D01029,Mrugesh Trading,,512065,512065.BO,Finance,Non Banking Financial Company (NBFC),82.01,5924.81
 INE285J01028,SIS,SIS,540673,SIS.NS,Other Consumer Services,Other Consumer Services,417.75,5904.1
 INE007N01010,Fedbank Financi.,FEDFINA,544027,FEDFINA.NS,Finance,Non Banking Financial Company (NBFC),156.84,5881.76
 INE353K01014,I T D C,ITDC,532189,ITDC.NS,Leisure Services,Hotels & Resorts,684.3,5869.2
@@ -861,9 +851,7 @@ INE485C01029,IOL Chemicals,IOLCP,524164,IOLCP.NS,Pharmaceuticals & Biotechnology
 INE943D01017,MPS,MPSLTD,532440,MPSLTD.NS,Printing & Publication,Printing & Publication,2897.9,4957.09
 INE255X01014,MSTC,MSTCLTD,542597,MSTCLTD.NS,Commercial Services & Supplies,Trading & Distributors,701.45,4938.21
 INE291D01011,KDDL Ltd,KDDL,532054,KDDL.NS,Consumer Durables,"Gems, Jewellery And Watches",4005.4,4926.35
-INE05KD23015,Energy InfrTrust,,542543,542543.BO,Gas,Gas Transmission/Marketing,74.04,4916.26
 INE127I01024,Goodluck India,GOODLUCK,530655,GOODLUCK.NS,Industrial Products,Iron & Steel Products,490.9,4895.04
-INE519N01014,Midwest Energy,,526570,526570.BO,Other Construction Materials,Other Construction Materials,3771,4891.82
 INE945F01025,Dec.Gold Mines,DECNGOLD,512068,DECNGOLD.NS,Non - Ferrous Metals,Precious Metals,245.67,4881.51
 INE415A01038,AGI Greenpac,AGI,500187,AGI.NS,Industrial Products,Packaging,753.6,4875.59
 INE350C01017,Optiemus Infra.,OPTIEMUS,530135,OPTIEMUS.NS,Telecom -  Equipment & Accessories,Telecom -  Equipment & Accessories,540.2,4870.79
@@ -905,7 +893,6 @@ INE01QM01018,eMudhra,EMUDHRA,543533,EMUDHRA.NS,IT - Services,IT Enabled Services
 INE207E01023,Ram Ratna Wires,RAMRAT,522281,RAMRAT.NS,Electrical Equipment,Other Electrical Equipment,477.35,4456.02
 INE024F01011,Shilchar Tech.,SHILCTECH,531201,SHILCTECH.NS,Electrical Equipment,Other Electrical Equipment,3883.1,4442.34
 INE516A01017,Uflex,UFLEX,500148,UFLEX.NS,Industrial Products,Packaging,614.6,4438.12
-INE0OXY01013,Afcom Holdings,,544224,544224.BO,Transport Services,Logistics Solution Provider,1544,4433.38
 INE02ID01020,Raymond Lifestyl,RAYMONDLSL,544240,RAYMONDLSL.NS,Textiles & Apparels,Other Textile Products,726.95,4428.84
 INE765D01022,WPIL,WPIL,505872,WPIL.NS,Industrial Manufacturing,Industrial Products,451.35,4408.37
 INE0FHS01024,Deep Industries,DEEPINDS,543288,DEEPINDS.NS,Oil,Oil Equipment & Services,688.05,4403.52
@@ -941,7 +928,6 @@ INE925R01014,CMS Info Systems,CMSINFO,543441,CMSINFO.NS,Commercial Services & Su
 INE193E01025,Bajaj Electrical,BAJAJELEC,500031,BAJAJELEC.NS,Consumer Durables,Household Appliances,351.65,4057.79
 INE515A01019,John Cockerill,COCKERILL,500147,COCKERILL.NS,Industrial Manufacturing,Industrial Products,8213.5,4055.67
 INE0OJW01016,Rossell Techsys,ROSSTECH,544294,ROSSTECH.NS,Aerospace & Defense,Aerospace & Defense,1074.2,4049.36
-INE052V01019,CIAN Agro,,519477,519477.BO,Agricultural Food & other Products,Edible Oil,1445,4043.96
 INE349Y01013,Ideaforge Tech,IDEAFORGE,543932,IDEAFORGE.NS,Aerospace & Defense,Aerospace & Defense,812.5,4038.82
 INE056I01025,Refex Industries,REFEX,532884,REFEX.NS,Other Utilities,Waste Management,293.95,4033.57
 INE495A01022,Dalmia Bharat,DALMIASUG,500097,DALMIASUG.NS,Agricultural Food & other Products,Sugar,497.95,4030.37
@@ -951,7 +937,6 @@ INE0R8O23017,Sustainable Ener,SEITINVIT,,SEITINVIT.NS,Power,Power Generation,124
 INE06ST01018,Indiqube Spaces,INDIQUBE,544454,INDIQUBE.NS,Commercial Services & Supplies,Diversified Commercial Services,189.1,4008.88
 INE0ILV01024,Capillary Tech.,CAPILLARY,544614,CAPILLARY.NS,IT - Software,Software Products,502.35,3998.14
 INE935B01025,Moschip Tech.,MOSCHIP,532407,MOSCHIP.NS,IT - Hardware,Computers Hardware & Equipments,204.89,3996.34
-INE758D01027,Dhenu Buildcon,,501945,501945.BO,Finance,Non Banking Financial Company (NBFC),6.72,3987.51
 INE0JUS01029,Harsha Engg Intl,HARSHA,543600,HARSHA.NS,Industrial Products,Other Industrial Products,437.6,3984.09
 INE295D01020,NACL Industries,NACLIND,524709,NACLIND.NS,Fertilizers & Agrochemicals,Pesticides & Agrochemicals,169.97,3981.43
 INE766P01016,Mahindra Logis.,MAHLOG,540768,MAHLOG.NS,Transport Services,Logistics Solution Provider,401.15,3980.31
@@ -959,7 +944,6 @@ INE450D01021,Pitti Engg.,PITTIENG,513519,PITTIENG.NS,Industrial Manufacturing,In
 INE142Z01019,Orient Electric,ORIENTELEC,541301,ORIENTELEC.NS,Consumer Durables,Household Appliances,185.08,3948.98
 INE0JPD01013,Sanathan Textile,SANATHAN,544314,SANATHAN.NS,Textiles & Apparels,Other Textile Products,465.6,3929.85
 INE455I01029,Kaveri Seed Co.,KSCL,532899,KSCL.NS,Agricultural Food & other Products,Other Agricultural Products,760.1,3909.88
-INE0QSW23016,Intellig Sup Tru,,544005,544005.BO,Transport Services,Shipping,128,3901.44
 INE0S3G01027,Pace Digitek,PACEDIGITK,544550,PACEDIGITK.NS,Telecom - Services,Telecom - Infrastructure,180.69,3900.22
 INE250A01039,Kirloskar Indus.,KIRLOSIND,500243,KIRLOSIND.NS,Industrial Products,Iron & Steel Products,3685,3872.78
 INE907A01026,Kalyani Steels,KSL,500235,KSL.NS,Industrial Products,Iron & Steel Products,881.15,3846.49
@@ -977,7 +961,6 @@ INE0GK401011,Tatva Chintan,TATVA,543321,TATVA.NS,Chemicals & Petrochemicals,Spec
 INE358U01012,Zota Health Care,ZOTA,,ZOTA.NS,Pharmaceuticals & Biotechnology,Pharmaceuticals,1087.4,3765.95
 INE633B01018,Polyplex Corpn,POLYPLEX,524051,POLYPLEX.NS,Industrial Products,Packaging,1194.1,3748.57
 INE421C01016,TVS Srichakra,TVSSRICHAK,509243,TVSSRICHAK.NS,Auto Components,Tyres & Rubber Products,4879.1,3737.39
-INE0L1C01019,Kesar India,,543542,543542.BO,Realty,"Residential, Commercial Projects",1195,3734.2
 INE822C01015,TCPL Packaging,TCPLPACK,523301,TCPLPACK.NS,Industrial Products,Packaging,4101.3,3732.18
 INE753U01022,Divgi Torq,DIVGIITTS,543812,DIVGIITTS.NS,Auto Components,Auto Components & Equipments,1217.9,3724.69
 INE0AJG01018,Hemisphere Prop,HEMIPROP,543242,HEMIPROP.NS,Commercial Services & Supplies,Diversified Commercial Services,130.58,3721.53
@@ -1002,7 +985,6 @@ INE124E01038,Steelcast,STEELCAS,513517,STEELCAS.NS,Industrial Products,Castings 
 INE578A01017,Heidelberg Cem.,HEIDELBERG,500292,HEIDELBERG.NS,Cement & Cement Products,Cement & Cement Products,158.98,3602.7
 INE046W01019,Muthoot Microfin,MUTHOOTMF,544055,MUTHOOTMF.NS,Finance,Microfinance Institutions,210.87,3595.17
 INE855C01023,Websol Energy,WEBELSOLAR,517498,WEBELSOLAR.NS,Electrical Equipment,Other Electrical Equipment,82.8,3594.87
-INE567L01025,Lords Mark Industries,,501261,501261.BO,Commercial Services & Supplies,Consulting Services,84.08,3587.04
 INE863B01029,Prem. Explosives,PREMEXPLN,526247,PREMEXPLN.NS,Chemicals & Petrochemicals,Explosives,665.15,3575.93
 INE634I01029,KNR Construct.,KNRCON,532942,KNRCON.NS,Construction,Civil Construction,127,3571.68
 INE631A01022,Shanthi Gears,SHANTIGEAR,522034,SHANTIGEAR.NS,Industrial Manufacturing,Industrial Products,464.25,3561.53
@@ -1044,7 +1026,6 @@ INE094B01013,Ashika Global Securities.,ASHIKAG,543766,ASHIKAG.NS,Finance,Non Ban
 INE0JA001018,Venus Pipes,VENUSPIPES,543528,VENUSPIPES.NS,Industrial Products,Iron & Steel Products,1556.6,3224.67
 INE382M01027,United Foodbrands,UFBL,543283,UFBL.NS,Leisure Services,Restaurants,822.6,3217.82
 INE442H01029,Ashoka Buildcon,ASHOKA,533271,ASHOKA.NS,Construction,Civil Construction,114.22,3206.42
-INE0Q8P01029,Bondada Engineer,,543971,543971.BO,Telecom - Services,Telecom - Infrastructure,286.35,3197.71
 INE401H01017,Kewal Kir.Cloth.,KKCL,532732,KKCL.NS,Textiles & Apparels,Garments & Apparels,516.45,3182.63
 INE01FR01028,Baazar Style,STYLEBAAZA,544243,STYLEBAAZA.NS,Retailing,Speciality Retail,417.65,3179.04
 INE266D01021,Grauer & Weil,GRAUWEIL,505710,GRAUWEIL.NS,Chemicals & Petrochemicals,Commodity Chemicals,70.07,3177.05
@@ -1056,7 +1037,6 @@ INE922A01025,Bhansali Engg.,BEPL,500052,BEPL.NS,Chemicals & Petrochemicals,Petro
 INE506A01018,Dredging Corpn.,DREDGECORP,523618,DREDGECORP.NS,Engineering Services,Dredging,1116.5,3126.2
 INE415I01015,Kiri Industries,KIRIINDUS,532967,KIRIINDUS.NS,Chemicals & Petrochemicals,Dyes And Pigments,477.9,3114.38
 INE314H01012,Technvision Ven.,TECHNVISN,501421,TECHNVISN.NS,IT - Software,Software Products,4932,3097.3
-INE1KZI01025,Tempsens Instruments,,,,,,,3069.98
 INE310A01015,Nilkamal Ltd,NILKAMAL,523385,NILKAMAL.NS,Consumer Durables,Plastic Products - Consumer,2053.6,3063.97
 INE034S01021,Arvind SmartSp.,ARVSMART,539301,ARVSMART.NS,Realty,"Residential, Commercial Projects",667,3061.33
 INE903D01011,Monarch Networth,MONARCH,511551,MONARCH.NS,Capital Markets,Stockbroking & Allied,385.45,3056.94
@@ -1071,7 +1051,6 @@ INE164A01016,Balmer Lawrie,BALMLAWRIE,523319,BALMLAWRIE.NS,Diversified,Diversifi
 INE039O01029,Jash Engineering,JASH,544402,JASH.NS,Industrial Manufacturing,Industrial Products,472.5,2985.9
 INE0I0M01023,Prabha Energy,PRABHA,544379,PRABHA.NS,Oil,Oil Exploration & Production,217.66,2979.89
 INE579B01039,Elpro Internatio,ELPROINTL,504000,ELPROINTL.NS,Realty,"Residential, Commercial Projects",175.47,2973.85
-INE520G01024,Axis Solution,,511144,511144.BO,IT - Software,Computers - Software & Consulting,628.85,2971.96
 INE231F01020,Sasken Technol.,SASKEN,532663,SASKEN.NS,IT - Services,IT Enabled Services,1949,2960.82
 INE060A01024,Navneet Educat.,NAVNETEDUL,508989,NAVNETEDUL.NS,Household Products,Stationary,133.62,2955.85
 INE624Z01016,Solara Active,SOLARA,541540,SOLARA.NS,Pharmaceuticals & Biotechnology,Pharmaceuticals,616.9,2948.45
@@ -1102,7 +1081,6 @@ INE244B01030,Patel Engineerin,PATELENG,531120,PATELENG.NS,Construction,Civil Con
 INE197D01010,Jindal Poly Film,JINDALPOLY,500227,JINDALPOLY.NS,Industrial Products,Packaging,637.6,2791.82
 INE163A01018,NOCIL,NOCIL,500730,NOCIL.NS,Chemicals & Petrochemicals,Specialty Chemicals,167.02,2789.65
 INE637C01025,Pokarna,POKARNA,532486,POKARNA.NS,Consumer Durables,Granites & Marbles,897.7,2783.23
-INE317W01030,Colab Platforms,,542866,542866.BO,Finance,Other Financial Services,136.4,2782.56
 INE02A801020,Rossari Biotech,ROSSARI,543213,ROSSARI.NS,Chemicals & Petrochemicals,Specialty Chemicals,501.75,2779.4
 INE0JEI23010,Roadstar Infra,ROADSTAR,544374,ROADSTAR.NS,Transport Infrastructure,"Road AssetsToll, Annuity, Hybrid-Annuity",61.01,2778.87
 INE725E01024,Orissa Minerals,ORISSAMINE,590086,ORISSAMINE.NS,Minerals & Mining,Industrial Minerals,4617.5,2770.5
@@ -1112,13 +1090,11 @@ INE08KJ01020,Mufin Green,MUFIN,542774,MUFIN.NS,Finance,Non Banking Financial Com
 INE0Z8Z23013,Capital Infra,CAPINVIT,544338,CAPINVIT.NS,Construction,Civil Construction,76.98,2763.44
 INE713R01022,GSP Crop Science,GSPCROP,544733,GSPCROP.NS,Fertilizers & Agrochemicals,Pesticides & Agrochemicals,594,2763.21
 INE076B01028,Siyaram Silk,SIYSIL,503811,SIYSIL.NS,Textiles & Apparels,Other Textile Products,606.35,2751.02
-INE00GK01023,Yash Highvoltage,,544310,544310.BO,Electrical Equipment,Other Electrical Equipment,912.2,2726.35
 INE385W01011,Dishman Carbogen,DCAL,540701,DCAL.NS,Pharmaceuticals & Biotechnology,Pharmaceuticals,173.54,2720.81
 INE874I01013,Ramky Infra,RAMKY,533262,RAMKY.NS,Construction,Civil Construction,392.2,2713.94
 INE885H01029,Sportking India,SPORTKING,539221,SPORTKING.NS,Textiles & Apparels,Other Textile Products,213.07,2707.52
 INE876N01018,Orient Cement,ORIENTCEM,535754,ORIENTCEM.NS,Cement & Cement Products,Cement & Cement Products,131.52,2702.21
 INE464A01036,Bharat Bijlee,BBL,503960,BBL.NS,Electrical Equipment,Heavy Electrical Equipment,2389.7,2701.11
-INE185Q01025,Lumino Inds,,,,,,,2697.34
 INE456Z01021,Medi Assist Ser.,MEDIASSIST,544088,MEDIASSIST.NS,Insurance,Insurance Distributors,360.75,2694.87
 INE07K301024,Zaggle Prepaid,ZAGGLE,543985,ZAGGLE.NS,IT - Services,IT Enabled Services,200.12,2690.78
 INE198501012,Euro Pratik Sale,EUROPRATIK,544519,EUROPRATIK.NS,Consumer Durables,"Furniture, Home Furnishing",263.15,2689.39
@@ -1170,13 +1146,9 @@ INE934S01014,GNA Axles,GNA,540124,GNA.NS,Auto Components,Auto Components & Equip
 INE0H9F01037,Sai Parenteral's,SAIPARENT,544742,SAIPARENT.NS,Pharmaceuticals & Biotechnology,Pharmaceuticals,540.85,2389.43
 INE426A01027,Alembic,ALEMBICLTD,506235,ALEMBICLTD.NS,Realty,"Residential, Commercial Projects",92.73,2381.14
 INE182D01020,Marathon Nextgen,MARATHON,503101,MARATHON.NS,Realty,"Residential, Commercial Projects",352.35,2376.41
-INE0N0J01014,Concord Control,,543619,543619.BO,Industrial Manufacturing,Industrial Products,2285.4,2373.02
 INE194R01017,Fredun Pharma,FREDUN,539730,FREDUN.NS,Pharmaceuticals & Biotechnology,Pharmaceuticals,1434.6,2372.55
-INE622Q01027,Mobavenue AI Tech,,539682,539682.BO,IT - Software,Software Products,306.65,2370.34
 INE0MLS01022,EPack PrefabTech,EPACKPEB,544540,EPACKPEB.NS,Industrial Manufacturing,Industrial Products,234.35,2358.29
 INE625X01026,Silver Touch,SILVERTUC,543525,SILVERTUC.NS,IT - Software,Computers - Software & Consulting,185.94,2357.91
-INE155D01018,Schneider APW,,544786,544786.BO,Industrial Manufacturing,Industrial Machinery,1949.05,2357.57
-INE18UN01038,Gaja Alternative Asset,,,,,,,2356.16
 INE893J01029,Mold-Tek Pack.,MOLDTKPAC,533080,MOLDTKPAC.NS,Industrial Products,Packaging,708.95,2355.76
 INE498Q01014,Vintage Coffee,VINCOFE,538920,VINCOFE.NS,Agricultural Food & other Products,Tea & Coffee,161.55,2353.6
 INE029L01018,Kalyani Invest.,KICL,533302,KICL.NS,Finance,Investment Company,5382.5,2352.15
@@ -1207,10 +1179,8 @@ INE600Y01019,Dynamic Cables,DYCL,540795,DYCL.NS,Industrial Products,Cables - Ele
 INE1B3L01017,Shringar House,SHRINGARMS,544512,SHRINGARMS.NS,Consumer Durables,"Gems, Jewellery And Watches",230.52,2222.95
 INE0KQN01018,Bajel Projects,BAJEL,544042,BAJEL.NS,Electrical Equipment,Heavy Electrical Equipment,191.78,2218.84
 INE461D01028,HLE Glascoat,HLEGLAS,522215,HLEGLAS.NS,Industrial Manufacturing,Industrial Products,319,2215.61
-INE0P9J01013,Amic Forging,,544037,544037.BO,Industrial Products,Castings & Forgings,1908.7,2204.33
 INE586B01026,TajGVK Hotels,TAJGVK,532390,TAJGVK.NS,Leisure Services,Hotels & Resorts,350.4,2197.06
 INE0OV601013,EMS,EMSLIMITED,543983,EMSLIMITED.NS,Other Utilities,Waste Management,394.35,2189.86
-INE0PX301025,Skyways Air Ser.,,,,,,,2189.74
 INE927X01018,Elcid Investment,ELCIDIN,503681,ELCIDIN.NS,Finance,Investment Company,109005,2180.1
 INE500L01026,S H Kelkar & Co.,SHK,539450,SHK.NS,Chemicals & Petrochemicals,Specialty Chemicals,157.47,2179.71
 INE1DV401010,Monolithisch Ind,MONOLITH,,MONOLITH.NS,Industrial Products,Electrodes & Refractories,999.4,2172.3
@@ -1220,13 +1190,11 @@ INE0YHV01011,OBSC Perfection,OBSCP,,OBSCP.NS,Auto Components,Auto Components & E
 INE838B01021,Bharat Rasayan,BHARATRAS,590021,BHARATRAS.NS,Fertilizers & Agrochemicals,Pesticides & Agrochemicals,1295,2152.43
 INE932A01024,Pennar Industrie,PENIND,513228,PENIND.NS,Industrial Manufacturing,Industrial Products,158.8,2151.68
 INE355A01028,Somany Ceramics,SOMANYCERA,531548,SOMANYCERA.NS,Consumer Durables,Ceramics,520.15,2133.28
-INE392H01026,Keto Motors,,537392,537392.BO,Retailing,Diversified Retail,302.75,2132.4
 INE229C01021,Sagar Cements,SAGCEM,502090,SAGCEM.NS,Cement & Cement Products,Cement & Cement Products,162.95,2129.88
 INE438E01032,Sika Interplant,SIKA,523606,SIKA.NS,Aerospace & Defense,Aerospace & Defense,1002.7,2125.81
 INE398A01010,Venky's (India),VENKEYS,523261,VENKEYS.NS,Food Products,Meat Products including Poultry,1507.4,2123.53
 INE586V01016,TCI Express,TCIEXP,540212,TCIEXP.NS,Transport Services,Logistics Solution Provider,550.95,2118.08
 INE08NE01025,Sanstar,SANSTAR,544217,SANSTAR.NS,Agricultural Food & other Products,Other Agricultural Products,105.75,2117.84
-INE219W01012,Modern Insulator,,515008,515008.BO,Electrical Equipment,Other Electrical Equipment,449.15,2117.47
 INE805C01028,K C P,KCP,590066,KCP.NS,Cement & Cement Products,Cement & Cement Products,163.83,2112.12
 INE052I01032,Camlin Fine,CAMLINFINE,532834,CAMLINFINE.NS,Chemicals & Petrochemicals,Specialty Chemicals,109.45,2102.5
 INE634A01018,Honda India,HONDAPOWER,522064,HONDAPOWER.NS,Industrial Manufacturing,Industrial Products,2068.3,2097.26
@@ -1241,9 +1209,7 @@ INE323C01030,Indian Hume Pipe,INDIANHUME,504741,INDIANHUME.NS,Construction,Civil
 INE109C01017,Arman Financial,ARMANFIN,531179,ARMANFIN.NS,Finance,Non Banking Financial Company (NBFC),1966.7,2067.94
 INE0LGX01024,Insolation Ener,INA,543620,INA.NS,Power,Power Generation,93.79,2067.62
 INE345A01011,Hind.Oil Explor.,HINDOILEXP,500186,HINDOILEXP.NS,Oil,Oil Exploration & Production,156.2,2065.64
-INE0NJ001013,CFF Fluid,,543920,543920.BO,Aerospace & Defense,Aerospace & Defense,982.1,2059.87
 INE415B01044,Marsons,MARSONS,517467,MARSONS.NS,Electrical Equipment,Heavy Electrical Equipment,119.56,2057.63
-INE809Q01020,GHV Infra,,505504,505504.BO,Construction,Civil Construction,284.75,2052.34
 INE0Q7P01013,Kody Technolab,KODYTECH,,KODYTECH.NS,IT - Software,Computers - Software & Consulting,1435,2051.11
 INE373T01047,Blue Cloud Soft.,BLUECLOUDS,539607,BLUECLOUDS.NS,IT - Software,Software Products,22.22,2051.09
 INE0H5O01029,Windlas Biotech,WINDLAS,543329,WINDLAS.NS,Pharmaceuticals & Biotechnology,Pharmaceuticals,993.6,2050.42
@@ -1259,18 +1225,15 @@ INE059B01024,Simplex Infra,SIMPLEXINF,523838,SIMPLEXINF.NS,Construction,Civil Co
 INE903A01025,Jaykay Enter.,JAYKAY,500306,JAYKAY.NS,Aerospace & Defense,Aerospace & Defense,154.96,2018.93
 INE782E01017,Hester Bios,HESTERBIO,524669,HESTERBIO.NS,Pharmaceuticals & Biotechnology,Pharmaceuticals,2367.8,2014.26
 INE806C01018,TIL,TIL,505196,TIL.NS,"Agricultural, Commercial & Construction Vehicles",Construction Vehicles,243.15,1999.83
-INE0OWC01011,Khazanchi Jewell,,543953,543953.BO,Consumer Durables,"Gems, Jewellery And Watches",802.85,1986.8
 INE077F01035,GOCL Corpn.,GOCLCORP,506480,GOCLCORP.NS,Chemicals & Petrochemicals,Explosives,400.6,1985.87
 INE304A01026,Mukand,MUKANDLTD,500460,MUKANDLTD.NS,Industrial Products,Iron & Steel Products,137.21,1982.62
 INE900B01029,Kabra Extrusion,KABRAEXTRU,524109,KABRAEXTRU.NS,Industrial Manufacturing,Industrial Products,566.2,1980.16
 INE08ZM01014,Greenpanel Inds.,GREENPANEL,542857,GREENPANEL.NS,Consumer Durables,Plywood Boards/ Laminates,160.97,1973.93
 INE243D01012,BF Utilities,BFUTILITIE,532430,BFUTILITIE.NS,Transport Infrastructure,"Road AssetsToll, Annuity, Hybrid-Annuity",523.85,1972.82
-INE631E01024,Spice LoungeFood,,539895,539895.BO,Leisure Services,Restaurants,28.27,1970.77
 INE926B01016,Grand Oak Canyon,GRANDOAK,523862,GRANDOAK.NS,Finance,Non Banking Financial Company (NBFC),37.97,1970.2
 INE0KL801015,DCX Systems,DCXINDIA,543650,DCXINDIA.NS,Aerospace & Defense,Aerospace & Defense,175.49,1954.72
 INE0G5901015,Epack Durable,EPACK,544095,EPACK.NS,Consumer Durables,Household Appliances,202.8,1951.51
 INE096B01018,Nucleus Soft.,NUCLEUS,531209,NUCLEUS.NS,IT - Software,Software Products,740.4,1949.13
-INE777X01017,Aayush Art,,540718,540718.BO,Textiles & Apparels,Other Textile Products,1270.2,1944.95
 INE752G01015,MSP Steel & Pow.,MSPL,532650,MSPL.NS,Industrial Products,Iron & Steel Products,34.3,1944.11
 INE551C01044,Shukra Pharma.,SHUKRAPHAR,524632,SHUKRAPHAR.NS,Pharmaceuticals & Biotechnology,Pharmaceuticals,44.06,1936.94
 INE0FRK01020,Motisons Jewel,MOTISONS,544053,MOTISONS.NS,Consumer Durables,"Gems, Jewellery And Watches",17,1933.76
@@ -1301,14 +1264,12 @@ INE425B01027,Brightcom Group,BCG,532368,BCG.NS,IT - Services,IT Enabled Services
 INE144Z01023,Tarsons Products,TARSONS,543399,TARSONS.NS,Healthcare Equipment & Supplies,Medical Equipment & Supplies,344.95,1835.35
 INE14UN01029,Vidya Wires,VIDYAWIRES,544633,VIDYAWIRES.NS,Industrial Products,"Aluminium, Copper & Zinc Products",86.27,1834.9
 INE0JR601024,Yatra Online,YATRA,543992,YATRA.NS,Leisure Services,"Tour, Travel Related Services",116.93,1834.82
-INE1B3501014,Zelio E-Mobility,,544563,544563.BO,Automobiles,2/3 Wheelers,865.65,1830.85
 INE598D01035,Algoquant Fin,ALGOQUANT,505725,ALGOQUANT.NS,Finance,Other Financial Services,65,1827.12
 INE418H01029,Allcargo Logist.,ALLCARGO,532749,ALLCARGO.NS,Transport Services,Logistics Solution Provider,12.17,1822.8
 INE08LI01020,Krsnaa Diagnost.,KRSNAA,543328,KRSNAA.NS,Healthcare Services,Healthcare Service Provider,561.65,1821.92
 INE887E01022,NGL Fine Chem,NGLFINE,524774,NGLFINE.NS,Pharmaceuticals & Biotechnology,Pharmaceuticals,2947.7,1821.68
 INE05TO01019,A C J K Exports,AEROPLANE,544743,AEROPLANE.NS,Agricultural Food & other Products,Other Agricultural Products,175.82,1820.64
 INE264T01014,Capacit'e Infra.,CAPACITE,540710,CAPACITE.NS,Construction,Civil Construction,214.54,1815.1
-INE002E01010,Sar Auto Prod.,,538992,538992.BO,Auto Components,Auto Components & Equipments,3808,1814.41
 INE0BJS01011,Go Fashion (I),GOCOLORS,543401,GOCOLORS.NS,Retailing,Speciality Retail,344.8,1813.51
 INE618L01018,5paisa Capital,5PAISA,540776,5PAISA.NS,Capital Markets,Stockbroking & Allied,384.25,1801.45
 INE07OG01012,NDR Auto Compon.,NDRAUTO,543214,NDRAUTO.NS,Auto Components,Auto Components & Equipments,756.1,1798.41
@@ -1320,7 +1281,6 @@ INE560K01014,PTC India Fin,PFS,533344,PFS.NS,Finance,Non Banking Financial Compa
 INE704B01017,RACL Geartech,RACLGEAR,520073,RACLGEAR.NS,Auto Components,Auto Components & Equipments,1512,1782.36
 INE070I01018,Insecticid.India,INSECTICID,532851,INSECTICID.NS,Fertilizers & Agrochemicals,Pesticides & Agrochemicals,609.75,1774.24
 INE00Q601028,Studds Accessor.,STUDDS,544599,STUDDS.NS,Auto Components,Auto Components & Equipments,450.15,1771.49
-INE039D01014,Hypersoft Tech.,,539724,539724.BO,IT - Software,Computers - Software & Consulting,208.65,1762.08
 INE1RDG01013,PNGS Reva Diamo.,PNGSREVA,544718,PNGSREVA.NS,Consumer Durables,"Gems, Jewellery And Watches",555.8,1761.8
 INE209B01025,Rico Auto Inds,RICOAUTO,520008,RICOAUTO.NS,Auto Components,Auto Components & Equipments,129.95,1758.22
 INE127T01021,K.P. Energy,KPEL,539686,KPEL.NS,Power,Power Generation,259.3,1758
@@ -1335,7 +1295,6 @@ INE103C01036,SMC Global Sec.,SMCGLOBAL,543263,SMCGLOBAL.NS,Capital Markets,Stock
 INE877V01027,Suraksha Diagno.,SURAKSHA,544293,SURAKSHA.NS,Healthcare Services,Healthcare Service Provider,325.8,1696.79
 INE153A01019,M T N L,MTNL,500108,MTNL.NS,Telecom - Services,Telecom - Cellular & Fixed line services,26.82,1689.66
 INE428Q01011,Suryoday Small,SURYODAY,543279,SURYODAY.NS,Banks,Other Bank,158.84,1688.42
-INE737E01011,KS Smart Technlogies,,516038,516038.BO,IT - Services,IT Enabled Services,102.5,1681.72
 INE716F01012,Indokem,INDOKEM,504092,INDOKEM.NS,Chemicals & Petrochemicals,Specialty Chemicals,600.85,1675.67
 INE285B01017,SpiceJet,SPICEJET,500285,SPICEJET.NS,Transport Services,Airline,10.96,1672.61
 INE0I0T01010,Virtuoso Optoel.,VOEPL,543597,VOEPL.NS,Consumer Durables,Diversified consumer products,488.05,1671.62
@@ -1344,7 +1303,6 @@ INE200D01020,Media Matrix,MMWL,512267,MMWL.NS,Entertainment,"Film Production, Di
 INE05AN01011,Hindware Home In,HINDWAREAP,542905,HINDWAREAP.NS,Consumer Durables,Sanitary Ware,198.63,1661.47
 INE106T01025,Hi-Tech Pipes,HITECH,543411,HITECH.NS,Industrial Products,Iron & Steel Products,81.37,1652.69
 INE597J01018,Shalby,SHALBY,540797,SHALBY.NS,Healthcare Services,Hospital,152.96,1652.12
-INE150C01029,Titan Biotech,,524717,524717.BO,Chemicals & Petrochemicals,Specialty Chemicals,399.4,1650.26
 INE898S01029,Aurum Proptech,AURUM,539289,AURUM.NS,IT - Services,IT Enabled Services,227.82,1642.9
 INE803D01021,Indo Borax & Ch.,INDOBORAX,524342,INDOBORAX.NS,Chemicals & Petrochemicals,Commodity Chemicals,511.85,1642.53
 INE632C01026,Vidhi Specialty,VIDHIING,531717,VIDHIING.NS,Chemicals & Petrochemicals,Specialty Chemicals,328.55,1640.94
@@ -1385,18 +1343,12 @@ INE193B01039,AYM Syntex,AYMSYNTEX,508933,AYMSYNTEX.NS,Textiles & Apparels,Other 
 INE312C01025,Syncom Formul.,SYNCOMF,524470,SYNCOMF.NS,Pharmaceuticals & Biotechnology,Pharmaceuticals,16.14,1517.16
 INE572D01014,Frontier Springs,FRONTSP,522195,FRONTSP.NS,Auto Components,Auto Components & Equipments,1278.4,1510.5
 INE184O01015,Diffusion Eng,DIFFNKG,544264,DIFFNKG.NS,Industrial Products,Other Industrial Products,401.45,1502.48
-INE0VN801010,Rajesh Power,,544291,544291.BO,Other Utilities,Multi Utilities,830.65,1495.78
 INE0LOJ01019,IKIO Tech,IKIO,543923,IKIO.NS,Consumer Durables,Consumer Electronics,191.66,1481.16
 INE840Y01029,One Point One,ONEPOINT,544748,ONEPOINT.NS,Commercial Services & Supplies,Business Process Outsourcing (BPO)/ Knowledge Process Outsourcing (KPO),56.17,1476.92
 INE204A01010,I G Petrochems,IGPL,500199,IGPL.NS,Chemicals & Petrochemicals,Commodity Chemicals,475.2,1463.37
-INE363L01045,Belding India,,513307,513307.BO,Industrial Products,"Aluminium, Copper & Zinc Products",1010.15,1462.58
 INE278M01019,Navkar Corporat.,NAVKARCORP,539332,NAVKARCORP.NS,Transport Services,Logistics Solution Provider,97.04,1460.64
-INE1WFC01025,Shankesh Jewellers,,,,,,,1460.39
 INE073G01016,Assoc.Alcohols,ASALCBR,507526,ASALCBR.NS,Beverages,Breweries & Distilleries,726.45,1458.65
-INE1SRC01010,Millworks Technologies,,544826,544826.BO,Aerospace & Defense,Aerospace & Defense,827.5,1457.62
 INE0Q5D01013,Accent Microcell,ACCENTMIC,,ACCENTMIC.NS,Pharmaceuticals & Biotechnology,Pharmaceuticals,605.05,1451.46
-INE0FMZ01045,Shree Refrigerat,,544458,544458.BO,Aerospace & Defense,Aerospace & Defense,405.4,1451.19
-INE795B01031,Citurgia Biochem,,506373,506373.BO,Chemicals & Petrochemicals,Commodity Chemicals,109.7,1449.09
 INE0U4701011,Digitide Solutio,DIGITIDE,544413,DIGITIDE.NS,IT - Services,IT Enabled Services,97.01,1446.52
 INE784R01023,Arfin India,ARFIN,539151,ARFIN.NS,Non - Ferrous Metals,Aluminium,85.62,1444.6
 INE851I01011,Updater Services,UDS,543996,UDS.NS,Commercial Services & Supplies,Diversified Commercial Services,215.67,1443.98
@@ -1405,7 +1357,6 @@ INE265B01019,Nitta Gelatin,NITTAGELA,506532,NITTAGELA.NS,Chemicals & Petrochemic
 INE419D01026,Chamanlal Setia,CLSEL,530307,CLSEL.NS,Agricultural Food & other Products,Other Agricultural Products,288.35,1433.84
 INE859A01011,PNB Gilts,PNBGILTS,532366,PNBGILTS.NS,Finance,Investment Company,79.65,1433.78
 INE415D01024,Bharat Seats,BHARATSE,523229,BHARATSE.NS,Auto Components,Auto Components & Equipments,228.19,1433.03
-INE881E01017,Keltech Energies,,506528,506528.BO,Chemicals & Petrochemicals,Explosives,14250,1425
 INE0SCO01019,Divine Power,DPEL,,DPEL.NS,Industrial Products,Cables - Electricals,570.4,1424.01
 INE390G01014,GPT Infraproject,GPTINFRA,533761,GPTINFRA.NS,Construction,Civil Construction,112.41,1420.46
 INE0KGZ01021,Signpost India,SIGNPOST,544117,SIGNPOST.NS,Media,Advertising & Media Agencies,264.65,1414.55
@@ -1447,7 +1398,6 @@ INE395U01014,NINtec Systems,NINSYS,539843,NINSYS.NS,IT - Software,Computers - So
 INE664D01019,Benares Hotels,BENARAS,509438,BENARAS.NS,Leisure Services,Hotels & Resorts,10200,1326
 INE438K01021,Sai Silks,KALAMANDIR,543989,KALAMANDIR.NS,Retailing,Speciality Retail,86.29,1323.4
 INE458B01036,Bhagyanagar Ind,BHAGYANGR,512296,BHAGYANGR.NS,Non - Ferrous Metals,Copper,394.5,1321.43
-INE760B01019,Valiant Commun.,,526775,526775.BO,Telecom -  Equipment & Accessories,Telecom -  Equipment & Accessories,1129.65,1320.8
 INE500A01029,DCW,DCW,500117,DCW.NS,Chemicals & Petrochemicals,Petrochemicals,44.73,1320.23
 INE831A01028,Onida Electronics,ONIDA,500279,ONIDA.NS,Consumer Durables,Consumer Electronics,35.66,1317.74
 INE1D0W01018,Technocraft Ven.,TECHNOCRAF,544864,TECHNOCRAF.NS,Other Utilities,Water Supply & Management,332.61,1317.34
@@ -1455,17 +1405,13 @@ INE155E01016,Inv.& Prec.Cast.,INVPRECQ,504786,INVPRECQ.NS,Industrial Products,Ca
 INE524T01011,TAAL Tech,TAALTECH,539956,TAALTECH.NS,Transport Services,Airline,4216.2,1313.91
 INE302D01024,RIR Power Electr,RIR,517035,RIR.NS,Electrical Equipment,Other Electrical Equipment,164.93,1312.39
 INE384C01016,Yuken India,YUKEN,522108,YUKEN.NS,Industrial Products,"Compressors, Pumps & Diesel Engines",964.6,1310.31
-INE288301026,Poojaa Precision Engg.,,544844,544844.BO,Auto Components,Auto Components & Equipments,653.85,1304.1
 INE0TY101024,Solarworld Ene.,SOLARWORLD,544532,SOLARWORLD.NS,Construction,Civil Construction,149.96,1299.74
 INE316L01019,Bharat Wire,BHARATWIRE,539799,BHARATWIRE.NS,Industrial Products,Iron & Steel Products,188.79,1298.55
 INE712K01011,Sh.Pushkar Chem.,SHREEPUSHK,539334,SHREEPUSHK.NS,Chemicals & Petrochemicals,Dyes And Pigments,401.15,1297.23
 INE646H01017,Capital Small,CAPITALSFB,544120,CAPITALSFB.NS,Banks,Other Bank,284.7,1294.39
 INE1YPB01014,Allcargo Global,AGL,544602,AGL.NS,Transport Services,Logistics Solution Provider,13.12,1289.41
-INE690J01011,Innovassynth Technologies,,533315,533315.BO,Chemicals & Petrochemicals,Commodity Chemicals,138.55,1286.58
-INE433O01024,Avishkar Infra,,508929,508929.BO,Realty,"Residential, Commercial Projects",572.9,1283.48
 INE161A01038,NIIT,NIITLTD,500304,NIITLTD.NS,Other Consumer Services,Education,93.62,1282.54
 INE1G2W01011,Q-Line Biotech,QLINE,,QLINE.NS,Healthcare Equipment & Supplies,Medical Equipment & Supplies,549.75,1282.47
-INE0QVH01025,KP Green Engg.,,544150,544150.BO,Electrical Equipment,Heavy Electrical Equipment,256.35,1281.75
 INE848A01014,IZMO,IZMO,532341,IZMO.NS,IT - Services,IT Enabled Services,854.7,1280.37
 INE449C01025,Andrew Yule & Co,ANDREWYU,526173,ANDREWYU.NS,Agricultural Food & other Products,Tea & Coffee,26.08,1275.18
 INE201A01024,Manali Petrochem,MANALIPETC,500268,MANALIPETC.NS,Chemicals & Petrochemicals,Petrochemicals,74.02,1273.14
@@ -1473,7 +1419,6 @@ INE363A01022,Asian Hotels (N),ASIANHOTNR,500023,ASIANHOTNR.NS,Leisure Services,H
 INE533D01032,Raj Rayon Inds.,RAJRILTD,530699,RAJRILTD.NS,Textiles & Apparels,Other Textile Products,22.72,1263.42
 INE1VXE01018,STL Networks,STLNETWORK,544395,STLNETWORK.NS,Telecom - Services,Other Telecom Services,25.85,1261.75
 INE197A01024,Jyoti Structures,JYOTISTRUC,513250,JYOTISTRUC.NS,Electrical Equipment,Heavy Electrical Equipment,10.57,1261.7
-INE754D01018,Sobhagya Mercant,,512014,512014.BO,Commercial Services & Supplies,Diversified Commercial Services,1211.75,1260.1
 INE158B01016,Eimco Elecon(I),EIMCOELECO,523708,EIMCOELECO.NS,Industrial Manufacturing,Industrial Products,2182.9,1259.53
 INE737D01021,Modison,MODISONLTD,506261,MODISONLTD.NS,Electrical Equipment,Other Electrical Equipment,387.15,1256.3
 INE497S01012,Godavari Bioref.,GODAVARIB,544279,GODAVARIB.NS,Diversified FMCG,Diversified FMCG,244.25,1249.97
@@ -1486,7 +1431,6 @@ INE486R01017,GPT Healthcare,GPTHEALTH,544131,GPTHEALTH.NS,Healthcare Services,Ho
 INE535D01037,Roto Pumps,ROTO,517500,ROTO.NS,Industrial Products,"Compressors, Pumps & Diesel Engines",65.58,1235.83
 INE786F01031,Uttam Sug.Mills,UTTAMSUGAR,532729,UTTAMSUGAR.NS,Agricultural Food & other Products,Sugar,323.3,1233.01
 INE0JYY01029,Mangalam World.,MWL,544764,MWL.NS,Metals & Minerals Trading,Trading - Metals,41.44,1230.8
-INE1B3O01011,Sunshine Picture,,,,,,,1230.69
 INE405C01035,Lincoln Pharma.,LINCOLN,531633,LINCOLN.NS,Pharmaceuticals & Biotechnology,Pharmaceuticals,614.05,1229.93
 INE963C01033,Faze Three,FAZE3Q,530079,FAZE3Q.NS,Textiles & Apparels,Other Textile Products,498.9,1227.19
 INE405A01021,Ultramarine Pig.,ULTRAMAR,506685,ULTRAMAR.NS,Chemicals & Petrochemicals,Dyes And Pigments,419.4,1224.65
@@ -1503,11 +1447,9 @@ INE0PRF01011,Unihealth Hosp,UNIHEALTH,,UNIHEALTH.NS,Healthcare Services,Hospital
 INE435A01051,Andhra Paper,ANDHRAPAP,502330,ANDHRAPAP.NS,"Paper, Forest & Jute Products",Paper & Paper Products,59.96,1192.31
 INE794B01026,Balaji Telefilms,BALAJITELE,532382,BALAJITELE.NS,Entertainment,Media & Entertainment,97.8,1192.2
 INE041A01016,Dhampur Sugar,DHAMPURSUG,500119,DHAMPURSUG.NS,Agricultural Food & other Products,Sugar,185.23,1191.15
-INE312M01024,JOJO,,531910,531910.BO,Entertainment,"Film Production, Distribution & Exhibition",172.7,1190.96
 INE255D01024,Gulshan Polyols,GULPOLY,532457,GULPOLY.NS,Agricultural Food & other Products,Other Agricultural Products,190.71,1189.47
 INE046A01015,Rel. Indl. Infra,RIIL,523445,RIIL.NS,Transport Services,Logistics Solution Provider,786.1,1187.01
 INE350H01032,B.L.Kashyap,BLKASHYAP,532719,BLKASHYAP.NS,Construction,Civil Construction,52.52,1184.01
-INE0WKY01013,Indo SMC,,544681,544681.BO,Electrical Equipment,Other Electrical Equipment,517.6,1182.99
 INE0PT501018,Platinum Industr,PLATIND,544134,PLATIND.NS,Chemicals & Petrochemicals,Specialty Chemicals,215.2,1181.98
 INE199P01028,Gretex Corporate,GCSL,543324,GCSL.NS,Capital Markets,Other Capital Market related Services,488.9,1181.15
 INE866K01023,Indosolar,WAAREEINDO,533257,WAAREEINDO.NS,Electrical Equipment,Heavy Electrical Equipment,283.9,1181.13
@@ -1520,28 +1462,23 @@ INE17D601016,Safe Enterprises,SAFEENTP,,SAFEENTP.NS,Consumer Durables,"Furniture
 INE06IJ01010,Utssav CZ Gold,UTSSAV,,UTSSAV.NS,Consumer Durables,"Gems, Jewellery And Watches",482.25,1164.54
 INE1J5V01013,Anawil Wire,ANAWIL,,ANAWIL.NS,Electrical Equipment,Heavy Electrical Equipment,465.15,1162.87
 INE295F01017,Butterfly Gan Ap,BUTTERFLY,517421,BUTTERFLY.NS,Consumer Durables,Household Appliances,647.4,1157.55
-INE0ORA01015,Cosmic CRF,,543928,543928.BO,Industrial Products,Iron & Steel Products,1255,1155.38
 INE701G01012,A.K.Capital Serv,AKCAPIT,530499,AKCAPIT.NS,Finance,Non Banking Financial Company (NBFC),1750,1155
 INE073V01015,Commerl. Synbags,COMSYN,539986,COMSYN.NS,Industrial Products,Packaging,286.17,1154.39
 INE672B01032,Munjal Auto Inds,MUNJALAU,520059,MUNJALAU.NS,Auto Components,Auto Components & Equipments,115.35,1153.5
 INE0GGO01015,Krishival Foods,KRISHIVAL,544416,KRISHIVAL.NS,Food Products,Other Food Products,405.65,1152.06
 INE0D0K01022,Sigachi Indust.,SIGACHI,543389,SIGACHI.NS,Pharmaceuticals & Biotechnology,Pharmaceuticals,30.05,1148.26
-INE0OLH01013,Macfos,,543787,543787.BO,Retailing,E-Retail/ E-Commerce,1108.1,1147.83
 INE959C01023,Oriental Aromat.,OAL,500078,OAL.NS,Chemicals & Petrochemicals,Specialty Chemicals,339.85,1143.72
 INE658G01014,S.A.L Steel,SALSTEEL,532604,SALSTEEL.NS,Ferrous Metals,Sponge Iron,78.93,1142.64
 INE02L001032,Borosil Scienti.,BOROSCI,544184,BOROSCI.NS,Industrial Products,Glass - Industrial,128.4,1142.14
 INE557A01011,BirlaNu Ltd,BIRLANU,509675,BIRLANU.NS,Other Construction Materials,Other Construction Materials,1514.2,1141.84
 INE520Y01019,ICE Make Refrig.,ICEMAKE,,ICEMAKE.NS,Industrial Manufacturing,Industrial Products,721.7,1138.82
 INE950M01013,Monte Carlo Fas.,MONTECARLO,538836,MONTECARLO.NS,Textiles & Apparels,Garments & Apparels,547.85,1135.81
-INE374E01021,BMW Industries,,542669,542669.BO,Industrial Products,Iron & Steel Products,50.38,1133.99
 INE284B01028,TGV Sraac,TGVSL,507753,TGVSL.NS,Chemicals & Petrochemicals,Commodity Chemicals,105.89,1133.97
 INE660C01027,Centrum Capital,CENTRUM,501150,CENTRUM.NS,Finance,Other Financial Services,23.28,1133.34
 INE0O5T01011,Remus Pharma.,REMUS,,REMUS.NS,Pharmaceuticals & Biotechnology,Pharmaceuticals,961.65,1133.21
 INE173M01012,Onix Solar,ONIXSOLAR,513119,ONIXSOLAR.NS,Non - Ferrous Metals,Copper,305.9,1127.79
 INE577L01016,STEL Holdings,STEL,533316,STEL.NS,Finance,Investment Company,611.05,1127.72
-INE833A01016,ADC India,,523411,523411.BO,Telecom -  Equipment & Accessories,Telecom -  Equipment & Accessories,2448,1126.08
 INE0PXC01024,Emkay Tools,ETL,,ETL.NS,Industrial Manufacturing,Industrial Products,1055,1125.82
-INE0HLJ01013,Shri Venkatesh,,543373,543373.BO,Agricultural Food & other Products,Edible Oil,507.8,1123.22
 INE1ARD01016,Sacheerome,SACHEEROME,,SACHEEROME.NS,Chemicals & Petrochemicals,Specialty Chemicals,500.55,1119.87
 INE0PPK01015,Orient Tech.,ORIENTTECH,544235,ORIENTTECH.NS,IT - Services,IT Enabled Services,243.65,1116.06
 INE828A01016,Bhartiya Intl.,BIL,526666,BIL.NS,Consumer Durables,Leather And Leather Products,831.1,1114.54
@@ -1581,7 +1518,6 @@ INE170V01027,Salasar Techno,SALASAR,540642,SALASAR.NS,Industrial Manufacturing,I
 INE148A01019,T N Petro Prod.,TNPETRO,500777,TNPETRO.NS,Chemicals & Petrochemicals,Petrochemicals,115.21,1036.54
 INE0TO701015,Mamata Machinery,MAMATA,544318,MAMATA.NS,Industrial Manufacturing,Industrial Products,420.35,1034.39
 INE994E01018,3B Blackbio,3BBLACKBIO,532067,3BBLACKBIO.NS,Healthcare Services,Healthcare Service Provider,1202.5,1032.07
-INE072A01029,India Homes,,513361,513361.BO,Industrial Products,Iron & Steel Products,25.89,1030.63
 INE559D01011,Crest Ventures,CREST,511413,CREST.NS,Finance,Non Banking Financial Company (NBFC),361.8,1029.31
 INE127B01011,The Hi-Tech Gear,HITECHGEAR,522073,HITECHGEAR.NS,Auto Components,Auto Components & Equipments,546.3,1028.14
 INE189I01024,Nelcast,NELCAST,532864,NELCAST.NS,Industrial Products,Castings & Forgings,117.81,1024.96
@@ -1589,43 +1525,36 @@ INE00ZE01026,Abans Financial,AFSL,543712,AFSL.NS,Finance,Holding Company,201.34,
 INE284H01025,Dam Capital Advi,DAMCAPITAL,544316,DAMCAPITAL.NS,Capital Markets,Stockbroking & Allied,144.47,1021.2
 INE511Y01018,MMP Industries,MMP,,MMP.NS,Non - Ferrous Metals,Aluminium,401.9,1020.93
 INE577D01013,Jyoti Resins,JYOTIRES,514448,JYOTIRES.NS,Chemicals & Petrochemicals,Specialty Chemicals,849.5,1019.4
-INE0XBS01012,Airfloa Rail,,544516,544516.BO,Industrial Manufacturing,Industrial Products,423.1,1014.17
 INE147P01019,Jindal Poly Inve,JPOLYINVST,536773,JPOLYINVST.NS,Finance,Investment Company,964,1013.16
 INE336H01023,Gayatri Projects,GAYAPROJ,532767,GAYAPROJ.NS,Construction,Civil Construction,21.76,1010.31
 INE457F01013,Salzer Electron.,SALZERELEC,517059,SALZERELEC.NS,Electrical Equipment,Other Electrical Equipment,569.55,1007.12
 INE413D01011,Arih.Found.Hsg.,ARIHANT,531381,ARIHANT.NS,Realty,"Residential, Commercial Projects",1007.2,1003.74
 INE338D01028,Bodal Chemicals,BODALCHEM,524370,BODALCHEM.NS,Chemicals & Petrochemicals,Dyes And Pigments,78.97,994.58
 INE366A01041,Dwarikesh Sugar,DWARKESH,532610,DWARKESH.NS,Agricultural Food & other Products,Sugar,53.63,993.77
-INE893C01032,Bharat Global,,521238,521238.BO,IT - Hardware,Computers Hardware & Equipments,98.12,993.56
 INE390H01020,Kamdhenu,KAMDHENU,532741,KAMDHENU.NS,Industrial Products,Iron & Steel Products,35.22,992.79
 INE778B01029,Ester Industries,ESTER,500136,ESTER.NS,Industrial Products,Packaging,95.14,992.26
 INE0MHO01029,Regaal Resources,REGAAL,544485,REGAAL.NS,Agricultural Food & other Products,Other Agricultural Products,95.96,988.33
 INE00YJ01010,Jaro Institute,JARO,544534,JARO.NS,Other Consumer Services,E-Learning,443.1,986.8
 INE00U401027,Unicommerce,UNIECOM,544227,UNIECOM.NS,IT - Software,Software Products,87.47,982.98
-INE799B01025,Hindusthan Insulators &,,539984,539984.BO,Electrical Equipment,Other Electrical Equipment,454.05,982.71
 INE083B01024,Themis Medicare,THEMISMED,530199,THEMISMED.NS,Pharmaceuticals & Biotechnology,Pharmaceuticals,106.14,977.55
 INE107A01015,T N Newsprint,TNPL,531426,TNPL.NS,"Paper, Forest & Jute Products",Paper & Paper Products,141.11,976.63
 INE0DM401012,Shri Ahimsa,SHRIAHIMSA,,SHRIAHIMSA.NS,Food Products,Other Food Products,415,972.38
 INE0GMR01016,Swaraj Suiting,SWARAJ,544861,SWARAJ.NS,Textiles & Apparels,Other Textile Products,367.6,971.14
-INE0IZQ01016,B-Right Real,,543543,543543.BO,Realty,"Residential, Commercial Projects",940,971.13
 INE611A01016,RSWM Ltd,RSWM,500350,RSWM.NS,Textiles & Apparels,Other Textile Products,204.83,964.78
 INE365Y01019,Bharat Parenter.,BPLPHARMA,541096,BPLPHARMA.NS,Pharmaceuticals & Biotechnology,Pharmaceuticals,1397.1,962.88
 INE17WC01013,Tejas Cargo,TEJASCARGO,,TEJASCARGO.NS,Transport Services,Logistics Solution Provider,402,960.49
 INE194D01017,Asian Star Co.,ASTAR,531847,ASTAR.NS,Consumer Durables,"Gems, Jewellery And Watches",600,960.41
 INE540G01014,Ambika Cotton,AMBIKCO,531978,AMBIKCO.NS,Textiles & Apparels,Other Textile Products,1677,960.08
 INE0VCK01011,FlySBS Aviation,FLYSBS,,FLYSBS.NS,Transport Services,Airline,554.6,959.67
-INE767M01029,Asgard Alcobev,,512025,512025.BO,Commercial Services & Supplies,Diversified Commercial Services,30.8,959.52
 INE528A01020,GKW,GKWLIMITED,,GKWLIMITED.NS,Finance,Investment Company,1606.5,959.08
 INE019J01013,Health X Platform,HEALTHX,533259,HEALTHX.NS,Healthcare Services,Healthcare Service Provider,300.85,957.02
 INE0SFW01015,Freshara Agro,FRESHARA,,FRESHARA.NS,Food Products,Other Food Products,406.95,956.3
 INE841D01013,Amal,AMAL,506597,AMAL.NS,Chemicals & Petrochemicals,Specialty Chemicals,772.95,955.57
-INE00TV01023,Sudarshan Pharma,,543828,543828.BO,Chemicals & Petrochemicals,Specialty Chemicals,38.17,952.95
 INE082A01010,Kopran,KOPRAN,524280,KOPRAN.NS,Pharmaceuticals & Biotechnology,Pharmaceuticals,196.09,946.83
 INE840M01016,Zuari Agro Chem.,ZUARI,534742,ZUARI.NS,Fertilizers & Agrochemicals,Fertilizers,225.04,946.47
 INE477B01010,Dhunseri Vent.,DVL,523736,DVL.NS,Industrial Products,Packaging,269.49,943.75
 INE0RFP01011,Sathlokhar Sys.,SSEGL,,SSEGL.NS,Construction,Civil Construction,363,943.02
 INE032B01021,Prime Securities,PRIMESECU,500337,PRIMESECU.NS,Finance,Other Financial Services,276.65,939.51
-INE958L01034,String Metaverse,,534535,534535.BO,IT - Services,IT Enabled Services,7.7,939.33
 INE235C01036,Sumeet Industrie,SUMEETINDS,514211,SUMEETINDS.NS,Textiles & Apparels,Other Textile Products,13.52,939.3
 INE076C01018,IFB Agro Inds.,IFBAGRO,507438,IFBAGRO.NS,Beverages,Breweries & Distilleries,1001.5,938.41
 INE843S01025,Suraj Estate,SURAJEST,544054,SURAJEST.NS,Realty,"Residential, Commercial Projects",195.46,933.78
@@ -1637,7 +1566,6 @@ INE409B01013,Swelect Energy,SWELECTES,532051,SWELECTES.NS,Electrical Equipment,H
 INE048C01025,Viceroy Hotels,VHLTD,523796,VHLTD.NS,Leisure Services,Hotels & Resorts,119.76,919.54
 INE0QN801017,Krystal Integrat,KRYSTAL,544149,KRYSTAL.NS,Commercial Services & Supplies,Diversified Commercial Services,657.95,919.28
 INE06XZ01023,Gem Aromatics,GEMAROMA,544491,GEMAROMA.NS,Chemicals & Petrochemicals,Specialty Chemicals,175.79,918.28
-INE868X01014,Yamuna Syndicate,,540980,540980.BO,Commercial Services & Supplies,Trading & Distributors,29865,917.95
 INE663B01015,Control Print,CONTROLPR,522295,CONTROLPR.NS,IT - Hardware,Computers Hardware & Equipments,573.8,917.75
 INE032Z01020,Bombay Super Hyb,BSHSL,544757,BSHSL.NS,Agricultural Food & other Products,Other Agricultural Products,87.07,913.69
 INE00OQ01016,Dharmaj Crop,DHARMAJ,543687,DHARMAJ.NS,Fertilizers & Agrochemicals,Pesticides & Agrochemicals,270,912.53
@@ -1646,15 +1574,11 @@ INE435D01014,Mac Charles(I),MCCHRLS-B,507836,MCCHRLS-B.NS,Leisure Services,Hotel
 INE01EG01016,Ritco Logistics,RITCO,542383,RITCO.NS,Transport Services,Logistics Solution Provider,317.9,909.92
 INE049A01027,Himatsing. Seide,HIMATSEIDE,514043,HIMATSEIDE.NS,Textiles & Apparels,Other Textile Products,72.12,906.85
 INE319Y01024,Tirupati Forge,TIRUPATIFL,,TIRUPATIFL.NS,Industrial Products,Castings & Forgings,69.62,905.34
-INE361D01012,Uni Abex Alloy,,504605,504605.BO,Industrial Products,Iron & Steel Products,4582.6,905.06
 INE0LEX01011,Sahana Systems,SAHANA,,SAHANA.NS,IT - Services,IT Enabled Services,853.05,904.62
 INE888C01040,Sadhana Nitro,SADHNANIQ,506642,SADHNANIQ.NS,Chemicals & Petrochemicals,Commodity Chemicals,2.97,900.56
 INE535F01024,Rajoo Engineers,RAJOOENG,522257,RAJOOENG.NS,Industrial Manufacturing,Industrial Products,50.36,899.81
 INE00CE01017,Shree Vasu Logis,SVLL,,SVLL.NS,Transport Services,Logistics Solution Provider,781.05,897.72
-INE535P01015,RRP Defense,,530929,530929.BO,Commercial Services & Supplies,Trading & Distributors,652.8,895.56
 INE0SGC01015,M.V.K. Agro,MVKAGRO,,MVKAGRO.NS,Agricultural Food & other Products,Sugar,177.3,895.43
-INE337E01010,Vikram Thermo,,530477,530477.BO,Chemicals & Petrochemicals,Commodity Chemicals,285.5,895.27
-INE670C01026,IIRM Holdings,,526530,526530.BO,Commercial Services & Supplies,Consulting Services,131.3,894.73
 INE730A01022,Oricon Enterpris,ORICONENT,513121,ORICONENT.NS,Industrial Products,Packaging,56.95,894.39
 INE388A01029,Ganesh Benzopl.,GANESHBE,500153,GANESHBE.NS,Oil,Oil Storage & Transportation,123.96,892.38
 INE760F01028,Indo Amines,INDOAMIN,524648,INDOAMIN.NS,Chemicals & Petrochemicals,Specialty Chemicals,122.35,888.11
@@ -1666,7 +1590,6 @@ INE770A01010,Pradeep Metals,PRADPME,513532,PRADPME.NS,Auto Components,Auto Compo
 INE270B01035,Mafatlal Inds.,MAFATIND,500264,MAFATIND.NS,Textiles & Apparels,Other Textile Products,121.81,879.21
 INE0SOY01013,TAC Infosec,TAC,,TAC.NS,IT - Software,Computers - Software & Consulting,417.85,878.58
 INE134B01017,Kirl. Electric,KECL,533193,KECL.NS,Electrical Equipment,Other Electrical Equipment,132.23,878.19
-INE599F01020,Foseco Crucible (India),,523160,523160.BO,Industrial Products,Electrodes & Refractories,1567.3,877.69
 INE316A01038,Eco Recyc.,ECORECO,530643,ECORECO.NS,Other Utilities,Waste Management,454.75,877.52
 INE442P01014,Suyog Telematics,SUYOG,537259,SUYOG.NS,Telecom - Services,Telecom - Infrastructure,748.8,877.38
 INE00QT01015,Synergy Green,SGIL,541929,SGIL.NS,Industrial Products,Castings & Forgings,564.05,876.7
@@ -1683,7 +1606,6 @@ INE550H01011,Supreme Infra.,SUPREMEINF,532904,SUPREMEINF.NS,Construction,Civil C
 INE740D01017,N R Agarwal Inds,NRAIL,516082,NRAIL.NS,"Paper, Forest & Jute Products",Paper & Paper Products,503.85,857.51
 INE895W01019,Panache Digilife,PANACHE,,PANACHE.NS,IT - Services,IT Enabled Services,533.15,853.79
 INE155G01029,NDTV,NDTV,532529,NDTV.NS,Entertainment,TV Broadcasting & Software Production,75.49,851.71
-INE091E01039,Jaybharat Text,,512233,512233.BO,Textiles & Apparels,Other Textile Products,22.21,850.28
 INE565V01010,Valiant Organics,VALIANTORG,540145,VALIANTORG.NS,Chemicals & Petrochemicals,Specialty Chemicals,302.7,848.61
 INE347W01011,Magadh Sugar,MAGADSUGAR,540650,MAGADSUGAR.NS,Agricultural Food & other Products,Sugar,601.3,847.33
 INE0CG601016,Max India Ltd,MAXIND,543223,MAXIND.NS,Finance,Holding Company,150.1,845.37
@@ -1707,11 +1629,9 @@ INE453D01025,Sarla Performanc,SARLAPOLY,526885,SARLAPOLY.NS,Textiles & Apparels,
 INE0BX301013,Prostarm Info,PROSTARM,544410,PROSTARM.NS,Electrical Equipment,Other Electrical Equipment,138.72,816.71
 INE606N01019,Excelsoft Tech.,EXCELSOFT,544617,EXCELSOFT.NS,IT - Services,IT Enabled Services,70.9,815.95
 INE392A01021,Visaka Industrie,VISAKAIND,509055,VISAKAIND.NS,Cement & Cement Products,Cement & Cement Products,94.43,815.92
-INE455D01012,Shah Foods,,519031,519031.BO,Food Products,Packaged Foods,349.55,814.98
 INE1SJO01012,Advit Jewels,RAMBHAJO,544803,RAMBHAJO.NS,Consumer Durables,"Gems, Jewellery And Watches",177.41,812.72
 INE0JM501013,Nupur Recyclers,NRL,,NRL.NS,Metals & Minerals Trading,Trading - Metals,117.66,812.67
 INE917H01012,Sr.Rayala.Hypo,SRHHYPOLTD,532842,SRHHYPOLTD.NS,Chemicals & Petrochemicals,Commodity Chemicals,473.15,812.15
-INE0O8901016,Exhicon Events,,543895,543895.BO,Other Consumer Services,Other Consumer Services,494.55,810.92
 INE0P8B01020,Gaudium IVF,GAUDIUMIVF,544709,GAUDIUMIVF.NS,Healthcare Services,Healthcare Service Provider,111.41,810.92
 INE417D01020,Fedders Holding,FEDDERSHOL,511628,FEDDERSHOL.NS,Finance,Non Banking Financial Company (NBFC),40.26,810.9
 INE334A01023,Sterling Tools,STERTOOLS,530759,STERTOOLS.NS,Auto Components,Auto Components & Equipments,223,810.48
@@ -1723,7 +1643,6 @@ INE760A01029,Kokuyo Camlin,KOKUYOCMLN,523207,KOKUYOCMLN.NS,Household Products,St
 INE0ATZ01017,Kronox Lab,KRONOX,544187,KRONOX.NS,Chemicals & Petrochemicals,Specialty Chemicals,215.18,798.4
 INE0CG401037,Mukka Proteins,MUKKA,544135,MUKKA.NS,Food Products,Animal Feed,26.59,797.7
 INE583V01021,Radhika Jeweltec,RADHIKAJWE,540125,RADHIKAJWE.NS,Consumer Durables,"Gems, Jewellery And Watches",67.56,797.21
-INE672K01025,True Green,,533407,533407.BO,Textiles & Apparels,Other Textile Products,241.65,796.41
 INE345H01024,Capital India,CIFL,530879,CIFL.NS,Finance,Non Banking Financial Company (NBFC),20.32,794.63
 INE863T01013,JITF Infra Logis,JITFINFRA,540311,JITFINFRA.NS,Other Utilities,Water Supply & Management,309,794.24
 INE0U9101019,Effwa Infra,EFFWA,,EFFWA.NS,Other Utilities,Waste Management,343.1,794.18
@@ -1732,14 +1651,12 @@ INE337M01021,Indo Thai Sec.,INDOTHAI,533676,INDOTHAI.NS,Capital Markets,Stockbro
 INE0PK601023,OCCL,OCCLLTD,544278,OCCLLTD.NS,Chemicals & Petrochemicals,Commodity Chemicals,158.63,792.36
 INE026D01011,Lotus Chocolate,LOTUSCHO,523475,LOTUSCHO.NS,Food Products,Packaged Foods,614.9,789.53
 INE0TR001017,Vision Infra,VIESL,,VIESL.NS,Commercial Services & Supplies,Diversified Commercial Services,319.95,788.43
-INE13VU01016,Beezaasan Exp.,,544369,544369.BO,Chemicals & Petrochemicals,Explosives,519.9,787.74
 INE01A001028,Stanley Lifesty.,STANLEY,544202,STANLEY.NS,Consumer Durables,"Furniture, Home Furnishing",137.89,787.71
 INE684B01029,IST,ISTLTD,508807,ISTLTD.NS,Auto Components,Auto Components & Equipments,674.8,787.09
 INE732C01016,NCL Industries,NCLIND,502168,NCLIND.NS,Cement & Cement Products,Cement & Cement Products,174,787.05
 INE219Y01026,R M Drip & Sprin,RMDRIP,544456,RMDRIP.NS,Industrial Products,Plastic Products - Industrial,18.37,786.66
 INE583B01015,Sandesh,SANDESH,526725,SANDESH.NS,Media,Print Media,1038.75,786.33
 INE00U801010,Parin Enterpris.,PARIN,,PARIN.NS,Consumer Durables,"Furniture, Home Furnishing",707,786.04
-INE312B01027,SJ Corp,,504398,504398.BO,Consumer Durables,"Gems, Jewellery And Watches",180.85,784.08
 INE0R8B01010,Patel Retail,PATELRMART,544487,PATELRMART.NS,Retailing,Diversified Retail,234.11,781.94
 INE692C01020,Taneja Aerospace,TANAA,522229,TANAA.NS,Aerospace & Defense,Aerospace & Defense,306.55,781.72
 INE709A01018,VLS Finance,VLSFINANCE,511333,VLSFINANCE.NS,Finance,Investment Company,248.95,781.17
@@ -1758,45 +1675,35 @@ INE489G01022,Anuh Pharma,ANUHPHR,506260,ANUHPHR.NS,Pharmaceuticals & Biotechnolo
 INE084K01015,Amanta Healthcar,AMANTA,544502,AMANTA.NS,Pharmaceuticals & Biotechnology,Pharmaceuticals,195.79,760.24
 INE0Y8W01025,Anlon Healthcare,AHCL,544497,AHCL.NS,Pharmaceuticals & Biotechnology,Pharmaceuticals,14.28,759
 INE955I01044,Sejal Glass,SEJALLTD,532993,SEJALLTD.NS,Industrial Products,Glass - Industrial,663.9,756.85
-INE0OMI01019,Bright Outdoor,,543831,543831.BO,Media,Advertising & Media Agencies,346.2,755.52
 INE763M01028,Mercury EV-Tech,MERCURYEV,531357,MERCURYEV.NS,Automobiles,Passenger Cars & Utility Vehicles,39.71,754.38
-INE1E4401010,Exato Technologies,,544626,544626.BO,IT - Services,IT Enabled Services,749.35,754.25
 INE726E01014,U P Hotels,UPHOT,509960,UPHOT.NS,Leisure Services,Hotels & Resorts,1396,753.84
 INE296E01026,Rajapalayam Mill,RAJPALAYAM,532503,RAJPALAYAM.NS,Textiles & Apparels,Other Textile Products,816.05,752.41
-INE070K01014,Apis India,,506166,506166.BO,Food Products,Other Food Products,54.52,751.02
 INE0L0L01012,Modi's Navnirman,MODIS,543539,MODIS.NS,Realty,"Residential, Commercial Projects",383.15,750.64
 INE032E01017,Aryaman Fin.Serv,ARYAMAN,530245,ARYAMAN.NS,Finance,Non Banking Financial Company (NBFC),610,747.07
 INE290E01011,Yogi Ltd,YOGI,511702,YOGI.NS,Finance,Non Banking Financial Company (NBFC),165.97,746.87
 INE130L01014,Enkei Wheels,ENKEIWHEL,533477,ENKEIWHEL.NS,Auto Components,Auto Components & Equipments,414.15,744.43
 INE418E01018,Permanent Magnet,PERMAGN,504132,PERMAGN.NS,Electrical Equipment,Other Electrical Equipment,864.45,743.43
-INE335Q01026,RNIT AI Solution,,517286,517286.BO,Auto Components,Auto Components & Equipments,87.65,743.2
 INE289B01019,GIC Housing Fin,GICHSGFIN,511676,GICHSGFIN.NS,Finance,Housing Finance Company,137.68,741.41
 INE389K01018,Welspun Investme,WELINV,533252,WELINV.NS,Finance,Investment Company,2022,738.03
 INE893I01013,Vascon Engineers,VASCONEQ,533156,VASCONEQ.NS,Realty,"Residential, Commercial Projects",31.84,737.72
-INE1ABX01018,Unified Data,,544406,544406.BO,IT - Services,IT Enabled Services,367,737.31
 INE204E01012,Agarwal Indl.,AGARIND,531921,AGARIND.NS,Chemicals & Petrochemicals,Petrochemicals,491.8,735.62
 INE704G01024,Bajaj Steel Inds,BAJAJST,507944,BAJAJST.NS,Industrial Manufacturing,Industrial Products,351.7,731.54
 INE0KNT01012,Manoj Vaibhav,MVGJL,543995,MVGJL.NS,Consumer Durables,"Gems, Jewellery And Watches",149.6,730.76
 INE0ISZ01012,Z-Tech (India),ZTECH,,ZTECH.NS,Other Utilities,Waste Management,494.4,729.95
 INE687A01016,Transpek Inds.,TRANSPEK,506687,TRANSPEK.NS,Chemicals & Petrochemicals,Commodity Chemicals,1306.7,729.87
-INE0H8H01019,CWD,,543378,543378.BO,Consumer Durables,Consumer Electronics,320.4,729.22
 INE655A01013,S T C,STCINDIA,512531,STCINDIA.NS,Commercial Services & Supplies,Trading & Distributors,121.21,727.26
 INE164B01030,Kellton Tech,KELLTONTEC,519602,KELLTONTEC.NS,IT - Services,IT Enabled Services,13.56,720.58
 INE144J01027,20 Microns,20MICRONS,533022,20MICRONS.NS,Minerals & Mining,Industrial Minerals,204.19,720.52
 INE506D01020,Haldyn Glass,HALDYNGL,515147,HALDYNGL.NS,Industrial Products,Packaging,133.72,718.77
 INE28GN01010,Advent Hotels,ADVENTHTL,544446,ADVENTHTL.NS,Leisure Services,Hotels & Resorts,133.2,718.52
 INE980Y01015,South West Pinn.,SOUTHWEST,543986,SOUTHWEST.NS,Commercial Services & Supplies,Diversified Commercial Services,220.04,718.46
-INE0TT901016,Forbes Precision,,544186,544186.BO,Industrial Manufacturing,Industrial Products,139.2,718.19
 INE0PKD01011,Mangal Electrica,MEIL,544492,MEIL.NS,Electrical Equipment,Other Electrical Equipment,259.55,717.14
 INE501Y01019,Sheetal Cool,SCPL,540757,SCPL.NS,Food Products,Dairy Products,682.75,716.89
 INE215I01027,Maan Aluminium,MAANALU,532906,MAANALU.NS,Non - Ferrous Metals,Aluminium,119.4,716.22
 INE865C01022,Adit.Birla Money,BIRLAMONEY,532974,BIRLAMONEY.NS,Capital Markets,Stockbroking & Allied,126.6,715.41
 INE515H01014,Empire Inds.,EMPIND,509525,EMPIND.NS,Diversified,Diversified,1192,715.2
 INE0RMF01018,OSEL Devices,OSELDEVICE,,OSELDEVICE.NS,Healthcare Equipment & Supplies,Medical Equipment & Supplies,400.55,712.76
-INE310B01013,Danlaw Tech.,,532329,532329.BO,Industrial Manufacturing,Industrial Products,1461,711.6
-INE0OJ401014,Bizotic Commer.,,543926,543926.BO,Textiles & Apparels,Garments & Apparels,123,711.58
 INE505A01010,DMCC Speciality,DMCC,506405,DMCC.NS,Chemicals & Petrochemicals,Specialty Chemicals,284.3,709.04
-INE574A01016,Jagatjit Inds.,,507155,507155.BO,Beverages,Breweries & Distilleries,150.35,703.38
 INE0N7W01012,BEML Land Assets,BLAL,543898,BLAL.NS,Finance,Investment Company,168.43,701.42
 INE0MEG01014,Viviana Power,VIVIANA,,VIVIANA.NS,Construction,Civil Construction,692.4,701.04
 INE830C01026,Emami Paper,EMAMIPAP,533208,EMAMIPAP.NS,"Paper, Forest & Jute Products",Paper & Paper Products,115.81,700.65
@@ -1807,11 +1714,8 @@ INE0OMO01025,Cellecor Gadgets,CELLECOR,,CELLECOR.NS,Consumer Durables,Consumer E
 INE0MGA01012,Karnika Industri,KARNIKA,,KARNIKA.NS,Textiles & Apparels,Garments & Apparels,112.35,696.54
 INE0Z7N01017,Tankup Engi.,TANKUP,,TANKUP.NS,Industrial Products,Other Industrial Products,1312.5,694.97
 INE360C01024,India Power Corp,DPSCLTD,,DPSCLTD.NS,Power,Integrated Power Utilities,7.13,694.31
-INE064H01021,GEE,,504028,504028.BO,Electrical Equipment,Other Electrical Equipment,133.35,693.11
 INE429I01024,C C C L,CCCL,532902,CCCL.NS,Realty,"Residential, Commercial Projects",15.49,692.03
 INE0O9T01021,Indef Manufactur,BAJAJINDEF,544364,BAJAJINDEF.NS,Industrial Manufacturing,Industrial Products,215.85,690.72
-INE673E01018,SMT Engineering,,538563,538563.BO,Commercial Services & Supplies,Trading & Distributors,382.15,690.55
-INE480D01010,Niyogin Fintech,,538772,538772.BO,Finance,Non Banking Financial Company (NBFC),62,689.73
 INE295A01018,Everest Inds.,EVERESTIND,508906,EVERESTIND.NS,Other Construction Materials,Other Construction Materials,434.5,688.93
 INE038F01029,T.V. Today Netw.,TVTODAY,532515,TVTODAY.NS,Entertainment,TV Broadcasting & Software Production,115.43,688.75
 INE0N5801013,Vasa Denticity,DENTALKART,,DENTALKART.NS,Healthcare Equipment & Supplies,Medical Equipment & Supplies,395.6,686.11
@@ -1830,7 +1734,6 @@ INE06WU01026,Laxmi India Fin.,LAXMIINDIA,544465,LAXMIINDIA.NS,Finance,Non Bankin
 INE138C01024,Kanoria Chem.,KANORICHEM,506525,KANORICHEM.NS,Industrial Manufacturing,Industrial Products,153.89,672.5
 INE1H7V01011,Parth Electrical,PARTH,,PARTH.NS,Electrical Equipment,Other Electrical Equipment,491.65,671.99
 INE400A01014,Tuticorin Alkali,TUTIALKA,506808,TUTIALKA.NS,Chemicals & Petrochemicals,Commodity Chemicals,55.09,671.19
-INE931X01010,Captain Techno.,,540652,540652.BO,Industrial Manufacturing,Industrial Products,289,671.06
 INE518E01015,Zim Laboratories,ZIMLAB,541400,ZIMLAB.NS,Pharmaceuticals & Biotechnology,Pharmaceuticals,125.03,670.89
 INE767C01012,Axtel Industries,AXTEL,523850,AXTEL.NS,Industrial Manufacturing,Industrial Products,411.95,665.5
 INE0U2N01013,Sunlite Recycli.,SUNLITE,,SUNLITE.NS,Industrial Products,"Aluminium, Copper & Zinc Products",481.95,665.37
@@ -1842,23 +1745,17 @@ INE0NN701020,Allcargo Termi,ATL,543954,ATL.NS,Transport Infrastructure,Port & Po
 INE06HJ01020,Ecos (India),ECOSMOBLTY,544239,ECOSMOBLTY.NS,Transport Services,Road Transport,109.82,658.92
 INE350Z01018,Gloster Ltd,GLOSTERLTD,542351,GLOSTERLTD.NS,"Paper, Forest & Jute Products",Jute & Jute Products,601,657.69
 INE939X01013,Manba Finance,MANBA,544262,MANBA.NS,Finance,Non Banking Financial Company (NBFC),130.9,657.63
-INE474O01010,India Finsec,,535667,535667.BO,Finance,Non Banking Financial Company (NBFC),225.2,657.4
 INE403Y01018,Innovana Think.,INNOVANA,544302,INNOVANA.NS,IT - Software,Computers - Software & Consulting,318,656.99
 INE037A01022,Uniphos Enter.,UNIENTER,500429,UNIENTER.NS,Chemicals & Petrochemicals,Trading - Chemicals,94.46,656.97
-INE0UZO01024,Neetu Yoshi,,544434,544434.BO,Industrial Products,Castings & Forgings,169.05,656.13
 INE230R01035,Rama Steel Tubes,RAMASTEEL,539309,RAMASTEEL.NS,Industrial Products,Iron & Steel Products,4.01,656.05
 INE0HF201011,Fabtech Tech.,FABTECH,544558,FABTECH.NS,Healthcare Services,"Healthcare Research, Analytics & Technology",146.82,652.63
 INE915K01010,Asian Hotels (W),AHLWEST,533221,AHLWEST.NS,Leisure Services,Hotels & Resorts,559.95,652.41
-INE2L0V01019,Susan Electrical,,544793,544793.BO,Industrial Products,Cables - Electricals,320.75,652.11
 INE1OOJ01011,Apsis Aerocom,APSISAERO,,APSISAERO.NS,Aerospace & Defense,Aerospace & Defense,540.85,651.83
 INE414Y01015,Shree Ganesh Rem,SGRL,540737,SGRL.NS,Pharmaceuticals & Biotechnology,Pharmaceuticals,507.6,651.64
 INE652V01016,Ganesh Consumer,GANESHCP,544528,GANESHCP.NS,Food Products,Packaged Foods,161.24,651.62
 INE050001010,Prakash Pipes,PPL,542684,PPL.NS,Industrial Products,Plastic Products - Industrial,271.6,649.62
-INE443P01038,Pervasive Comm.,,517172,517172.BO,Commercial Services & Supplies,Trading & Distributors,7.2,648.69
-INE103001017,Annu Projects,,,,,,,648.38
 INE220Z01013,Sharat Industrie,SHINDL,519397,SHINDL.NS,Food Products,Seafood,165.28,648.14
 INE626A01014,Saurashtra Cem.,SAURASHCEM,502175,SAURASHCEM.NS,Cement & Cement Products,Cement & Cement Products,58.22,647.91
-INE0TJ801010,L. T. Elevator,,544518,544518.BO,Industrial Manufacturing,Industrial Products,338,647.71
 INE529I01021,Kuantum Papers,KUANTUM,532937,KUANTUM.NS,"Paper, Forest & Jute Products",Paper & Paper Products,74.19,647.41
 INE052T01021,Best Agrolife,BESTAGRO,539660,BESTAGRO.NS,Fertilizers & Agrochemicals,Pesticides & Agrochemicals,18.24,646.92
 INE0D6I01023,Ksolves India,KSOLVES,543599,KSOLVES.NS,IT - Software,Computers - Software & Consulting,272.05,645.31
@@ -1869,23 +1766,18 @@ INE546V01010,Euro India Fresh,EIFFL,,EIFFL.NS,Food Products,Packaged Foods,258.6
 INE416A01051,Aqylon Nexus,AQYLON,530943,AQYLON.NS,Entertainment,TV Broadcasting & Software Production,25.27,641.18
 INE694E01014,Kanpur Plastipa.,KANPRPLA,507779,KANPRPLA.NS,Industrial Products,Packaging,260.91,641.12
 INE08NZ01012,Namo eWaste,NAMOEWASTE,,NAMOEWASTE.NS,Other Utilities,Waste Management,280.25,640.86
-INE0N6U01018,Kalyani Cast-Tec,,544023,544023.BO,Industrial Manufacturing,Industrial Products,889.45,638.67
 INE0ONE01016,Proventus Agro.,PROV,,PROV.NS,Food Products,Other Food Products,1845,637.16
 INE195N01013,Prozone Realty,PROZONER,534675,PROZONER.NS,Realty,"Residential, Commercial Projects",41.73,636.8
 INE051B01021,Vakrangee,VAKRANGEE,511431,VAKRANGEE.NS,IT - Services,IT Enabled Services,5.87,635.83
 INE071E01023,Ugar Sugar Works,UGARSUGAR,530363,UGARSUGAR.NS,Agricultural Food & other Products,Sugar,56.5,635.63
 INE229A01017,Onward Technolog,ONWARDTEC,517536,ONWARDTEC.NS,IT - Services,IT Enabled Services,285.5,635.03
-INE266B01017,Kinetic Engg.,,500240,500240.BO,Auto Components,Auto Components & Equipments,235.9,634.83
 INE734N01019,Snowman Logistic,SNOWMAN,538635,SNOWMAN.NS,Transport Services,Logistics Solution Provider,37.84,632.26
 INE0I7D01019,Foce India,FOCE,,FOCE.NS,Consumer Durables,"Gems, Jewellery And Watches",537,630.6
 INE0ADB01012,Innovision,INNOVISION,544732,INNOVISION.NS,Transport Infrastructure,"Road AssetsToll, Annuity, Hybrid-Annuity",264.55,629.98
-INE834C01028,Modern Malleable,,517336,517336.BO,Industrial Products,Iron & Steel Products,54,629.24
-INE0Q0M01015,Veefin Solutions,,543931,543931.BO,IT - Services,IT Enabled Services,246.25,628.91
 INE0A1101019,DC Infotech,DCI,543636,DCI.NS,IT - Hardware,Computers Hardware & Equipments,381.35,625.41
 INE645H01027,Sutlej Textiles,SUTLEJTEX,532782,SUTLEJTEX.NS,Textiles & Apparels,Other Textile Products,38.14,624.84
 INE260R01016,Dhabriya Poly.,DHABRIYA,538715,DHABRIYA.NS,Industrial Products,Plastic Products - Industrial,576.7,624.23
 INE311M01018,Shraddha Prime,SHRADDHA,531771,SHRADDHA.NS,Realty,"Residential, Commercial Projects",154.21,623.02
-INE896J01014,Tandhan Industries,,512062,512062.BO,Commercial Services & Supplies,Diversified Commercial Services,125,622.16
 INE626Z01029,Hardwyn India,HARDWYN,541276,HARDWYN.NS,Consumer Durables,"Furniture, Home Furnishing",9.08,620.89
 INE562X01013,Univastu India,UNIVASTU,,UNIVASTU.NS,Construction,Civil Construction,171.55,617.35
 INE0TQE01026,Glottis,GLOTTIS,544557,GLOTTIS.NS,Transport Services,Logistics Solution Provider,66.66,615.96
@@ -1901,20 +1793,12 @@ INE310C01029,Hind.Composites,HINDCOMPOS,509635,HINDCOMPOS.NS,Auto Components,Aut
 INE0QRV01016,ABS Marine,ABSMARINE,,ABSMARINE.NS,Transport Services,Shipping,247.5,607.61
 INE564J01026,Sh. Jagdamba Pol,SHRJAGP,512453,SHRJAGP.NS,Industrial Products,Packaging,692.85,606.8
 INE809I01019,OnMobile Global,ONMOBILE,532944,ONMOBILE.NS,Media,Web based media and service,56.99,606.12
-INE919M01026,Axentra Corp,,511634,511634.BO,Construction,Civil Construction,307.65,606.07
-INE0U6201010,Subam Papers,,544267,544267.BO,Industrial Products,Packaging,220.35,605.51
 INE719F01016,Shiv Aum Steels,SHIVAUM,,SHIVAUM.NS,Commercial Services & Supplies,Trading & Distributors,444.15,604.06
-INE395F01023,Stellant Secu.,,526071,526071.BO,Finance,Other Financial Services,1087.95,602.29
 INE412U01025,BIGBLOC Const.,BIGBLOC,540061,BIGBLOC.NS,Cement & Cement Products,Cement & Cement Products,42.49,601.56
 INE0MIS01010,Pyramid Technopl,PYRAMID,543969,PYRAMID.NS,Industrial Products,Packaging,163.43,601.17
 INE879A01019,Sh. Rama Multi.,SHREERAMA,532310,SHREERAMA.NS,Industrial Products,Packaging,45.04,601.14
-INE1OOT01028,Digilogic Systems,,544684,544684.BO,Aerospace & Defense,Aerospace & Defense,207.6,601.02
-INE0NT601018,PNGS Gargi FJ,,543709,543709.BO,Consumer Durables,"Gems, Jewellery And Watches",571.3,598.17
-INE437D01010,Magna Electrocas,,517449,517449.BO,Industrial Products,Castings & Forgings,1411.15,597.21
-INE1RQS01010,Merritronix,,544773,544773.BO,Industrial Manufacturing,Industrial Products,341.3,596.76
 INE636A01039,Mawana Sugars,MAWANASUG,523371,MAWANASUG.NS,Agricultural Food & other Products,Sugar,152.54,596.74
 INE320L01011,Dhunseri Invest.,DHUNINV,533336,DHUNINV.NS,Finance,Non Banking Financial Company (NBFC),975.65,594.87
-INE0WDX01010,CLN Energy,,544347,544347.BO,Auto Components,Auto Components & Equipments,563,594.15
 INE0R8C01018,Ganesh Green,GGBL,,GGBL.NS,Electrical Equipment,Other Electrical Equipment,238.35,591.13
 INE440G01017,Triton Valves,TRITONV,505978,TRITONV.NS,Auto Components,Auto Components & Equipments,1153.7,590.94
 INE1MTV01019,KRM Ayurveda,KRMAYURVED,,KRMAYURVED.NS,Pharmaceuticals & Biotechnology,Pharmaceuticals,277.05,589.03
@@ -1922,77 +1806,55 @@ INE298I01015,Aries Agro,ARIES,532935,ARIES.NS,Fertilizers & Agrochemicals,Fertil
 INE953E01022,KSE,KSE,519421,KSE.NS,Food Products,Animal Feed,183.84,588.29
 INE308A01027,Nahar Poly,NAHARPOLY,523391,NAHARPOLY.NS,Industrial Products,Packaging,238.75,587.04
 INE170E01023,Satia Industries,SATIA,539201,SATIA.NS,"Paper, Forest & Jute Products",Paper & Paper Products,58.68,586.8
-INE265C01025,Prabhatam Infra Venture Venture,,531647,531647.BO,"Paper, Forest & Jute Products",Paper & Paper Products,26.39,584.64
-INE0Q1S01010,Sunita Tools Ltd,,544001,544001.BO,Industrial Manufacturing,Industrial Products,929.85,583.99
 INE467D01017,Virat Industries,VIRAT,530521,VIRAT.NS,Textiles & Apparels,Garments & Apparels,401.7,583.4
-INE0ZOM01013,Goel Construct.,,544504,544504.BO,Construction,Civil Construction,402.1,581.02
 INE938C01019,Lakshmi Mills,LAKSHMIMIL,502958,LAKSHMIMIL.NS,Textiles & Apparels,Other Textile Products,8344.5,580.78
 INE365I01020,NBI Indl. Fin.,NBIFIN,,NBIFIN.NS,Finance,Non Banking Financial Company (NBFC),1964.9,580.6
 INE587G01015,Kaya Ltd,KAYA,539276,KAYA.NS,Leisure Services,Wellness,382.25,580.55
 INE0QHG01026,Supreme Power,SUPREMEPWR,,SUPREMEPWR.NS,Electrical Equipment,Other Electrical Equipment,232.2,580.29
-INE0LEG01024,Hy-Tech Engineer,,,,,,,578.45
-INE133D01023,Artson,,522134,522134.BO,Industrial Manufacturing,Industrial Products,156.45,577.61
 INE231G01010,Orbit Exports,ORBTEXP,512626,ORBTEXP.NS,Textiles & Apparels,Other Textile Products,225.12,576.76
 INE728Z01015,Softtech Enginee,SOFTTECH,543470,SOFTTECH.NS,IT - Software,Computers - Software & Consulting,416.2,576.11
 INE318C01014,Sayaji Hotels,SAYAJIHOTL,523710,SAYAJIHOTL.NS,Leisure Services,Hotels & Resorts,328,574.59
 INE878I01022,Bafna Pharma.,BAFNAPH,532989,BAFNAPH.NS,Pharmaceuticals & Biotechnology,Pharmaceuticals,242.45,573.55
 INE802B01027,Linc,LINC,531241,LINC.NS,Household Products,Stationary,96.37,573.3
 INE798F01010,Panchmahal Steel,PANCHMAHQ,513511,PANCHMAHQ.NS,Industrial Products,Iron & Steel Products,300,572.4
-INE984B01023,Integra Engg.,,505358,505358.BO,Industrial Manufacturing,Industrial Products,166.15,571.97
-INE0TL001013,Cryogenic OGS,,544440,544440.BO,Industrial Manufacturing,Industrial Products,400.3,571.63
 INE550F01049,Haz.Multi Proj.,HAZOOR,532467,HAZOOR.NS,Construction,Civil Construction,21.12,571.57
 INE120D01012,Hitech Corp.,HITECHCORP,526217,HITECHCORP.NS,Industrial Products,Packaging,331.5,569.37
-INE1IJQ01026,Bai-Kakaji Poly.,,544670,544670.BO,Consumer Durables,Plastic Products - Consumer,265.15,567.54
 INE729D01010,Kilitch Drugs,KILITCH,524500,KILITCH.NS,Pharmaceuticals & Biotechnology,Pharmaceuticals,162.33,567.53
 INE0B2N01016,Chandan Healthca,CHANDAN,,CHANDAN.NS,Healthcare Services,Healthcare Service Provider,230.85,564.48
 INE824Q01011,Manaksia Steels,MANAKSTEEL,539044,MANAKSTEEL.NS,Ferrous Metals,Iron & Steel,85.46,560.05
 INE0F3301020,S J Logistics (I,SJLOGISTIC,,SJLOGISTIC.NS,Transport Services,Logistics Solution Provider,353.55,559.43
 INE25E901019,Om Power Transmission,OMPOWER,544750,OMPOWER.NS,Construction,Civil Construction,163.09,558.5
 INE099F01013,Sreeleathers,SREEL,535601,SREEL.NS,Consumer Durables,Footwear,240.84,557.67
-INE783E01023,High Energy Bat.,,504176,504176.BO,Household Products,Household Products,621.8,557.37
-INE498D01012,Satani Bearings,,505703,505703.BO,Industrial Manufacturing,Industrial Products,278,556
 INE697V01011,Pansari Develop.,PANSARI,,PANSARI.NS,Realty,"Residential, Commercial Projects",317.55,554.02
 INE761G01016,Black Rose Indus,BLACKROSE,514183,BLACKROSE.NS,Chemicals & Petrochemicals,Specialty Chemicals,108.49,553.3
 INE0PEQ01016,RBZ Jewellers Lt,RBZJEWEL,544060,RBZJEWEL.NS,Consumer Durables,"Gems, Jewellery And Watches",138.09,552.36
-INE491D01017,Arvaya Healthcare,,524723,524723.BO,Commercial Services & Supplies,Trading & Distributors,114.55,550.09
 INE818B01023,Pasupati Acrylon,PASUPTAC,500456,PASUPTAC.NS,Chemicals & Petrochemicals,Petrochemicals,61.71,550.02
 INE835B01035,Mold-Tek Technol,MOLDTECH,526263,MOLDTECH.NS,Construction,Civil Construction,190,547.3
 INE110B01017,Mindteck (India),MINDTECK,517344,MINDTECK.NS,IT - Software,Computers - Software & Consulting,171.27,547.28
 INE569C01020,Orient Ceratech,ORIENTCER,504879,ORIENTCER.NS,Industrial Products,Electrodes & Refractories,45.63,545.91
-INE249D01019,Riddhi Siddhi Gl,,524480,524480.BO,Commercial Services & Supplies,Trading & Distributors,764.65,545.18
 INE303A01010,DIC India,DICIND,500089,DICIND.NS,Chemicals & Petrochemicals,Printing Inks,593.9,545.14
 INE291W01037,Global Education,GLOBAL,,GLOBAL.NS,Other Consumer Services,Education,106.98,544.54
 INE289A01011,Nahar Indl. Ent.,NAHARINDUS,519136,NAHARINDUS.NS,Textiles & Apparels,Other Textile Products,125.61,542.71
 INE745B01028,Khaitan Chemical,KHAICHEM,507794,KHAICHEM.NS,Fertilizers & Agrochemicals,Fertilizers,55.82,541.39
-INE439N01031,Blue Pearl Agri,,514440,514440.BO,Chemicals & Petrochemicals,Commodity Chemicals,8.98,541.1
 INE555P01013,Kiran Vyapar,KIRANVYPAR,537750,KIRANVYPAR.NS,Finance,Non Banking Financial Company (NBFC),198,540.23
 INE286H01012,VISA Chrome,VISACHROME,532721,VISACHROME.NS,Ferrous Metals,Ferro & Silica Manganese,36.99,539.28
 INE037Z01029,Concord Enviro,CEWATER,544315,CEWATER.NS,Other Utilities,Waste Management,260,538.1
-INE882B01037,Nurture Well Industries,,531889,531889.BO,Food Products,Packaged Foods,23.05,536.69
 INE266F01018,Aptech,APTECHT,532475,APTECHT.NS,Other Consumer Services,Education,92.51,536.58
 INE143A01010,Oswal Green Tech,OSWALGREEN,539290,OSWALGREEN.NS,Finance,Investment Company,20.85,535.45
-INE13YH01017,SK Minerals & Additives,,544584,544584.BO,Chemicals & Petrochemicals,Specialty Chemicals,436.9,534.77
 INE0KNW01016,KN Agri Resource,KNAGRI,,KNAGRI.NS,Agricultural Food & other Products,Edible Oil,213.7,534.23
 INE0PUC01020,Sar Televenture,SARTELE,,SARTELE.NS,Telecom - Services,Telecom - Infrastructure,105.85,530.81
 INE607D01018,Orient Bell,ORIENTBELL,530365,ORIENTBELL.NS,Consumer Durables,Ceramics,359.45,528.95
-INE175N01023,Aerpace Indus,,534733,534733.BO,Industrial Products,Iron & Steel Products,34.09,524.5
 INE718F01018,CSL Finance,CSLFINANCE,530067,CSLFINANCE.NS,Finance,Non Banking Financial Company (NBFC),230.17,524.39
 INE577A01027,Munjal Showa,MUNJALSHOW,520043,MUNJALSHOW.NS,Auto Components,Auto Components & Equipments,131.02,524.01
 INE0P0001010,Australian Prem,APS,,APS.NS,Electrical Equipment,Heavy Electrical Equipment,259.85,523.86
 INE0JWS01017,Valiant Laborato,VALIANTLAB,543998,VALIANTLAB.NS,Pharmaceuticals & Biotechnology,Pharmaceuticals,95.74,519.99
-INE834D01018,Vipul Organics,,530627,530627.BO,Chemicals & Petrochemicals,Specialty Chemicals,272.8,519.81
 INE00S901012,Nila Spaces,NILASPACES,542231,NILASPACES.NS,Realty,"Residential, Commercial Projects",13.08,515.21
 INE942G01012,Mcleod Russel,MCLEODRUSS,532654,MCLEODRUSS.NS,Agricultural Food & other Products,Tea & Coffee,49.31,515.07
-INE0Q1R01012,Qualitek Labs,,544091,544091.BO,Commercial Services & Supplies,Consulting Services,442,515.02
 INE138A01028,Peninsula Land,PENINLAND,503031,PENINLAND.NS,Realty,"Residential, Commercial Projects",15.5,514.18
 INE0ZK601013,CSM Technologies,CSM,544806,CSM.NS,IT - Software,Computers - Software & Consulting,99.55,513.71
-INE1KLZ01011,Systematic Inds.,,544541,544541.BO,Industrial Products,Cables - Electricals,230,513.62
-INE229R01011,Aryaman Capital,,538716,538716.BO,Finance,Investment Company,428.8,513.58
 INE783X01023,Chemfab Alka.,CHEMFAB,541269,CHEMFAB.NS,Chemicals & Petrochemicals,Commodity Chemicals,356.75,512.78
 INE1AII01014,Iware Supplych.,IWARE,,IWARE.NS,Transport Services,Logistics Solution Provider,445,512.05
 INE17GV01016,Patil Automation,PATILAUTOM,,PATILAUTOM.NS,Industrial Manufacturing,Industrial Products,234.2,511.04
-INE140B01048,JTL Defence,,537254,537254.BO,Industrial Products,"Aluminium, Copper & Zinc Products",485.15,510.68
-INE0GYI01028,Hemant Surgical,,543916,543916.BO,Healthcare Equipment & Supplies,Medical Equipment & Supplies,350.95,510.2
 INE638A01035,Singer India,SINGERIND,505729,SINGERIND.NS,Consumer Durables,Household Appliances,82,510.2
 INE836F01026,Dish TV India,DISHTV,532839,DISHTV.NS,Entertainment,TV Broadcasting & Software Production,2.77,510.04
 INE035S01028,POCL Enterprises,POEL,539195,POEL.NS,Chemicals & Petrochemicals,Commodity Chemicals,165.65,509.64

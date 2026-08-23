@@ -58,12 +58,21 @@ The Yahoo symbol is only how the price is fetched — a rename or a BSE-only
 listing must not change which company a row refers to. Market cap comes from the
 same registry, carried forward on price (see live_mcap).
 
-The page draws a candlestick chart when you open a stock, so the row carries the
-raw bars — `ohlcv`, one [open, high, low, close, volume] per session — rather than
-the percent moves it used to. Those moves are one division away from consecutive
-closes, so shipping both would be shipping the same numbers twice. There are
-BASE_WINDOW + 1 bars: the extra leading one is the reference close that makes the
-first session's move computable.
+TWO files come out of a run, because the board and the dialog need very different
+amounts of data:
+
+  trend.json  what the board draws. Every row's numbers plus `daily`, the recent
+              percent moves the row's bar chart needs. Small enough to block on.
+  bars.json   what the dialog draws: 60 sessions of open/high/low/close/volume
+              per stock, held columnar and keyed on ISIN. Several times the size
+              of the board file, and needed only once you open a stock — so the
+              page fetches it in the background after the board is on screen and
+              merges it in when it lands.
+
+Keeping the bars in trend.json would have meant a 7 MB download before the first
+row appeared, for a chart most rows never open. The dates are shipped once as a
+shared calendar rather than per stock; the handful whose sessions differ (recent
+listings, suspensions) carry their own.
 
 Data: Yahoo Finance via yfinance. EOD.
 Output: trend.json
@@ -78,9 +87,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import stock_registry as registry  # noqa: E402
 
 WINDOWS = [30, 15, 5]    # every one is computed; the page picks
-BASE_WINDOW = 30         # longest window: sets the chart, the sort and the vol baseline
+BASE_WINDOW = 30         # longest scoring window: sets the sort and the vol baseline
+CHART_BARS = 60          # sessions of price and volume in the dialog chart
 VOL_RECENT = 5           # "now" leg of the volume ratio
-FETCH = "4mo"
+FETCH = "6mo"            # comfortably more sessions than CHART_BARS needs
 QUIET_DAY = 15.0         # a single move above this is an "event", not a grind
 WINSOR_PCT = 6.0         # daily cap applied before fitting score/consistency
 STRONG_UP_FRAC = 2 / 3   # share of the window that must close up to call it a grind
@@ -232,6 +242,7 @@ def analyse(symbol, df, meta=None):
 
     frame = df.iloc[-(BASE_WINDOW + 1):]
     closes = frame["Close"].to_numpy(float)
+    chart = df.iloc[-CHART_BARS:]          # longer than the scoring window, for the dialog
     meta = meta or {}
     mcap = live_mcap(meta, float(closes[-1]))
 
@@ -266,12 +277,14 @@ def analyse(symbol, df, meta=None):
     # One bar per session for the candlestick chart. Prices to 2dp (paise), volume
     # as a whole number of shares — the JSON is served to a browser and a stock
     # priced at 138.4237 helps nobody.
-    bars = frame[["Open", "High", "Low", "Close", "Volume"]] if \
-        all(c in frame for c in ("Open", "High", "Low", "Close", "Volume")) else None
+    bars = chart[["Open", "High", "Low", "Close", "Volume"]] if \
+        all(c in chart for c in ("Open", "High", "Low", "Close", "Volume")) else None
     ohlcv = None
     if bars is not None:
+        # volume to the nearest hundred shares: the chart reads it as "12.3L", so
+        # single shares are noise in the payload
         ohlcv = [[round(float(o), 2), round(float(h), 2), round(float(l), 2),
-                  round(float(c), 2), int(v) if v == v else 0]
+                  round(float(c), 2), int(round(v / 100.0) * 100) if v == v else 0]
                  for o, h, l, c, v in bars.to_numpy()]
 
     # BSE-only listings have no NSE symbol — their scrip code is the right short
@@ -294,9 +307,11 @@ def analyse(symbol, df, meta=None):
         # ohlcv and dates are the same length and aligned; the page derives the
         # daily moves from the closes. A row whose feed had no OHLC keeps the old
         # percent series so the board still draws its bar chart.
-        "ohlcv": ohlcv,
-        "dates": [d.strftime("%Y-%m-%d") for d in frame.index],
-        **({} if ohlcv else {"daily": [round(float(v), 2) for v in daily]}),
+        "ohlcv": ohlcv,                    # moved to bars.json before writing
+        "dates": [d.strftime("%Y-%m-%d") for d in chart.index],
+        "_dates": [d.strftime("%Y-%m-%d") for d in chart.index],
+        # the board's own bar chart runs on these, so it never waits for bars.json
+        "daily": [round(float(v), 2) for v in daily],
     }
 
 
@@ -350,11 +365,38 @@ def main():
     base = lambda r: r["windows"][str(BASE_WINDOW)]
     rows.sort(key=lambda r: (order[base(r)["verdict"]], -base(r)["up_days"], -base(r)["total"]))
 
-    json.dump({"generated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+    stamp = datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+    # --- split the bars out before writing the board file ----------------------
+    # the most common calendar wins the shared `dates`; only stocks that traded on
+    # different days carry their own
+    from collections import Counter
+    tally = Counter(tuple(r.pop("dates", []) or []) for r in rows)
+    shared = list(tally.most_common(1)[0][0]) if tally else []
+
+    bars = {}
+    for r in rows:
+        ohlcv = r.pop("ohlcv", None)
+        dates = r.pop("_dates", None)
+        if not ohlcv:
+            continue
+        entry = {"o": [b[0] for b in ohlcv], "h": [b[1] for b in ohlcv],
+                 "l": [b[2] for b in ohlcv], "c": [b[3] for b in ohlcv],
+                 "v": [b[4] for b in ohlcv]}
+        if dates and list(dates) != shared:
+            entry["d"] = list(dates)
+        bars[r["isin"] or r["symbol"]] = entry
+
+    json.dump({"generated": stamp, "chart_bars": CHART_BARS,
+               "dates": shared, "bars": bars},
+              open("bars.json", "w"), separators=(",", ":"))
+
+    json.dump({"generated": stamp,
                "identity": "isin",         # rows are keyed on ISIN, not ticker
                "windows": WINDOWS, "base_window": BASE_WINDOW,
+               "chart_bars": CHART_BARS,
                "vol_recent": VOL_RECENT, "quiet_day": QUIET_DAY,
-               "days": BASE_WINDOW,        # legacy key: length of the shipped chart
+               "days": BASE_WINDOW,        # legacy key: length of the row bar chart
                "requested": len(universe), "resolved": len(rows),
                "failed": failed, "rows": rows},
               open("trend.json", "w"), separators=(",", ":"))

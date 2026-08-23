@@ -28,23 +28,23 @@ median, 0% above 0.8 at n=30.
 Share of **driftless random walks** (pure noise, 20k trials) that clear the
 consistency gate — i.e. the false-positive rate, measured on the current code:
 
-| n  | eff median | % eff > 0.45 | % eff > 0.75 | false trends per 1,989 names @0.45 |
+| n  | eff median | % eff > 0.45 | % eff > 0.75 | false trends per 1,861 names @0.45 |
 |----|-----|-----|-----|-----|
-| 5  | 0.48 | 52.7% | 27.2% | ~1,048 |
-| 10 | 0.30 | 29.8% | 6.4%  | ~593 |
-| 15 | 0.24 | 18.3% | 1.7%  | ~364 |
-| 30 | 0.16 | 5.0%  | 0.1%  | ~99  |
+| 5  | 0.48 | 52.7% | 27.2% | ~981 |
+| 10 | 0.30 | 29.8% | 6.4%  | ~555 |
+| 15 | 0.24 | 18.3% | 1.7%  | ~341 |
+| 30 | 0.16 | 5.0%  | 0.1%  | ~93  |
 
 (The rates are per name and do not change with the universe; only the last column
-does. It was written for the old 752-name universe — scanning every listed company
+does. It was written for the old 752-name universe — scanning the whole exchange
 scales the count of lucky-looking trends with it, which is the argument for the
 tighter gate below, not against the wider scan.)
 
 This is why 15 is the ranking window, and why **`TREND_MIN_EFF` is 0.75**. It was
 0.45, calibrated back when the ranking window was 30 sessions. Measured on the
 current code with the 0.75 gate, **98.3% of pure noise is correctly called
-`choppy`** — only ~1.7% (about 34 of 1,989 names) still earns a trend label by luck,
-down from ~364. The cost is that some genuine but untidy trends now read `choppy`;
+`choppy`** — only ~1.7% (about 32 of 1,861 names) still earns a trend label by luck,
+down from ~341. The cost is that some genuine but untidy trends now read `choppy`;
 that is the right trade for a screen whose job is to narrow the list. A clean move
 of even 0.3%/day still scores 76 with eff 1.00 and reads `trending up`.
 
@@ -71,11 +71,11 @@ unchanged closes
 
 ## Universe and identity
 
-`universe.txt` holds **every listed company** with a tradable listing — 1,989
-names, 1,861 on NSE and 128 BSE-only. One company per line, `<ISIN>,<Yahoo symbol>`:
+`universe.txt` holds **every NSE-listed company** — 1,861 names. One company per
+line, `<ISIN>,<Yahoo symbol>`:
 
     INE002A01018,RELIANCE.NS
-    INE0BWS23018,543225.BO
+    INE467B01029,TCS.NS
 
 Blank lines and `#` comments are ignored, and a bare ticker per line still parses,
 so an older or hand-edited file keeps working. Don't edit it by hand though: it is
@@ -86,8 +86,8 @@ printed at the end of the Actions log, never silently dropped.
 The registry is also where a row gets its **ISIN**, company name and industry. The
 board shows the name (*Sansera Engineering Ltd.*, not *SANSERA*) with the ticker
 and ISIN beneath it, and the filter box matches any of the three. The ISIN is the
-identity: tickers get renamed and BSE-only listings have none, and neither should
-change which company a row refers to. A symbol the registry does not know is still
+identity: tickers get renamed, and that should not change which company a row
+refers to. A symbol the registry does not know is still
 scanned — it just carries no ISIN, and the run log says how many.
 
 ## Refresh cadence

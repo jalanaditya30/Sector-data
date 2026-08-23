@@ -44,7 +44,7 @@ jobs:
         run: |
           git config user.name  "quiet-bot"
           git config user.email "bot@users.noreply.github.com"
-          git add -f quiet/trend.json
+          git add -f quiet/trend.json quiet/bars.json
           git diff --cached --quiet || git commit -m "quiet: refresh $(date -u +%FT%TZ)"
           # another bot may have pushed while this ran
           git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true

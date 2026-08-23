@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Quiet Climbers — NSE</title>
+<script>/* set the theme before first paint, so the page never flashes light */
+(function(){try{var t=localStorage.getItem("sector-data:theme");if(!t)t=window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 <link rel="stylesheet" href="../boards.css">
 <style>
 :root{
@@ -14,6 +16,25 @@
   --hover:#f5f8fd; --zebra:#fafcff; --grid:#dbe3ee; --recent:#eff4fb;
   --shadow:0 1px 2px rgba(19,25,34,.05),0 4px 16px rgba(19,25,34,.06);
 }
+
+/* ---------- night ----------
+   Same variable names, different values: nothing below this line in the
+   stylesheet has to know which way the theme is set. */
+:root[data-theme=dark]{
+  --bg:#0e1117; --card:#161a21; --line:#222833; --line2:#303845;
+  --ink:#e6e9ef; --dim:#9aa4b2; --faint:#6d7885;
+  --up:#2ea36a; --down:#e5564a; --accent:#5b9cf6; --gold:#d3a04a;
+  --upsoft:#12281e; --downsoft:#2a1513; --goldsoft:#282013;
+  --hover:#1b212b; --zebra:#131820; --grid:#2a313d; --recent:#1a2130;
+  --shadow:0 1px 2px rgba(0,0,0,.45),0 4px 16px rgba(0,0,0,.4);
+}
+:root[data-theme=dark] .chip.up{border-color:#22513a}
+:root[data-theme=dark] .chip.down{border-color:#5a2a25}
+:root[data-theme=dark] .chip.gold{border-color:#4d3d1c}
+:root[data-theme=dark] .v-quiet-climb,:root[data-theme=dark] .st-up{border-color:#22513a}
+:root[data-theme=dark] .v-quiet-slide,:root[data-theme=dark] .st-down{border-color:#5a2a25}
+:root[data-theme=dark] .v-one-big-day,:root[data-theme=dark] .st-turn{border-color:#4d3d1c;color:#d3a04a;background:#282013}
+:root[data-theme=dark] .modal-back{background:rgba(0,0,0,.6)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);
   font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
@@ -130,6 +151,8 @@ table{border-collapse:separate;border-spacing:0;width:100%;table-layout:fixed;
   background:var(--card);border:1px solid var(--line);border-radius:12px;
   box-shadow:var(--shadow)}
 tbody td{overflow:hidden}
+tbody tr.empty td{text-align:center;color:var(--faint);padding:26px 12px;
+  font-size:13px;white-space:normal}
 thead th:first-child{border-top-left-radius:11px}
 thead th:last-child{border-top-right-radius:11px}
 tbody tr:last-child td:first-child{border-bottom-left-radius:11px}
@@ -247,7 +270,7 @@ td.score{font-weight:700}
 .modal-back{position:absolute;inset:0;background:rgba(19,25,34,.45)}
 .modal-card{position:relative;background:var(--card);border-radius:14px;
   border:1px solid var(--line);box-shadow:0 12px 48px rgba(19,25,34,.28);
-  width:min(880px,100%);max-height:min(90vh,760px);overflow:auto;padding:20px 22px 22px}
+  width:min(1120px,100%);max-height:min(94vh,880px);overflow:auto;padding:20px 22px 22px}
 .modal-x{position:absolute;top:12px;right:14px;font-size:20px;line-height:1;
   background:none;border:none;color:var(--faint);cursor:pointer;padding:4px 8px;
   border-radius:6px;font-family:inherit}
@@ -264,25 +287,46 @@ td.score{font-weight:700}
   color:var(--faint);font-weight:600}
 .mstat .val{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;
   font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
-.mchart{margin:14px 0 6px}
-.mchart svg{width:100%;height:auto;display:block}
-.mchart .cnote{color:var(--faint);font-size:11.5px;margin-top:2px}
-.mbars{margin-top:12px}
+/* ---------- the dialog chart ----------
+   Deliberately NOT themed: the panel stays dark whichever way the site theme is
+   set, because that is the surface this is modelled on and flipping a chart's
+   polarity changes how the candles read. Its colours are literals for the same
+   reason — they are TradingView's, not the site's. */
+.mchart{margin:14px 0 6px;border-radius:10px;overflow:hidden;background:#131722;
+  border:1px solid #2a2e39}
+.mchart svg.tv{width:100%;height:auto;display:block;cursor:crosshair}
+.mchart .cnote{color:#787b86;font-size:11.5px;padding:0 12px 10px;line-height:1.55}
+.mchart .cnote code{background:#1c2030;color:#d1d4dc;padding:1px 4px;border-radius:3px}
+.mchart .bg{fill:#131722}
+.mchart .grid line{stroke:#242832;stroke-width:1}
+.mchart .sep{stroke:#2a2e39;stroke-width:1}
+.mchart .body.up,.mchart .vol.up{fill:#26a69a}
+.mchart .body.dn,.mchart .vol.dn{fill:#ef5350}
+.mchart .vol{opacity:.55}
+.mchart .wick{stroke-width:1.1;fill:none}
+.mchart .wick.up{stroke:#26a69a} .mchart .wick.dn{stroke:#ef5350}
+.mchart .vavg{stroke:#f0b90b;stroke-width:1.2;stroke-dasharray:5 4;opacity:.9}
+.mchart .vavglab{fill:#f0b90b;font-size:10.5px}
+.mchart .axis text{fill:#787b86}
+.mchart text{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:11px}
+.mchart .hit{fill:transparent}
+.mchart .cross .cx,.mchart .cross .cy{stroke:#758696;stroke-width:1;stroke-dasharray:4 4}
+.mchart .cross .chip{fill:#363a45}
+.mchart .cross .chiplab{fill:#d1d4dc;font-size:10.5px}
+/* the legend line above the chart, TradingView order and colouring */
+.tvleg{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 9px;
+  padding:9px 12px 7px;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  font-size:11.5px;color:#d1d4dc;min-height:17px}
+.tvleg .ldate{color:#787b86;margin-right:4px}
+.tvleg .lk{color:#787b86}
+.tvleg .lv{font-weight:700}
+.tvleg .lv.u{color:#26a69a} .tvleg .lv.d{color:#ef5350}
+.tvskel{height:320px;background:linear-gradient(90deg,#171b26,#1c2030,#171b26);
+  background-size:200% 100%;animation:sk 1.4s ease-in-out infinite}
+@keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.mbars{margin-top:14px}
 .mbars .k{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.07em;
   color:var(--faint);font-weight:600;margin-bottom:4px}
-/* SVG cannot read a CSS variable from a presentation attribute, so the candles
-   carry classes and take their colour from here */
-.mchart .body.up,.mchart .vol.up{fill:var(--up)}
-.mchart .body.dn,.mchart .vol.dn{fill:var(--down)}
-.mchart .vol{opacity:.5}
-.mchart .wick{stroke-width:1.1}
-.mchart .wick.up{stroke:var(--up)} .mchart .wick.dn{stroke:var(--down)}
-.mchart .grid{stroke:var(--grid);stroke-width:1}
-.mchart .frame{stroke:var(--line2);stroke-width:1;fill:none}
-.mchart .band{fill:var(--recent)}
-.mchart text{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
-  font-size:11px;fill:var(--faint)}
-.mchart text.pane{font-size:10px;letter-spacing:.06em}
 .mlinks{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
 .mlink{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;
   padding:8px 14px;border-radius:8px;border:1px solid var(--line2);background:var(--card);
@@ -316,6 +360,9 @@ td.score{font-weight:700}
   <span class="bbtn" aria-current="page">Quiet Climbers</span>
   <span class="sep"></span>
   <span class="hint">5 / 15 / 30 sessions, pure counting</span>
+
+  <button class="bbtn thbtn" type="button" id="theme" aria-pressed="false"
+          title="Switch between day and night"><span class="ic">◐</span></button>
 </nav>
 
 <header>
@@ -490,7 +537,7 @@ const shares=v=>v==null?"—":v>=1e7?(v/1e7).toFixed(2)+"cr"
    bars, still lands in the same two fields. */
 function series(r){
   if(r._daily) return r;
-  if(r.ohlcv && r.ohlcv.length>1){
+  if(r.ohlcv && r.ohlcv.length>1){          // a pre-split feed carried its own bars
     const c=r.ohlcv.map(b=>b[3]);
     r._daily=c.slice(1).map((v,i)=>+((v/c[i]-1)*100).toFixed(2));
     r._dates=(r.dates||[]).slice(1);
@@ -498,6 +545,31 @@ function series(r){
     r._daily=r.daily||[]; r._dates=r.dates||[];
   }
   return r;
+}
+
+/* ---------------------------------------------------------------------------
+   bars.json holds 60 sessions of OHLCV per stock — several times the size of
+   the board file and needed only once a dialog opens. It is fetched after the
+   board is on screen, so screening never waits for it; a dialog opened before
+   it lands shows a placeholder and fills itself in when it does.
+--------------------------------------------------------------------------- */
+let BARS=null, BARS_STATE="idle", BARS_WAITERS=[];
+function loadBars(){
+  if(BARS_STATE!=="idle") return;
+  BARS_STATE="loading";
+  fetch("bars.json?t="+Date.now())
+    .then(r=>{ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+    .then(j=>{ BARS=j; BARS_STATE="ready"; BARS_WAITERS.splice(0).forEach(f=>f()); })
+    .catch(e=>{ BARS_STATE="failed"; BARS_WAITERS.splice(0).forEach(f=>f(e)); });
+}
+// pre-split feeds keep their bars on the row; read either shape the same way
+function barsFor(r){
+  if(r.ohlcv&&r.ohlcv.length>1){
+    return {o:r.ohlcv.map(b=>b[0]), h:r.ohlcv.map(b=>b[1]), l:r.ohlcv.map(b=>b[2]),
+            c:r.ohlcv.map(b=>b[3]), v:r.ohlcv.map(b=>b[4]), d:r.dates||[]};
+  }
+  const b=BARS&&BARS.bars&&BARS.bars[keyOf(r)];
+  return b?{o:b.o,h:b.h,l:b.l,c:b.c,v:b.v,d:b.d||BARS.dates||[]}:null;
 }
 
 /* ---------------------------------------------------------------------------
@@ -509,14 +581,15 @@ function series(r){
 const COLUMNS=[
   {k:"name", label:"company", cls:"l", always:true, w:270,
    sort:r=>nameOf(r),
-   cell:r=>`<td class="l"><div class="co"><span class="jump">`
+   cell:r=>`<td class="l"><div class="co"><span><button class="sym" type="button"`
+     +` data-stock="${esc(keyOf(r))}" title="Open chart and links">${esc(nameOf(r))}</button>${
+     W(r).thin?'<span class="flag">THIN</span>':''}${identity(r)}</span>`
+     +`<span class="jump">`
      +`<a class="j" href="${esc(screenerURL(r))}" target="_blank" rel="noopener noreferrer"`
      +` title="Screener · ${esc(nameOf(r))}" aria-label="Open ${esc(nameOf(r))} on Screener">S</a>`
      +`<a class="j" href="${esc(tvURL(r))}" target="_blank" rel="noopener noreferrer"`
      +` title="TradingView · ${esc(nameOf(r))}" aria-label="Open ${esc(nameOf(r))} on TradingView">T</a>`
-     +`</span><span><button class="sym" type="button" data-stock="${esc(keyOf(r))}"`
-     +` title="Open chart and links">${esc(nameOf(r))}</button>${
-     W(r).thin?'<span class="flag">THIN</span>':''}${identity(r)}</span></div></td>`},
+     +`</span></div></td>`},
 
   {k:"up_days", label:()=>`up days`, num:true, w:124, fmt:v=>`${v}/${win}`, sort:r=>W(r).up_days,
    cell:r=>{ const w=W(r), pct=w.days?w.up_days/w.days*100:0;
@@ -576,9 +649,6 @@ const COLUMNS=[
      +`<span class="barkey"><i class="kb u"></i>up<i class="kb d"></i>down</span></div>`,
    cell:r=>`<td class="l">${bars(r)}</td>`},
 
-  {k:"candles", label:()=>`${win}d candles`, cls:"l", nosort:true,
-   w:()=>win*((win<=5?14:win<=15?9:6)+2)+30,
-   cell:r=>`<td class="l">${rowCandles(r,win)}</td>`},
 ];
 
 const keyOf=r=>r.isin||r.symbol;
@@ -616,9 +686,9 @@ function bars(r){
     band=`<rect class="band" x="${Math.max(0,left).toFixed(1)}" y="0" `
       +`width="${width.toFixed(1)}" height="${H}" rx="4"/>`;
   }
-  const span=dt.length?`${dt[0]} to ${dt[dt.length-1]}`:"";
+  const span=dt.length?`, ${dt[0]} to ${dt[dt.length-1]}`:"";
   return `<svg class="bars" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">`
-    +`<title>Daily moves, ${span}. Open the stock for exact figures.</title>`
+    +`<title>Daily moves over ${n} sessions${span}. Open the stock for the full chart.</title>`
     +band
     +`<line class="zline" x1="0" x2="${W}" y1="${mid}" y2="${mid}"/>`
     +(up?`<path class="up" d="${up}"/>`:"")
@@ -627,100 +697,143 @@ function bars(r){
     +`</svg>`;
 }
 
-/* The same candles the dialog draws, shrunk to a table row: price only, no
-   axis, no volume, four paths. Enough to see the shape of the move while
-   scanning; the dialog has the readable version. */
-function rowCandles(r,n){
-  const all=r.ohlcv||[], bs=all.slice(-n);
-  if(bs.length<2) return `<span class="zero">—</span>`;
-  const CW=n<=5?14:n<=15?9:6, GAP=2, W=bs.length*(CW+GAP), H=46, T=3, B=H-3;
-  const lo=Math.min(...bs.map(b=>b[2])), hi=Math.max(...bs.map(b=>b[1]));
-  const rng=(hi-lo)||Math.abs(hi)*0.02||1;
-  const y=v=>T+(hi-v)/rng*(B-T);
-  let bu="",bd="",wu="",wd="";
-  bs.forEach((b,i)=>{
-    const [o,h,l,c]=b, x=i*(CW+GAP), mid=x+CW/2;
-    const top=y(Math.max(o,c)), bot=y(Math.min(o,c));
-    const body=rect(x,top,CW,Math.max(1,bot-top));
-    const wick=`M${mid.toFixed(1)} ${y(h).toFixed(1)}V${y(l).toFixed(1)}`;
-    if(c>=o){ bu+=body; wu+=wick; } else { bd+=body; wd+=wick; }
-  });
-  return `<svg class="rowc" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">`
-    +`<title>Last ${bs.length} sessions, open-high-low-close. `
-    +`Open the stock for the readable chart.</title>`
-    +(wu?`<path class="wick up" d="${wu}"/>`:"")
-    +(wd?`<path class="wick dn" d="${wd}"/>`:"")
-    +(bu?`<path class="body up" d="${bu}"/>`:"")
-    +(bd?`<path class="body dn" d="${bd}"/>`:"")
-    +`</svg>`;
+/* ---------------------------------------------------------------------------
+   The dialog chart: 60 sessions of candles with volume welded underneath, drawn
+   as one inline SVG. Modelled on TradingView — a dark panel whatever the site
+   theme is doing, a right-hand price axis, a crosshair that reads out the candle
+   under the pointer, and a flat line across the volume pane at the 60-session
+   average so today's bar can be judged against it at a glance.
+
+   One SVG rather than two stacked charts: the panes share an x scale and the
+   crosshair spans both, so a candle and its volume line up by construction
+   rather than by luck.
+--------------------------------------------------------------------------- */
+const CH={W:1000, H:496, L:8, RA:66, PT:38, PB:352, VT:360, VB:452, DT:474};
+const fmtPx=(v,dp)=>v==null?"—":v.toFixed(dp);
+const dpFor=hi=>hi<10?3:hi<1000?2:1;
+
+function tvChart(b){
+  const n=b.c.length;
+  if(!n) return "";
+  const {W,H,L,RA,PT,PB,VT,VB,DT}=CH, R=W-RA;
+  let lo=Math.min(...b.l), hi=Math.max(...b.h);
+  const pad=(hi-lo)*0.08 || Math.abs(hi)*0.02 || 1;
+  const top=hi+pad, bottom=lo-pad;
+  const py=v=>PB-((v-bottom)/(top-bottom))*(PB-PT);
+  const vmax=Math.max(...b.v,1), vavg=b.v.reduce((a,x)=>a+x,0)/n;
+  const vy=v=>VB-(v/vmax)*(VB-VT);
+  const step=(R-L)/n, cw=Math.max(1.5,Math.min(14,step*0.68));
+  const dp=dpFor(hi), xOf=i=>L+step*i+step/2;
+
+  let grid="",axis="";
+  for(let i=0;i<=4;i++){
+    const v=bottom+(top-bottom)*i/4, y=py(v);
+    grid+=`<line x1="${L}" x2="${R}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}"/>`;
+    axis+=`<text x="${R+7}" y="${(y+3.5).toFixed(1)}">${v.toFixed(dp)}</text>`;
+  }
+  axis+=`<text x="${R+7}" y="${VT+13}">${shares(vmax)}</text>`;
+
+  let vgrid="",dates="";
+  const stride=Math.max(1,Math.round(n/6));
+  for(let i=stride;i<n;i+=stride){
+    const x=xOf(i).toFixed(1);
+    vgrid+=`<line x1="${x}" x2="${x}" y1="${PT}" y2="${VB}"/>`;
+    dates+=`<text x="${x}" y="${DT}" text-anchor="middle">${(b.d[i]||"").slice(5)}</text>`;
+  }
+
+  let bu="",bd="",wu="",wd="",vu="",vd="";
+  for(let i=0;i<n;i++){
+    const o=b.o[i],h=b.h[i],l=b.l[i],c=b.c[i],v=b.v[i];
+    const x=xOf(i), left=x-cw/2, isUp=c>=o;
+    const bodyTop=py(Math.max(o,c)), bodyBot=py(Math.min(o,c));
+    const body=rect(left,bodyTop,cw,Math.max(1,bodyBot-bodyTop));
+    const wick=`M${x.toFixed(1)} ${py(h).toFixed(1)}V${py(l).toFixed(1)}`;
+    const vol=rect(left,vy(v),cw,Math.max(0.6,VB-vy(v)));
+    if(isUp){ bu+=body; wu+=wick; vu+=vol; } else { bd+=body; wd+=wick; vd+=vol; }
+  }
+
+  const avgY=vy(vavg).toFixed(1);
+  return `<svg class="tv" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">`
+    +`<rect class="bg" x="0" y="0" width="${W}" height="${H}"/>`
+    +`<g class="grid">${grid}${vgrid}</g>`
+    +`<line class="sep" x1="${L}" x2="${R}" y1="${VT-4}" y2="${VT-4}"/>`
+    +`<path class="wick up" d="${wu}"/><path class="wick dn" d="${wd}"/>`
+    +`<path class="body up" d="${bu}"/><path class="body dn" d="${bd}"/>`
+    +`<path class="vol up" d="${vu}"/><path class="vol dn" d="${vd}"/>`
+    +`<line class="vavg" x1="${L}" x2="${R}" y1="${avgY}" y2="${avgY}"/>`
+    +`<text class="vavglab" x="${R+7}" y="${(+avgY+3.5).toFixed(1)}">${shares(vavg)} avg</text>`
+    +`<g class="axis">${axis}${dates}</g>`
+    +`<g class="cross" style="display:none">`
+      +`<line class="cx" y1="${PT}" y2="${VB}"/><line class="cy" x1="${L}" x2="${R}"/>`
+      +`<rect class="chip cpx" width="58" height="17" rx="2"/>`
+      +`<text class="chiplab cpxt" text-anchor="middle"></text>`
+      +`<rect class="chip cdt" width="70" height="17" rx="2"/>`
+      +`<text class="chiplab cdtt" text-anchor="middle"></text>`
+    +`</g></svg>`;
 }
 
-/* ---------------------------------------------------------------------------
-   Candlestick chart, drawn as inline SVG — no chart library, nothing to load.
-   Price panel on top, volume underneath, sharing one x axis. Every candle
-   carries a <title> so hovering gives the exact OHLC and volume.
---------------------------------------------------------------------------- */
-function candles(r, n){
-  const all=r.ohlcv||[], bars=all.slice(-n), dates=(r.dates||[]).slice(-n);
-  if(bars.length<2) return "";
-  const WD=820, L=10, R=WD-58, T=12, PB=250, VT=284, VB=356, H=378;
-  const lo=Math.min(...bars.map(b=>b[2])), hi=Math.max(...bars.map(b=>b[1]));
-  const pad=(hi-lo)*0.06 || Math.abs(hi)*0.02 || 1;
-  const y0=lo-pad, y1=hi+pad;
-  const py=v=>PB-((v-y0)/(y1-y0))*(PB-T);
-  const vmax=Math.max(...bars.map(b=>b[4]),1);
-  const vy=v=>VB-(v/vmax)*(VB-VT);
-  const step=(R-L)/bars.length, cw=Math.max(2,Math.min(18,step*0.62));
-  const dp=hi<10?3:hi<1000?2:1;                       // paise matter on a Rs 8 stock
+/* The legend above the chart, in TradingView's order and colouring. Shows the
+   last session until the pointer picks one, then follows the pointer. */
+function tvLegend(b,i){
+  const o=b.o[i],h=b.h[i],l=b.l[i],c=b.c[i],v=b.v[i];
+  const prev=i>0?b.c[i-1]:b.o[i];
+  const chg=prev?(c/prev-1)*100:0, up=c>=o, dp=dpFor(Math.max(...b.h));
+  const k=(lab,val)=>`<span class="lk">${lab}</span><span class="lv ${up?"u":"d"}">${val}</span>`;
+  return `<span class="ldate">${b.d[i]||""}</span>`
+    +k("O",fmtPx(o,dp))+k("H",fmtPx(h,dp))+k("L",fmtPx(l,dp))+k("C",fmtPx(c,dp))
+    +`<span class="lv ${chg>=0?"u":"d"}">${(chg>=0?"+":"")+chg.toFixed(2)}%</span>`
+    +`<span class="lk">Vol</span><span class="lv ${up?"u":"d"}">${shares(v)}</span>`;
+}
 
-  // four price gridlines with labels down the right edge
-  let grid="";
-  for(let i=0;i<=3;i++){
-    const v=y0+(y1-y0)*i/3, y=py(v);
-    grid+=`<line class="grid" x1="${L}" x2="${R}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}"/>`
-      +`<text x="${R+6}" y="${(y+3.5).toFixed(1)}">${v.toFixed(dp)}</text>`;
-  }
+/* Wire the crosshair. The nearest session is found by dividing the pointer
+   offset by the step, and that one index drives both rules, both axis chips and
+   the legend — so the price pane and the volume pane can never disagree about
+   which session you are reading. */
+function wireCrosshair(root,b){
+  const svg=root.querySelector("svg.tv"), legend=root.querySelector(".tvleg");
+  if(!svg||!b.c.length) return;
+  const {W,L,RA,PT,PB,VB,DT}=CH, R=W-RA, n=b.c.length, step=(R-L)/n;
+  const g=svg.querySelector(".cross");
+  const cx=g.querySelector(".cx"), cy=g.querySelector(".cy");
+  const cpx=g.querySelector(".cpx"), cpxt=g.querySelector(".cpxt");
+  const cdt=g.querySelector(".cdt"), cdtt=g.querySelector(".cdtt");
+  let lo=Math.min(...b.l), hi=Math.max(...b.h);
+  const pad=(hi-lo)*0.08||Math.abs(hi)*0.02||1;
+  const top=hi+pad, bottom=lo-pad, dp=dpFor(hi);
 
-  // the sessions the board's window covers, when it is shorter than the chart
-  let band="";
-  if(win<bars.length){
-    const x=L+step*(bars.length-win);
-    band=`<rect class="band" x="${x.toFixed(1)}" y="${T-4}" width="${(R-x).toFixed(1)}"`
-      +` height="${VB-T+4}" rx="4"/>`;
-  }
-
-  let body="";
-  bars.forEach((b,i)=>{
-    const [o,h,l,c,v]=b, up=c>=o, k2=up?"up":"dn";
-    const x=L+step*i+step/2, top=py(Math.max(o,c)), bot=py(Math.min(o,c));
-    const tip=`${dates[i]||""}  O ${o.toFixed(dp)}  H ${h.toFixed(dp)}  L ${l.toFixed(dp)}`
-      +`  C ${c.toFixed(dp)}  ·  vol ${shares(v)}`;
-    body+=`<g><title>${esc(tip)}</title>`
-      +`<line class="wick ${k2}" x1="${x.toFixed(1)}" x2="${x.toFixed(1)}"`
-      +` y1="${py(h).toFixed(1)}" y2="${py(l).toFixed(1)}"/>`
-      +`<rect class="body ${k2}" x="${(x-cw/2).toFixed(1)}" y="${top.toFixed(1)}"`
-      +` width="${cw.toFixed(1)}" height="${Math.max(1,bot-top).toFixed(1)}"/>`
-      +`<rect class="vol ${k2}" x="${(x-cw/2).toFixed(1)}" y="${vy(v).toFixed(1)}"`
-      +` width="${cw.toFixed(1)}" height="${Math.max(0.5,VB-vy(v)).toFixed(1)}"/>`
-      +`</g>`;
+  const move=(clientX,clientY)=>{
+    const box=svg.getBoundingClientRect(), scale=W/box.width;
+    const x=(clientX-box.left)*scale, y=(clientY-box.top)*scale;
+    const i=Math.max(0,Math.min(n-1,Math.floor((x-L)/step)));
+    const cxx=+(L+step*i+step/2).toFixed(1);
+    g.style.display="";
+    cx.setAttribute("x1",cxx); cx.setAttribute("x2",cxx);
+    const yy=Math.max(PT,Math.min(VB,y));
+    cy.setAttribute("y1",yy.toFixed(1)); cy.setAttribute("y2",yy.toFixed(1));
+    // the price chip only means anything while the pointer is in the price pane
+    const inPrice=y>=PT&&y<=PB;
+    cpx.style.display=cpxt.style.display=inPrice?"":"none";
+    if(inPrice){
+      const price=bottom+(PB-yy)/(PB-PT)*(top-bottom);
+      cpx.setAttribute("x",R+2); cpx.setAttribute("y",(yy-8.5).toFixed(1));
+      cpxt.setAttribute("x",R+31); cpxt.setAttribute("y",(yy+3.5).toFixed(1));
+      cpxt.textContent=price.toFixed(dp);
+    }
+    cdt.setAttribute("x",(cxx-35).toFixed(1)); cdt.setAttribute("y",DT-13);
+    cdtt.setAttribute("x",cxx); cdtt.setAttribute("y",DT-1);
+    cdtt.textContent=b.d[i]||"";
+    if(legend) legend.innerHTML=tvLegend(b,i);
+  };
+  svg.addEventListener("mousemove",e=>move(e.clientX,e.clientY));
+  svg.addEventListener("mouseleave",()=>{
+    g.style.display="none";
+    if(legend) legend.innerHTML=tvLegend(b,n-1);
   });
-
-  // date labels: first, middle, last only — thirty of them would be a smear
-  const ticks=[0,Math.floor((bars.length-1)/2),bars.length-1].map(i=>{
-    const x=L+step*i+step/2;
-    const anchor=i===0?"start":i===bars.length-1?"end":"middle";
-    return `<text x="${x.toFixed(1)}" y="${H-4}" text-anchor="${anchor}">${dates[i]||""}</text>`;
-  }).join("");
-
-  return `<svg viewBox="0 0 ${WD} ${H}" role="img"`
-    +` aria-label="Candlestick chart, last ${bars.length} sessions, with volume">`
-    +band+grid
-    +`<line class="grid" x1="${L}" x2="${R}" y1="${VB}" y2="${VB}"/>`
-    +body+ticks
-    +`<text class="pane" x="${L}" y="${T-1}">PRICE ₹</text>`
-    +`<text class="pane" x="${L}" y="${VT-3}">VOLUME</text>`
-    +`<text x="${R+6}" y="${VT+4}">${shares(vmax)}</text>`
-    +`</svg>`;
+  svg.addEventListener("touchmove",e=>{
+    if(!e.touches.length) return;
+    e.preventDefault();
+    move(e.touches[0].clientX,e.touches[0].clientY);
+  },{passive:false});
 }
 
 /* ---------------------------------------------------------------------------
@@ -732,11 +845,11 @@ const tvURL=r=>`https://www.tradingview.com/chart/?symbol=`
   +encodeURIComponent(`${r.exchange||"NSE"}:${r.symbol}`);
 const screenerURL=r=>`https://www.screener.in/company/${encodeURIComponent(r.symbol)}/`;
 
-let lastFocus=null;
+let lastFocus=null, openKey=null;
 function openStock(key){
   const r=INDEX[key]; if(!r) return;
-  series(r);
-  const w=W(r), n=Math.min((r.ohlcv||[]).length, 30);
+  series(r); openKey=key;
+  const w=W(r);
   const stat=(k2,v,cl)=>`<div class="mstat"><span class="k">${k2}</span>`
     +`<span class="val ${cl||""}">${v}</span></div>`;
 
@@ -754,14 +867,9 @@ function openStock(key){
       +stat("turnover/mcap",pctDay(w.turn_mcap)+(w.turn_mcap==null?"":"%"))
       +stat("mcap ₹cr",crore(r.mcap_cr))
     +`</div>`
-    +(r.ohlcv&&r.ohlcv.length>1
-      ? `<div class="mchart">${candles(r,n)}<div class="cnote">Last ${n} sessions.`
-        +(win<n?` Shaded: the ${win} sessions the board is scoring.`:"")
-        +` Hover a candle for its open, high, low, close and volume.</div></div>`
-        +`<div class="mbars"><span class="k">daily moves · ${win} sessions</span>`
-        +bars(r)+`</div>`
-      : `<div class="mchart"><div class="cnote">This feed predates the candle data —`
-        +` the next scheduled refresh adds it.</div></div>`)
+    +chartBlock(r)
+    +`<div class="mbars"><span class="k">daily moves · ${win} sessions</span>`
+    +bars(r)+`</div>`
     +`<div class="mlinks">`
       +`<a class="mlink" href="${esc(screenerURL(r))}" target="_blank" rel="noopener noreferrer">`
         +`Screener <span class="arr">↗</span></a>`
@@ -778,11 +886,43 @@ function openStock(key){
   m.hidden=false;
   document.body.style.overflow="hidden";
   m.querySelector(".modal-x").focus();
+  paintChart(r);
+}
+
+/* The chart block is written twice: once when the dialog opens, and again if the
+   bars were still in flight then. Everything else in the dialog is ready from
+   the board file, so nothing else waits. */
+function chartBlock(r){
+  const b=barsFor(r);
+  if(b) return `<div class="mchart"><div class="tvleg"></div>${tvChart(b)}`
+    +`<div class="cnote">${b.c.length} sessions · candles with volume beneath.`
+    +` Move across the chart for that session's open, high, low, close, change and`
+    +` volume. The line across the volume pane is the ${b.c.length}-session average.`
+    +`</div></div>`;
+  if(BARS_STATE==="failed")
+    return `<div class="mchart"><div class="cnote">Could not load <code>bars.json</code>,`
+      +` so there is no chart. Everything else on this card is from the board file.</div></div>`;
+  return `<div class="mchart"><div class="tvskel"></div>`
+    +`<div class="cnote">Loading 60 sessions of price and volume…</div></div>`;
+}
+function paintChart(r){
+  const b=barsFor(r);
+  const host=document.querySelector("#mbody .mchart");
+  if(!host) return;
+  if(b){
+    host.outerHTML=chartBlock(r);   // replaces the placeholder in place
+    const root=document.getElementById("mbody");
+    root.querySelector(".tvleg").innerHTML=tvLegend(b,b.c.length-1);
+    wireCrosshair(root,b);
+    return;
+  }
+  loadBars();
+  BARS_WAITERS.push(()=>{ if(openKey===keyOf(r)&&!document.getElementById("modal").hidden) paintChart(r); });
 }
 function closeStock(){
   const m=document.getElementById("modal");
   if(m.hidden) return;
-  m.hidden=true;
+  m.hidden=true; openKey=null;
   document.body.style.overflow="";
   if(lastFocus&&lastFocus.focus) lastFocus.focus();
 }
@@ -882,13 +1022,22 @@ function openPop(colKey, anchor){
 
     const r0=el.querySelector("#pr0"), r1=el.querySelector("#pr1"),
           fill=el.querySelector("#pfill");
-    const paint=()=>{
+
+    /* Dragging repaints the handles and the readout only. Re-filtering 1,800
+       rows on every step of the drag made the handle stutter and threw away
+       every result but the last one; the board is recomputed once, when the
+       handle is let go. `input` fires continuously, `change` fires on release. */
+    const draw=()=>{
       const a=Math.min(+r0.value,+r1.value), b=Math.max(+r0.value,+r1.value),
             span=dom.length-1;
       fill.style.left=(a/span*100)+"%";
       fill.style.width=((b-a)/span*100)+"%";
       el.querySelector("#pv0").textContent=fmt(dom[a]);
       el.querySelector("#pv1").textContent=fmt(dom[b]);
+      return {a,b,span};
+    };
+    const commit=()=>{
+      const {a,b,span}=draw();
       // a slider pushed back to both ends is not a filter — drop it entirely so
       // the column stops counting as filtered
       if(a===0&&b===span) delete ranges[colKey];
@@ -903,12 +1052,13 @@ function openPop(colKey, anchor){
     };
     // the handles may cross; whichever is being dragged wins and the pair is
     // read as min/max rather than first/second
-    r0.oninput=paint; r1.oninput=paint;
+    r0.oninput=draw; r1.oninput=draw;
+    r0.onchange=commit; r1.onchange=commit;
     el.querySelector("#preset").onclick=()=>{
       delete ranges[colKey];
-      r0.value=0; r1.value=dom.length-1; paint();
+      r0.value=0; r1.value=dom.length-1; commit();
     };
-    paint();
+    draw();
   }
 
   el.hidden=false;
@@ -1001,7 +1151,21 @@ function renderRows(){
     if(typeof x==="string") return x.localeCompare(y)*-dir;
     return ((x??-1e9)-(y??-1e9))*dir;});
 
-  paintRows(rows,cols);
+  // an empty board should say why, not just sit there blank
+  if(!rows.length){
+    const bits=[];
+    if(picks.size) bits.push("verdict chips");
+    if(activeRanges().length) bits.push(activeRanges().length+" column filter"
+      +(activeRanges().length>1?"s":""));
+    if(document.getElementById("q").value.trim()) bits.push("the search box");
+    if(document.getElementById("hideThin").checked) bits.push("hide illiquid");
+    document.querySelector("tbody").innerHTML=
+      `<tr class="empty"><td colspan="${cols.length}">Nothing matches`
+      +(bits.length?` — filtered by ${bits.join(", ")}.`:".")
+      +` <button class="chipclear" type="button" id="eclear">reset view</button></td></tr>`;
+    const e=document.getElementById("eclear");
+    if(e) e.onclick=()=>document.getElementById("reset").click();
+  } else paintRows(rows,cols);
 
   const nr=activeRanges().length;
   document.getElementById("count").textContent=
@@ -1152,10 +1316,13 @@ fetch("trend.json?t="+Date.now())
    }
    document.getElementById("q").value=S.q||"";
    document.getElementById("hideThin").checked=S.thin!==false;
-   buildWindows(); buildColumnSwitches(); render();})
+   buildWindows(); buildColumnSwitches(); render();
+   // the board is on screen now; pull the chart data in behind it
+   (window.requestIdleCallback||(f=>setTimeout(f,400)))(loadBars);})
  .catch(e=>{document.querySelector(".wrap").innerHTML=
    `<div id="err"><h2>No data</h2><p>${e.message}</p>
     <p>Run <code>python trend_scan.py universe.txt</code> to build trend.json.</p></div>`;});
 </script>
+<script src="../theme.js"></script>
 </body>
 </html>
