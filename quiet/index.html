@@ -29,9 +29,20 @@ h1 span{color:var(--up)}
 .meta{color:var(--dim);font-size:12px}
 .ask{margin-top:10px;color:var(--dim);font-size:13px;max-width:820px}
 .ask b{color:var(--ink);font-weight:600}
-.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
-.chip{font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px;
-  border:1px solid var(--line2);color:var(--dim);background:var(--bg)}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px;align-items:center}
+/* the chips are the verdict filter — a count you can click, not just a tally */
+.chip{font-size:12px;font-weight:600;padding:4px 11px;border-radius:99px;
+  border:1px solid var(--line2);color:var(--dim);background:var(--bg);
+  font-family:inherit;cursor:pointer}
+.chip:hover{border-color:var(--accent)}
+.chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* an unpicked chip steps back so the picked ones read as the current filter */
+.chips.picking .chip[aria-pressed=false]{opacity:.45}
+.chips.picking .chip[aria-pressed=false]:hover{opacity:.8}
+.chip[aria-pressed=true]{box-shadow:0 0 0 1px currentColor inset}
+.chipclear{font-size:11.5px;color:var(--faint);background:none;border:none;
+  cursor:pointer;text-decoration:underline;font-family:inherit;padding:2px 4px}
+.chipclear:hover{color:var(--ink)}
 .chip.up{color:var(--up);background:var(--upsoft);border-color:#b9e3cd}
 .chip.down{color:var(--down);background:var(--downsoft);border-color:#f6c9c4}
 .chip.gold{color:var(--gold);background:var(--goldsoft);border-color:#efd9a4}
@@ -65,6 +76,19 @@ label.chk:hover{color:var(--ink)}
   background:var(--card);border-bottom:1px solid var(--line);font-size:12.5px}
 .colbar .collabel{text-transform:uppercase;letter-spacing:.07em;font-size:10.5px;
   font-weight:600;color:var(--faint)}
+/* range filters: one min-max pair per visible numeric column */
+.fbar{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;padding:10px 22px;
+  background:var(--zebra);border-bottom:1px solid var(--line);font-size:12px}
+.fgrp{display:flex;align-items:center;gap:4px}
+.fgrp .flab{color:var(--dim);font-weight:600;margin-right:2px}
+.fgrp .dash{color:var(--faint)}
+.fgrp input{width:62px;font:inherit;font-size:12px;padding:4px 6px;border-radius:6px;
+  border:1px solid var(--line2);background:var(--card);color:var(--ink);
+  font-variant-numeric:tabular-nums}
+.fgrp input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
+.fgrp input.set{border-color:var(--accent);background:var(--hover)}
+.badge{display:inline-block;min-width:16px;padding:0 5px;margin-left:5px;border-radius:99px;
+  background:var(--accent);color:#fff;font-size:10.5px;font-weight:700;text-align:center}
 
 /* ---------- table ---------- */
 /* No overflow on .wrap or table at desktop width: either would become a scroll
@@ -93,6 +117,12 @@ tbody tr:nth-child(even){background:var(--zebra)}
 tbody tr:hover{background:var(--hover)}
 tbody tr:last-child td{border-bottom:none}
 .sym{font-weight:700;font-size:13.5px;letter-spacing:.01em}
+/* the company name opens the detail dialog. A real button so it is keyboard
+   reachable, styled back down to look like the text it replaced. */
+button.sym{font-family:inherit;background:none;border:none;padding:0;cursor:pointer;
+  color:var(--ink);text-align:left;border-bottom:1px dotted var(--line2)}
+button.sym:hover{color:var(--accent);border-bottom-color:var(--accent)}
+button.sym:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 /* identity line: ISIN is what the row IS, the ticker only says how it was fetched */
 .ident{display:block;margin-top:2px;font-size:10.5px;color:var(--faint);
   font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.02em}
@@ -160,6 +190,54 @@ thead th:first-child,tbody td:first-child{min-width:250px;white-space:normal}
 .lgrid{display:flex;flex-wrap:wrap;gap:8px 16px;margin:10px 0 4px}
 .lgrid div{display:flex;align-items:center;gap:7px;font-size:12px}
 
+/* ---------- stock dialog ---------- */
+.modal[hidden]{display:none}
+.modal{position:fixed;inset:0;z-index:50;display:flex;align-items:center;
+  justify-content:center;padding:24px}
+.modal-back{position:absolute;inset:0;background:rgba(19,25,34,.45)}
+.modal-card{position:relative;background:var(--card);border-radius:14px;
+  border:1px solid var(--line);box-shadow:0 12px 48px rgba(19,25,34,.28);
+  width:min(880px,100%);max-height:min(90vh,760px);overflow:auto;padding:20px 22px 22px}
+.modal-x{position:absolute;top:12px;right:14px;font-size:20px;line-height:1;
+  background:none;border:none;color:var(--faint);cursor:pointer;padding:4px 8px;
+  border-radius:6px;font-family:inherit}
+.modal-x:hover{color:var(--ink);background:var(--hover)}
+.mtitle{margin:0 40px 2px 0;font-size:17px;font-weight:700;letter-spacing:-.01em}
+.msub{color:var(--faint);font-size:11.5px;
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.02em}
+.msub .ex{border:1px solid var(--line2);border-radius:3px;padding:0 4px;margin-left:5px;
+  font-size:9.5px;letter-spacing:.06em}
+.mstats{display:flex;flex-wrap:wrap;gap:6px 22px;margin:13px 0 4px;
+  padding:11px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.mstat{min-width:86px}
+.mstat .k{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.07em;
+  color:var(--faint);font-weight:600}
+.mstat .val{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.mchart{margin:14px 0 6px}
+.mchart svg{width:100%;height:auto;display:block}
+.mchart .cnote{color:var(--faint);font-size:11.5px;margin-top:2px}
+/* SVG cannot read a CSS variable from a presentation attribute, so the candles
+   carry classes and take their colour from here */
+.mchart .body.up,.mchart .vol.up{fill:var(--up)}
+.mchart .body.dn,.mchart .vol.dn{fill:var(--down)}
+.mchart .vol{opacity:.5}
+.mchart .wick{stroke-width:1.1}
+.mchart .wick.up{stroke:var(--up)} .mchart .wick.dn{stroke:var(--down)}
+.mchart .grid{stroke:var(--grid);stroke-width:1}
+.mchart .frame{stroke:var(--line2);stroke-width:1;fill:none}
+.mchart .band{fill:var(--recent)}
+.mchart text{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  font-size:11px;fill:var(--faint)}
+.mchart text.pane{font-size:10px;letter-spacing:.06em}
+.mlinks{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
+.mlink{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;
+  padding:8px 14px;border-radius:8px;border:1px solid var(--line2);background:var(--card);
+  color:var(--dim);text-decoration:none}
+.mlink:hover{color:var(--accent);border-color:var(--accent);background:var(--hover)}
+.mlink .arr{color:var(--faint);font-size:11px}
+.mwarn{color:var(--faint);font-size:11.5px;margin-top:10px;line-height:1.6}
+
 /* ---------- empty / error ---------- */
 #err{margin:40px auto;max-width:560px;background:var(--card);
   border:1px solid var(--line);border-left:4px solid var(--accent);
@@ -211,10 +289,13 @@ thead th:first-child,tbody td:first-child{min-width:250px;white-space:normal}
     <button class="seg" type="button" data-win="15">15d</button>
     <button class="seg" type="button" data-win="30">30d</button>
   </span>
-  <label class="chk"><input type="checkbox" id="only" checked> quiet climbs only</label>
   <label class="chk"><input type="checkbox" id="hideThin" checked> hide illiquid</label>
+  <button class="seg" type="button" id="fbtn" aria-pressed="false">range filters</button>
   <span class="meta" id="count"></span>
 </div>
+
+<!-- one min-max pair per visible numeric column; hidden until asked for -->
+<div class="fbar" id="fbar" hidden></div>
 
 <div class="colbar">
   <span class="collabel">columns</span>
@@ -278,6 +359,14 @@ thead th:first-child,tbody td:first-child{min-width:250px;white-space:normal}
      untradeable. Left on by default.</p>
 </div>
 
+<div class="modal" id="modal" hidden>
+  <div class="modal-back" data-close></div>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="mtitle">
+    <button class="modal-x" type="button" data-close aria-label="Close">×</button>
+    <div id="mbody"></div>
+  </div>
+</div>
+
 <script>
 /* ---------------------------------------------------------------------------
    The scan ships every window (30 / 15 / 5) for every stock, so switching one
@@ -285,23 +374,29 @@ thead th:first-child,tbody td:first-child{min-width:250px;white-space:normal}
    pulls that window's block out of a row. Anything read through W() changes
    when you switch; anything read off `r` directly does not.
 --------------------------------------------------------------------------- */
-let DATA=null, win=30, k="up_days", dir=-1;
+let DATA=null, INDEX={}, win=30, k="up_days", dir=-1;
 
-const WKEY="quiet:window", CKEY="quiet:columns";
+const WKEY="quiet:window", CKEY="quiet:columns",
+      FKEY="quiet:filterbar", VKEY="quiet:verdicts";
 const store={
   get(key){ try{ return localStorage.getItem(key); }catch(e){ return null; } },
   set(key,v){ try{ localStorage.setItem(key,v); }catch(e){ /* private mode */ } },
+};
+const readJSON=(key,fallback)=>{
+  try{ const v=store.get(key); return v?JSON.parse(v):fallback; }catch(e){ return fallback; }
 };
 
 const sgn=v=>(v==null?"—":(v>0?"+":"")+v.toFixed(1));
 const cls=v=>v>0?"pos":v<0?"neg":"zero";
 const W=r=>r.windows[String(win)]||{};
+const esc=t=>String(t==null?"":t).replace(/[&<>"']/g,
+  c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 // rows scanned before the registry existed carry no name — fall back to the symbol
 const nameOf=r=>r.name||r.symbol;
 // ISIN is the identity; the ticker only says how the price was fetched, and a
 // BSE-only listing has no NSE symbol at all — hence the exchange tag.
-const identity=r=>`<span class="ident"><span class="tk">${r.symbol}</span>`
-  +(r.isin?` · ${r.isin}`:"")
+const identity=r=>`<span class="ident"><span class="tk">${esc(r.symbol)}</span>`
+  +(r.isin?` · ${esc(r.isin)}`:"")
   +(r.exchange==="BSE"?`<span class="ex">BSE</span>`:"")
   +`</span>`;
 
@@ -313,47 +408,67 @@ const crore=v=>v==null?"—":Math.round(v).toLocaleString("en-IN");
 const pctDay=v=>v==null?"—":(v>=1?v.toFixed(2):v.toFixed(3));
 const volCls=v=>v==null?"rv-lo":v>=1.5?"rv-hi":v<=0.8?"rv-lo":"rv-mid";
 const turnCls=v=>v==null?"rv-lo":v>=1?"rv-hi":v<0.05?"rv-lo":"rv-mid";
+const shares=v=>v==null?"—":v>=1e7?(v/1e7).toFixed(2)+"cr"
+  :v>=1e5?(v/1e5).toFixed(1)+"L":v>=1e3?Math.round(v/1e3)+"k":String(v);
+
+/* Rows carry raw bars now. The daily moves the bar chart wants are one division
+   away from consecutive closes, so they are derived once per row and cached
+   rather than shipped twice — and a pre-candle feed, which has the moves but no
+   bars, still lands in the same two fields. */
+function series(r){
+  if(r._daily) return r;
+  if(r.ohlcv && r.ohlcv.length>1){
+    const c=r.ohlcv.map(b=>b[3]);
+    r._daily=c.slice(1).map((v,i)=>+((v/c[i]-1)*100).toFixed(2));
+    r._dates=(r.dates||[]).slice(1);
+  }else{
+    r._daily=r.daily||[]; r._dates=r.dates||[];
+  }
+  return r;
+}
 
 /* ---------------------------------------------------------------------------
    Columns. One entry per column: how to label it (a function where the label
    depends on the window), how to sort it, and how to draw a cell. `always`
    columns have no switch — the company a row refers to is not optional.
+   `num` marks a column the range filter can work on.
 --------------------------------------------------------------------------- */
 const COLUMNS=[
   {k:"name", label:"company", cls:"l", always:true,
    sort:r=>nameOf(r),
-   cell:r=>`<td class="l"><span class="sym">${nameOf(r)}</span>${
+   cell:r=>`<td class="l"><button class="sym" type="button" data-no-bounce`
+     +` data-stock="${esc(keyOf(r))}" title="Open chart and links">${esc(nameOf(r))}</button>${
      W(r).thin?'<span class="flag">THIN</span>':''}${identity(r)}</td>`},
 
-  {k:"up_days", label:()=>`up days`, sort:r=>W(r).up_days,
+  {k:"up_days", label:()=>`up days`, num:true, sort:r=>W(r).up_days,
    cell:r=>{ const w=W(r), pct=w.days?w.up_days/w.days*100:0;
      return `<td><span class="updays"><span class="frac num"><b>${w.up_days}</b>`
        +`<span>/${w.days}</span></span><span class="mbar"><b class="${pct>=50?'':'dn'}"`
        +` style="width:${pct.toFixed(0)}%"></b></span></span></td>`; }},
 
-  {k:"total", label:()=>`${win}d %`, sort:r=>W(r).total,
+  {k:"total", label:()=>`${win}d %`, num:true, unit:"%", sort:r=>W(r).total,
    cell:r=>`<td class="num ${cls(W(r).total)}">${sgn(W(r).total)}</td>`},
 
-  {k:"vol_ratio", label:"vol 5d/30d", sort:r=>r.vol_ratio,
+  {k:"vol_ratio", label:"vol 5d/30d", num:true, unit:"×", sort:r=>r.vol_ratio,
    cell:r=>`<td class="num"><span class="rv ${volCls(r.vol_ratio)}"`
      +` title="Average daily volume over the last 5 sessions against the last 30.">`
      +`${r.vol_ratio==null?"—":r.vol_ratio.toFixed(2)+"×"}</span></td>`},
 
-  {k:"turn_mcap", label:()=>`turnover/mcap`, sort:r=>W(r).turn_mcap,
+  {k:"turn_mcap", label:()=>`turnover/mcap`, num:true, unit:"%", sort:r=>W(r).turn_mcap,
    cell:r=>{ const v=W(r).turn_mcap;
      return `<td class="num"><span class="rv ${turnCls(v)}"`
        +` title="Average daily turnover over ${win} sessions as a share of market cap.">`
        +`${pctDay(v)}${v==null?"":'<span class="unit">%</span>'}</span></td>`; }},
 
-  {k:"turnover_cr", label:"turnover ₹cr", sort:r=>W(r).turnover_cr,
+  {k:"turnover_cr", label:"turnover ₹cr", num:true, unit:"₹cr", sort:r=>W(r).turnover_cr,
    cell:r=>`<td class="num zero" title="Average daily turnover over the window, Rs crore.">`
      +`${W(r).turnover_cr==null?"—":W(r).turnover_cr.toFixed(1)}</td>`},
 
-  {k:"mcap_cr", label:"mcap ₹cr", sort:r=>r.mcap_cr,
+  {k:"mcap_cr", label:"mcap ₹cr", num:true, unit:"₹cr", sort:r=>r.mcap_cr,
    cell:r=>`<td class="num zero" title="Market cap from stocks.csv, carried forward on price.">`
      +`${crore(r.mcap_cr)}</td>`},
 
-  {k:"recent_up", label:"last 5", sort:r=>r.recent_up,
+  {k:"recent_up", label:"last 5", num:true, sort:r=>r.recent_up,
    cell:r=>`<td class="frac num" title="Up days in the most recent week — does not follow the window.">`
      +`<b>${r.recent_up}</b><span>/5</span></td>`},
 
@@ -367,8 +482,10 @@ const COLUMNS=[
    cell:r=>`<td class="l">${bars(r)}</td>`},
 ];
 
-let hidden=new Set();
-try{ const saved=store.get(CKEY); if(saved) hidden=new Set(JSON.parse(saved)); }catch(e){}
+const keyOf=r=>r.isin||r.symbol;
+let hidden=new Set(readJSON(CKEY,[]));
+let picks=new Set(readJSON(VKEY,["quiet climb"]));   // verdict chips; empty = all
+const ranges={};                                      // column key -> {min,max}
 const shownCols=()=>COLUMNS.filter(c=>c.always||!hidden.has(c.k));
 const labelOf=c=>typeof c.label==="function"?c.label():c.label;
 
@@ -380,14 +497,15 @@ const labelOf=c=>typeof c.label==="function"?c.label():c.label;
 const CAP=2.5, RECENT=5;
 const barWidth=n=>n<=5?26:n<=15?13:7;
 function bars(r){
-  const d=r.daily.slice(-win), dt=r.dates.slice(-win);
+  series(r);
+  const d=r._daily.slice(-win), dt=r._dates.slice(-win);
   const n=d.length, CW=barWidth(n), CGAP=2;
   const cols=d.map((v,i)=>{
     const flat=Math.abs(v)<0.05;
     const h=Math.max(2,Math.min(1,Math.abs(v)/CAP)*47);
     const bar=flat?`<i class="fl"></i>`
                   :`<i class="${v>0?"up":"dn"}" style="height:${h.toFixed(1)}%"></i>`;
-    return `<span class="c" style="width:${CW}px" title="${dt[i]} · ${sgn(v)}%">${bar}</span>`;
+    return `<span class="c" style="width:${CW}px" title="${dt[i]||""} · ${sgn(v)}%">${bar}</span>`;
   }).join("");
   // the shaded "most recent 5" block only means something if the window is longer
   let band="";
@@ -398,24 +516,222 @@ function bars(r){
   return `<div class="bars">${band}<span class="zline"></span>${cols}</div>`;
 }
 
-function render(){
-  if(!DATA) return;
+/* ---------------------------------------------------------------------------
+   Candlestick chart, drawn as inline SVG — no chart library, nothing to load.
+   Price panel on top, volume underneath, sharing one x axis. Every candle
+   carries a <title> so hovering gives the exact OHLC and volume.
+--------------------------------------------------------------------------- */
+function candles(r, n){
+  const all=r.ohlcv||[], bars=all.slice(-n), dates=(r.dates||[]).slice(-n);
+  if(bars.length<2) return "";
+  const WD=820, L=10, R=WD-58, T=12, PB=250, VT=284, VB=356, H=378;
+  const lo=Math.min(...bars.map(b=>b[2])), hi=Math.max(...bars.map(b=>b[1]));
+  const pad=(hi-lo)*0.06 || Math.abs(hi)*0.02 || 1;
+  const y0=lo-pad, y1=hi+pad;
+  const py=v=>PB-((v-y0)/(y1-y0))*(PB-T);
+  const vmax=Math.max(...bars.map(b=>b[4]),1);
+  const vy=v=>VB-(v/vmax)*(VB-VT);
+  const step=(R-L)/bars.length, cw=Math.max(2,Math.min(18,step*0.62));
+  const dp=hi<10?3:hi<1000?2:1;                       // paise matter on a Rs 8 stock
+
+  // four price gridlines with labels down the right edge
+  let grid="";
+  for(let i=0;i<=3;i++){
+    const v=y0+(y1-y0)*i/3, y=py(v);
+    grid+=`<line class="grid" x1="${L}" x2="${R}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}"/>`
+      +`<text x="${R+6}" y="${(y+3.5).toFixed(1)}">${v.toFixed(dp)}</text>`;
+  }
+
+  // the sessions the board's window covers, when it is shorter than the chart
+  let band="";
+  if(win<bars.length){
+    const x=L+step*(bars.length-win);
+    band=`<rect class="band" x="${x.toFixed(1)}" y="${T-4}" width="${(R-x).toFixed(1)}"`
+      +` height="${VB-T+4}" rx="4"/>`;
+  }
+
+  let body="";
+  bars.forEach((b,i)=>{
+    const [o,h,l,c,v]=b, up=c>=o, k2=up?"up":"dn";
+    const x=L+step*i+step/2, top=py(Math.max(o,c)), bot=py(Math.min(o,c));
+    const tip=`${dates[i]||""}  O ${o.toFixed(dp)}  H ${h.toFixed(dp)}  L ${l.toFixed(dp)}`
+      +`  C ${c.toFixed(dp)}  ·  vol ${shares(v)}`;
+    body+=`<g><title>${esc(tip)}</title>`
+      +`<line class="wick ${k2}" x1="${x.toFixed(1)}" x2="${x.toFixed(1)}"`
+      +` y1="${py(h).toFixed(1)}" y2="${py(l).toFixed(1)}"/>`
+      +`<rect class="body ${k2}" x="${(x-cw/2).toFixed(1)}" y="${top.toFixed(1)}"`
+      +` width="${cw.toFixed(1)}" height="${Math.max(1,bot-top).toFixed(1)}"/>`
+      +`<rect class="vol ${k2}" x="${(x-cw/2).toFixed(1)}" y="${vy(v).toFixed(1)}"`
+      +` width="${cw.toFixed(1)}" height="${Math.max(0.5,VB-vy(v)).toFixed(1)}"/>`
+      +`</g>`;
+  });
+
+  // date labels: first, middle, last only — thirty of them would be a smear
+  const ticks=[0,Math.floor((bars.length-1)/2),bars.length-1].map(i=>{
+    const x=L+step*i+step/2;
+    const anchor=i===0?"start":i===bars.length-1?"end":"middle";
+    return `<text x="${x.toFixed(1)}" y="${H-4}" text-anchor="${anchor}">${dates[i]||""}</text>`;
+  }).join("");
+
+  return `<svg viewBox="0 0 ${WD} ${H}" role="img"`
+    +` aria-label="Candlestick chart, last ${bars.length} sessions, with volume">`
+    +band+grid
+    +`<line class="grid" x1="${L}" x2="${R}" y1="${VB}" y2="${VB}"/>`
+    +body+ticks
+    +`<text class="pane" x="${L}" y="${T-1}">PRICE ₹</text>`
+    +`<text class="pane" x="${L}" y="${VT-3}">VOLUME</text>`
+    +`<text x="${R+6}" y="${VT+4}">${shares(vmax)}</text>`
+    +`</svg>`;
+}
+
+/* ---------------------------------------------------------------------------
+   The stock dialog: candles, the window's numbers, and the two places you would
+   go next. Both links are the same shape — a fixed prefix plus this row's
+   symbol — so a BSE-only listing carries its scrip code into both.
+--------------------------------------------------------------------------- */
+const tvURL=r=>`https://www.tradingview.com/chart/?symbol=`
+  +encodeURIComponent(`${r.exchange||"NSE"}:${r.symbol}`);
+const screenerURL=r=>`https://www.screener.in/company/${encodeURIComponent(r.symbol)}/`;
+
+let lastFocus=null;
+function openStock(key){
+  const r=INDEX[key]; if(!r) return;
+  series(r);
+  const w=W(r), n=Math.min((r.ohlcv||[]).length, 30);
+  const stat=(k2,v,cl)=>`<div class="mstat"><span class="k">${k2}</span>`
+    +`<span class="val ${cl||""}">${v}</span></div>`;
+
+  document.getElementById("mbody").innerHTML=
+    `<h2 class="mtitle" id="mtitle">${esc(nameOf(r))}</h2>`
+    +`<div class="msub">${esc(r.symbol)}${r.isin?` · ${esc(r.isin)}`:""}`
+    +(r.exchange==="BSE"?`<span class="ex">BSE</span>`:"")
+    +(r.industry?` · ${esc(r.industry)}`:"")+`</div>`
+    +`<div class="mstats">`
+      +stat("last",`₹${r.last==null?"—":r.last.toLocaleString("en-IN")}`)
+      +stat(`${win}d move`,sgn(w.total)+"%",cls(w.total))
+      +stat("up days",`${w.up_days}/${w.days}`)
+      +stat("verdict",`<span class="v v-${(w.verdict||"").replace(/ /g,"-")}">${w.verdict||"—"}</span>`)
+      +stat("vol 5d/30d",r.vol_ratio==null?"—":r.vol_ratio.toFixed(2)+"×")
+      +stat("turnover/mcap",pctDay(w.turn_mcap)+(w.turn_mcap==null?"":"%"))
+      +stat("mcap ₹cr",crore(r.mcap_cr))
+    +`</div>`
+    +(r.ohlcv&&r.ohlcv.length>1
+      ? `<div class="mchart">${candles(r,n)}<div class="cnote">Last ${n} sessions.`
+        +(win<n?` Shaded: the ${win} sessions the board is scoring.`:"")
+        +` Hover a candle for its open, high, low, close and volume.</div></div>`
+      : `<div class="mchart"><div class="cnote">This feed predates the candle data —`
+        +` the next scheduled refresh adds it.</div></div>`)
+    +`<div class="mlinks">`
+      +`<a class="mlink" href="${esc(screenerURL(r))}" target="_blank" rel="noopener noreferrer">`
+        +`Screener <span class="arr">↗</span></a>`
+      +`<a class="mlink" href="${esc(tvURL(r))}" target="_blank" rel="noopener noreferrer">`
+        +`TradingView <span class="arr">↗</span></a>`
+    +`</div>`
+    +(r.exchange==="BSE"
+      ? `<div class="mwarn">This company has no NSE listing, so both links carry its BSE`
+        +` scrip code (${esc(r.symbol)}) rather than a ticker.</div>`
+      : "");
+
+  const m=document.getElementById("modal");
+  lastFocus=document.activeElement;
+  m.hidden=false;
+  document.body.style.overflow="hidden";
+  m.querySelector(".modal-x").focus();
+}
+function closeStock(){
+  const m=document.getElementById("modal");
+  if(m.hidden) return;
+  m.hidden=true;
+  document.body.style.overflow="";
+  if(lastFocus&&lastFocus.focus) lastFocus.focus();
+}
+document.getElementById("modal").addEventListener("click",e=>{
+  if(e.target.hasAttribute("data-close")) closeStock();
+});
+addEventListener("keydown",e=>{ if(e.key==="Escape") closeStock(); });
+// the rows are rebuilt constantly, so listen on the table rather than per button
+document.querySelector("table").addEventListener("click",e=>{
+  const b=e.target.closest("button[data-stock]");
+  if(b) openStock(b.dataset.stock);
+});
+
+/* ---------------------------------------------------------------------------
+   Filtering. Three independent gates: the text box, the range filters, and the
+   liquidity switch. The verdict chips are a fourth, kept separate so the chips
+   can count a board that is not already filtered down to one verdict.
+--------------------------------------------------------------------------- */
+function activeRanges(){
+  return COLUMNS.filter(c=>ranges[c.k]&&(ranges[c.k].min!=null||ranges[c.k].max!=null));
+}
+function inRanges(r){
+  for(const c of activeRanges()){
+    const rg=ranges[c.k], v=c.sort(r);
+    // a row with no reading cannot satisfy a range — a blank is not a number
+    if(typeof v!=="number"||!isFinite(v)) return false;
+    if(rg.min!=null&&v<rg.min) return false;
+    if(rg.max!=null&&v>rg.max) return false;
+  }
+  return true;
+}
+
+function buildFilterBar(){
+  const bar=document.getElementById("fbar");
+  const numeric=shownCols().filter(c=>c.num);
+  bar.innerHTML=numeric.map(c=>{
+    const rg=ranges[c.k]||{};
+    const inp=(b,ph)=>`<input type="number" step="any" inputmode="decimal"`
+      +` data-f="${c.k}" data-b="${b}" placeholder="${ph}"`
+      +` class="${rg[b]!=null?"set":""}" value="${rg[b]??""}"`
+      +` aria-label="${labelOf(c)} ${ph}">`;
+    return `<span class="fgrp"><span class="flab">${labelOf(c)}</span>`
+      +inp("min","min")+`<span class="dash">–</span>`+inp("max","max")
+      +(c.unit?`<span class="dash">${c.unit}</span>`:"")+`</span>`;
+  }).join("")
+    +`<button class="chipclear" type="button" id="fclear">clear ranges</button>`;
+
+  let t=null;
+  bar.querySelectorAll("input").forEach(inp=>inp.oninput=()=>{
+    const key=inp.dataset.f, bound=inp.dataset.b;
+    const v=inp.value.trim()===""?null:Number(inp.value);
+    ranges[key]=ranges[key]||{min:null,max:null};
+    ranges[key][bound]=(v==null||isNaN(v))?null:v;
+    inp.classList.toggle("set",ranges[key][bound]!=null);
+    // rows only — rebuilding the bar here would pull focus out of the field
+    clearTimeout(t); t=setTimeout(()=>renderRows(),150);
+  });
+  bar.querySelector("#fclear").onclick=()=>{
+    for(const key of Object.keys(ranges)) delete ranges[key];
+    buildFilterBar(); renderRows();
+  };
+}
+
+function syncFilterButton(){
+  const n=activeRanges().length, btn=document.getElementById("fbtn");
+  const open=!document.getElementById("fbar").hidden;
+  btn.setAttribute("aria-pressed",String(open));
+  btn.innerHTML="range filters"+(n?`<span class="badge">${n}</span>`:"");
+}
+
+document.getElementById("fbtn").onclick=()=>{
+  const bar=document.getElementById("fbar");
+  bar.hidden=!bar.hidden;
+  store.set(FKEY,bar.hidden?"off":"on");
+  syncFilterButton(); syncStickyOffset();
+};
+
+/* ---------------------------------------------------------------------------
+   Render. Head and rows are separate because typing in a range field must not
+   rebuild the head — and because only the head depends on the window and the
+   column switches.
+--------------------------------------------------------------------------- */
+function passes(r){
   const q=document.getElementById("q").value.trim().toUpperCase();
-  const only=document.getElementById("only").checked;
   const noThin=document.getElementById("hideThin").checked;
+  return (!q||r.symbol.includes(q)||nameOf(r).toUpperCase().includes(q)||(r.isin||"").includes(q))
+    && !(noThin&&W(r).thin) && inRanges(r);
+}
 
-  // split out from the verdict toggle so the chips below can count the same
-  // board without "quiet climbs only" zeroing every other verdict by definition
-  const passes=r=>
-    (!q||r.symbol.includes(q)||nameOf(r).toUpperCase().includes(q)||(r.isin||"").includes(q))
-    && !(noThin&&W(r).thin);
-  let rows=DATA.rows.filter(r=>passes(r) && !(only && W(r).verdict!=="quiet climb"));
-
-  const col=COLUMNS.find(c=>c.k===k)||COLUMNS[1];
-  rows.sort((a,b)=>{const x=col.sort(a),y=col.sort(b);
-    if(typeof x==="string") return x.localeCompare(y)*-dir;
-    return ((x??-1e9)-(y??-1e9))*dir;});
-
+function renderHead(){
   const cols=shownCols();
   document.querySelector("thead").innerHTML="<tr>"+cols.map(c=>{
     const sorted=c.k===k;
@@ -423,33 +739,63 @@ function render(){
       +(c.nosort?"":` data-k="${c.k}"`)+`>`
       +(c.head?c.head():labelOf(c)+(sorted?(dir<0?" ↓":" ↑"):""))+`</th>`;
   }).join("")+"</tr>";
+  document.querySelectorAll("th[data-k]").forEach(th=>th.onclick=()=>{
+    const nk=th.dataset.k; if(nk===k) dir*=-1; else {k=nk;dir=-1;} render();});
+}
+
+function renderRows(){
+  if(!DATA) return;
+  const cols=shownCols();
+  const base=DATA.rows.filter(passes);              // everything except the verdict chips
+  let rows=picks.size?base.filter(r=>picks.has(W(r).verdict)):base.slice();
+
+  const col=COLUMNS.find(c=>c.k===k)||COLUMNS[1];
+  rows.sort((a,b)=>{const x=col.sort(a),y=col.sort(b);
+    if(typeof x==="string") return x.localeCompare(y)*-dir;
+    return ((x??-1e9)-(y??-1e9))*dir;});
 
   document.querySelector("tbody").innerHTML=
     rows.map(r=>"<tr>"+cols.map(c=>c.cell(r)).join("")+"</tr>").join("");
 
-  document.querySelectorAll("th[data-k]").forEach(th=>th.onclick=()=>{
-    const nk=th.dataset.k; if(nk===k) dir*=-1; else {k=nk;dir=-1;} render();});
-
+  const nr=activeRanges().length;
   document.getElementById("count").textContent=
-    `${rows.length} shown of ${DATA.rows.length} scored · ${win}-session window`;
+    `${rows.length} shown of ${DATA.rows.length} scored · ${win}-session window`
+    +(nr?` · ${nr} range filter${nr>1?"s":""}`:"");
 
-  // The chips count the board as filtered — minus the verdict toggle, which
-  // would otherwise zero every chip but one. Where rows are hidden, the chip
-  // carries both numbers.
+  // The chips are the verdict filter AND the tally. They count `base` — the
+  // board minus the verdict pick — so picking one does not zero the other three.
   const count=rs=>rs.reduce((a,r)=>{const v=W(r).verdict;a[v]=(a[v]||0)+1;return a;},{});
-  const t=count(DATA.rows.filter(passes)), all=count(DATA.rows);
+  const t=count(base), all=count(DATA.rows);
   const chip=(cl,v)=>{
-    const now=t[v]||0, tot=all[v]||0, hid=tot-now;
-    return `<span class="chip ${cl}"${hid?` title="${hid} more ${v} hidden by the`
-      +` filters above. Untick them to see all ${tot}."`:""}>`
-      +`${now}${hid?`<span class="of">of ${tot}</span>`:""} ${v}</span>`;
+    const now=t[v]||0, tot=all[v]||0, hid=tot-now, on=picks.has(v);
+    return `<button class="chip ${cl}" type="button" data-no-bounce data-verdict="${v}"`
+      +` aria-pressed="${on}" title="${on?"Showing":"Click to show"} ${v}`
+      +(hid?` · ${hid} more hidden by the filters above`:"")+`">`
+      +`${now}${hid?`<span class="of">of ${tot}</span>`:""} ${v}</button>`;
   };
-  document.getElementById("chips").innerHTML=
-    chip("up","quiet climb")+chip("down","quiet slide")+
-    chip("gold","one big day")+chip("","no pattern");
-
+  const chips=document.getElementById("chips");
+  chips.className="chips"+(picks.size?" picking":"");
+  chips.innerHTML=chip("up","quiet climb")+chip("down","quiet slide")+
+    chip("gold","one big day")+chip("","no pattern")
+    +(picks.size?`<button class="chipclear" type="button" id="vclear">show all</button>`:"");
+  syncFilterButton();
   syncStickyOffset();
 }
+
+function render(){ if(!DATA) return; renderHead(); renderRows(); }
+
+document.getElementById("chips").addEventListener("click",e=>{
+  const c=e.target.closest("[data-verdict]");
+  if(c){
+    const v=c.dataset.verdict;
+    picks.has(v)?picks.delete(v):picks.add(v);
+    store.set(VKEY,JSON.stringify([...picks]));
+    renderRows(); return;
+  }
+  if(e.target.id==="vclear"){
+    picks.clear(); store.set(VKEY,"[]"); renderRows();
+  }
+});
 
 /* ---------------------------------------------------------------------------
    Window selector. Feeds built before the windows existed carry one length
@@ -470,7 +816,7 @@ function buildWindows(){
         o.setAttribute("aria-pressed", String(Number(o.dataset.win)===win)));
       // three switch labels carry the window ("15d %", "last 15 sessions"), so
       // the switches are rebuilt with it rather than left describing the old one
-      buildColumnSwitches();
+      buildColumnSwitches(); buildFilterBar();
       render(); };
   });
 }
@@ -480,17 +826,20 @@ function buildColumnSwitches(){
     `<label class="chk"><input type="checkbox" data-col="${c.k}"`
     +`${hidden.has(c.k)?"":" checked"}> ${labelOf(c)}</label>`).join("");
   document.querySelectorAll("#cols input").forEach(cb=>cb.onchange=()=>{
-    cb.checked?hidden.delete(cb.dataset.col):hidden.add(cb.dataset.col);
+    const key=cb.dataset.col;
+    cb.checked?hidden.delete(key):hidden.add(key);
     store.set(CKEY,JSON.stringify([...hidden]));
-    // sorting on a column you just switched off would leave the order
-    // unexplainable — fall back to the default sort
+    // a range filter on a column you just switched off would keep filtering
+    // invisibly — drop it with the column
+    if(!cb.checked) delete ranges[key];
+    // sorting on a hidden column would leave the order unexplainable
     if(hidden.has(k)){ k="up_days"; dir=-1; }
-    render();
+    buildFilterBar(); render();
   });
 }
 
-["q","only","hideThin"].forEach(id=>{const e=document.getElementById(id);
-  e.addEventListener(e.type==="checkbox"?"change":"input",render);});
+["q","hideThin"].forEach(id=>{const e=document.getElementById(id);
+  e.addEventListener(e.type==="checkbox"?"change":"input",renderRows);});
 
 // the column header parks under the sticky controls bar — measure, don't guess
 function syncStickyOffset(){
@@ -519,6 +868,7 @@ function adapt(d){
 fetch("trend.json?t="+Date.now())
  .then(r=>{if(!r.ok)throw new Error("HTTP "+r.status);return r.json();})
  .then(d=>{DATA=adapt(d);
+   DATA.rows.forEach(r=>{ series(r); INDEX[keyOf(r)]=r; });
    const have=(DATA.windows||[30]).map(Number);
    const saved=Number(store.get(WKEY));
    win=have.includes(saved)?saved:(have.includes(DATA.base_window)?DATA.base_window:have[0]);
@@ -536,7 +886,8 @@ fetch("trend.json?t="+Date.now())
      document.getElementById("count").textContent="0 scored";
      return;
    }
-   buildWindows(); buildColumnSwitches(); render();})
+   if(store.get(FKEY)==="on") document.getElementById("fbar").hidden=false;
+   buildWindows(); buildColumnSwitches(); buildFilterBar(); render();})
  .catch(e=>{document.querySelector(".wrap").innerHTML=
    `<div id="err"><h2>No data</h2><p>${e.message}</p>
     <p>Run <code>python trend_scan.py universe.txt</code> to build trend.json.</p></div>`;});
