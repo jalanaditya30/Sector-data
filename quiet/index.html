@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Quiet Climbers — NSE</title>
-<link rel="stylesheet" href="../bounce.css">
+<link rel="stylesheet" href="../boards.css">
 <style>
 :root{
   --bg:#eef1f6; --card:#ffffff; --line:#e2e8f1; --line2:#cbd5e4;
@@ -27,8 +27,6 @@ header{padding:18px 22px 14px;background:var(--card);border-bottom:1px solid var
 h1{margin:0;font-size:17px;font-weight:700;letter-spacing:-.01em}
 h1 span{color:var(--up)}
 .meta{color:var(--dim);font-size:12px}
-.ask{margin-top:10px;color:var(--dim);font-size:13px;max-width:820px}
-.ask b{color:var(--ink);font-weight:600}
 .chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px;align-items:center}
 /* the chips are the verdict filter — a count you can click, not just a tally */
 .chip{font-size:12px;font-weight:600;padding:4px 11px;border-radius:99px;
@@ -122,16 +120,27 @@ th:hover .fx{color:var(--dim);border-color:var(--line2)}
 /* No overflow on .wrap or table at desktop width: either would become a scroll
    container and capture the sticky <th>, detaching it and hiding the first row. */
 .wrap{padding:18px 22px 48px}
-table{border-collapse:separate;border-spacing:0;width:100%;min-width:1000px;
+/* table-layout:fixed, with widths declared in a <colgroup> the page builds.
+   Automatic layout has to measure every cell in every row before it can settle
+   on column widths — on 1,800 rows carrying two charts each that was 4.7s of
+   layout. Fixed widths plus clipped cells bring the same board in around 1.4s,
+   and the rows are painted in chunks on top of that, so the first screenful is
+   there immediately. */
+table{border-collapse:separate;border-spacing:0;width:100%;table-layout:fixed;
   background:var(--card);border:1px solid var(--line);border-radius:12px;
   box-shadow:var(--shadow)}
+tbody td{overflow:hidden}
 thead th:first-child{border-top-left-radius:11px}
 thead th:last-child{border-top-right-radius:11px}
 tbody tr:last-child td:first-child{border-bottom-left-radius:11px}
 tbody tr:last-child td:last-child{border-bottom-right-radius:11px}
+/* Headers wrap rather than run past their column. With table-layout:fixed a
+   label that overflows is painted over by the next sticky <th>, which quietly
+   swallowed clicks on the filter handle underneath. */
 th{background:var(--card);color:var(--dim);font-weight:600;font-size:11px;
-  letter-spacing:.07em;text-transform:uppercase;padding:11px 13px;text-align:right;
-  border-bottom:1px solid var(--line2);cursor:pointer;white-space:nowrap;
+  letter-spacing:.06em;text-transform:uppercase;padding:10px 11px;text-align:right;
+  border-bottom:1px solid var(--line2);cursor:pointer;white-space:normal;
+  vertical-align:bottom;line-height:1.35;
   position:sticky;top:var(--ctrlh,57px);z-index:4}
 th.l{text-align:left}
 th:hover{color:var(--ink);background:var(--hover)}
@@ -145,6 +154,15 @@ tbody tr:nth-child(even){background:var(--zebra)}
 tbody tr:hover{background:var(--hover)}
 tbody tr:last-child td{border-bottom:none}
 .sym{font-weight:700;font-size:13.5px;letter-spacing:.01em}
+/* company cell: the two jump-outs stand in front of the name, stacked, so they
+   cost one column of width rather than two */
+.co{display:flex;align-items:flex-start;gap:9px}
+.jump{display:flex;flex-direction:column;gap:2px;flex:none;padding-top:1px}
+.j{display:block;width:19px;height:16px;line-height:15px;text-align:center;
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:10px;font-weight:700;
+  border:1px solid var(--line2);border-radius:4px;color:var(--faint);text-decoration:none}
+.j:hover{color:var(--accent);border-color:var(--accent);background:var(--hover)}
+.j:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 /* the company name opens the detail dialog. A real button so it is keyboard
    reachable, styled back down to look like the text it replaced. */
 button.sym{font-family:inherit;background:none;border:none;padding:0;cursor:pointer;
@@ -157,7 +175,7 @@ button.sym:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .ident .tk{color:var(--dim);font-weight:600}
 .ident .ex{border:1px solid var(--line2);border-radius:3px;padding:0 4px;margin-left:5px;
   font-size:9.5px;letter-spacing:.06em}
-thead th:first-child,tbody td:first-child{min-width:250px;white-space:normal}
+thead th:first-child,tbody td:first-child{white-space:normal}
 .pos{color:var(--up)} .neg{color:var(--down)} .zero{color:var(--faint)}
 .big{color:var(--gold);font-weight:700}
 /* liquidity readings: emphasis tiers for readability, not thresholds to trade on */
@@ -190,21 +208,20 @@ td.score{font-weight:700}
   border-radius:4px;margin-left:6px;vertical-align:1px;color:var(--faint);
   border:1px solid currentColor}
 
-/* ---------- the 30-session bar chart ---------- */
-.bars{position:relative;display:flex;gap:2px;height:44px;align-items:stretch;
-  width:max-content}
-/* continuous band behind the most recent 5 sessions (the "last 5" column) */
-.band{position:absolute;top:-2px;bottom:-2px;background:var(--recent);
-  border-radius:5px;z-index:0}
-/* zero line above the band so it stays visible the whole way across */
-.zline{position:absolute;left:0;right:0;top:calc(50% - .5px);height:1px;
-  background:var(--line2);z-index:1}
-.c{position:relative;width:7px;z-index:2}
-.c i{position:absolute;left:0;right:0;border-radius:2px}
-.c i.up{bottom:50%;background:var(--up)}
-.c i.dn{top:50%;background:var(--down)}
-.c i.fl{top:calc(50% - 1px);height:2px;background:var(--faint);border-radius:1px}
-.c:hover i{filter:brightness(1.15)}
+/* ---------- the two in-row charts ----------
+   Both are drawn as a handful of SVG <path>s rather than one element per
+   session. At 1,800 rows x 30 sessions the per-element version built 170,000
+   DOM nodes and took nearly six seconds to lay out; three paths per chart
+   render the same picture in a fraction of that. The cost is per-session
+   hovering, which the dialog does properly anyway. */
+.bars,.rowc{display:block}
+.bars .band,.rowc .band{fill:var(--recent)}
+.bars .zline{stroke:var(--line2);stroke-width:1}
+.bars .up,.rowc .body.up{fill:var(--up)}
+.bars .dn,.rowc .body.dn{fill:var(--down)}
+.bars .fl{fill:var(--faint)}
+.rowc .wick{fill:none;stroke-width:1}
+.rowc .wick.up{stroke:var(--up)} .rowc .wick.dn{stroke:var(--down)}
 .barhead{display:flex;align-items:center;gap:9px}
 .barkey{display:flex;align-items:center;gap:4px;font-size:10px;text-transform:none;
   letter-spacing:0;font-weight:500;color:var(--faint)}
@@ -250,6 +267,9 @@ td.score{font-weight:700}
 .mchart{margin:14px 0 6px}
 .mchart svg{width:100%;height:auto;display:block}
 .mchart .cnote{color:var(--faint);font-size:11.5px;margin-top:2px}
+.mbars{margin-top:12px}
+.mbars .k{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.07em;
+  color:var(--faint);font-weight:600;margin-bottom:4px}
 /* SVG cannot read a CSS variable from a presentation attribute, so the candles
    carry classes and take their colour from here */
 .mchart .body.up,.mchart .vol.up{fill:var(--up)}
@@ -296,19 +316,12 @@ td.score{font-weight:700}
   <span class="bbtn" aria-current="page">Quiet Climbers</span>
   <span class="sep"></span>
   <span class="hint">5 / 15 / 30 sessions, pure counting</span>
-  <button class="bbtn" type="button" data-bounce-toggle>bounce: on</button>
 </nav>
 
 <header>
   <div class="hrow">
     <h1>Quiet <span>Climbers</span></h1>
     <div class="meta" id="meta">loading…</div>
-  </div>
-  <div class="ask">
-    Looking for stocks that rise <b>a little, most days, for weeks</b> — the ones no one
-    posts about. Two numbers decide it: how many sessions in the window closed up, and
-    whether the gain came in small steps or one jump. Pick the window — <b>5, 15 or 30
-    sessions</b> — and every figure below is recomputed on it.
   </div>
   <div class="chips" id="chips"></div>
 </header>
@@ -494,68 +507,78 @@ function series(r){
    `num` marks a column the range filter can work on.
 --------------------------------------------------------------------------- */
 const COLUMNS=[
-  {k:"name", label:"company", cls:"l", always:true,
+  {k:"name", label:"company", cls:"l", always:true, w:270,
    sort:r=>nameOf(r),
-   cell:r=>`<td class="l"><button class="sym" type="button" data-no-bounce`
-     +` data-stock="${esc(keyOf(r))}" title="Open chart and links">${esc(nameOf(r))}</button>${
-     W(r).thin?'<span class="flag">THIN</span>':''}${identity(r)}</td>`},
+   cell:r=>`<td class="l"><div class="co"><span class="jump">`
+     +`<a class="j" href="${esc(screenerURL(r))}" target="_blank" rel="noopener noreferrer"`
+     +` title="Screener · ${esc(nameOf(r))}" aria-label="Open ${esc(nameOf(r))} on Screener">S</a>`
+     +`<a class="j" href="${esc(tvURL(r))}" target="_blank" rel="noopener noreferrer"`
+     +` title="TradingView · ${esc(nameOf(r))}" aria-label="Open ${esc(nameOf(r))} on TradingView">T</a>`
+     +`</span><span><button class="sym" type="button" data-stock="${esc(keyOf(r))}"`
+     +` title="Open chart and links">${esc(nameOf(r))}</button>${
+     W(r).thin?'<span class="flag">THIN</span>':''}${identity(r)}</span></div></td>`},
 
-  {k:"up_days", label:()=>`up days`, num:true, fmt:v=>`${v}/${win}`, sort:r=>W(r).up_days,
+  {k:"up_days", label:()=>`up days`, num:true, w:124, fmt:v=>`${v}/${win}`, sort:r=>W(r).up_days,
    cell:r=>{ const w=W(r), pct=w.days?w.up_days/w.days*100:0;
      return `<td><span class="updays"><span class="frac num"><b>${w.up_days}</b>`
        +`<span>/${w.days}</span></span><span class="mbar"><b class="${pct>=50?'':'dn'}"`
        +` style="width:${pct.toFixed(0)}%"></b></span></span></td>`; }},
 
-  {k:"total", label:()=>`${win}d %`, num:true, fmt:v=>sgn(v)+"%", sort:r=>W(r).total,
+  {k:"total", label:()=>`${win}d %`, num:true, w:80, fmt:v=>sgn(v)+"%", sort:r=>W(r).total,
    cell:r=>`<td class="num ${cls(W(r).total)}">${sgn(W(r).total)}</td>`},
 
   // borrowed from the trend scanner: drift x consistency squared
-  {k:"score", label:()=>`${win}d score`, num:true, fmt:v=>v.toFixed(0),
+  {k:"score", label:()=>`${win}d score`, num:true, w:96, fmt:v=>v.toFixed(0),
    sort:r=>W(r).score,
    cell:r=>{ const v=W(r).score;
      return `<td class="num score ${cls(v)}" title="Annualised log drift × consistency².`
        +` A move that was both meaningful and travelled in a straight line.">`
        +`${v==null?"—":v.toFixed(0)}</td>`; }},
 
-  {k:"eff", label:"consistency", num:true, fmt:v=>v.toFixed(2), sort:r=>W(r).eff,
+  {k:"eff", label:"consistency", num:true, w:124, fmt:v=>v.toFixed(2), sort:r=>W(r).eff,
    cell:r=>{ const e=W(r).eff;
      return `<td><span class="meter" title="Net move ÷ total distance travelled.`
        +` 1.00 is a straight line."><span class="num">${e==null?"—":e.toFixed(2)}</span>`
        +`<span class="mbar"><b style="width:${((e||0)*100).toFixed(0)}%"></b></span></span></td>`; }},
 
-  {k:"vol_ratio", label:"vol 5d/30d", num:true, fmt:v=>v.toFixed(2)+"×", sort:r=>r.vol_ratio,
+  {k:"vol_ratio", label:"vol 5d/30d", num:true, w:106, fmt:v=>v.toFixed(2)+"×", sort:r=>r.vol_ratio,
    cell:r=>`<td class="num"><span class="rv ${volCls(r.vol_ratio)}"`
      +` title="Average daily volume over the last 5 sessions against the last 30.">`
      +`${r.vol_ratio==null?"—":r.vol_ratio.toFixed(2)+"×"}</span></td>`},
 
-  {k:"turn_mcap", label:()=>`turnover/mcap`, num:true, fmt:v=>pctDay(v)+"%",
+  {k:"turn_mcap", label:()=>`turnover/mcap`, num:true, w:124, fmt:v=>pctDay(v)+"%",
    sort:r=>W(r).turn_mcap,
    cell:r=>{ const v=W(r).turn_mcap;
      return `<td class="num"><span class="rv ${turnCls(v)}"`
        +` title="Average daily turnover over ${win} sessions as a share of market cap.">`
        +`${pctDay(v)}${v==null?"":'<span class="unit">%</span>'}</span></td>`; }},
 
-  {k:"turnover_cr", label:"turnover ₹cr", num:true, fmt:v=>"₹"+v.toFixed(1)+"cr",
+  {k:"turnover_cr", label:"turnover ₹cr", num:true, w:112, fmt:v=>"₹"+v.toFixed(1)+"cr",
    sort:r=>W(r).turnover_cr,
    cell:r=>`<td class="num zero" title="Average daily turnover over the window, Rs crore.">`
      +`${W(r).turnover_cr==null?"—":W(r).turnover_cr.toFixed(1)}</td>`},
 
-  {k:"mcap_cr", label:"mcap ₹cr", num:true, fmt:v=>"₹"+crore(v)+"cr", sort:r=>r.mcap_cr,
+  {k:"mcap_cr", label:"mcap ₹cr", num:true, w:108, fmt:v=>"₹"+crore(v)+"cr", sort:r=>r.mcap_cr,
    cell:r=>`<td class="num zero" title="Market cap from stocks.csv, carried forward on price.">`
      +`${crore(r.mcap_cr)}</td>`},
 
-  {k:"recent_up", label:"last 5", num:true, fmt:v=>`${v}/5`, sort:r=>r.recent_up,
+  {k:"recent_up", label:"last 5", num:true, w:78, fmt:v=>`${v}/5`, sort:r=>r.recent_up,
    cell:r=>`<td class="frac num" title="Up days in the most recent week — does not follow the window.">`
      +`<b>${r.recent_up}</b><span>/5</span></td>`},
 
-  {k:"verdict", label:"verdict", cls:"l", sort:r=>W(r).verdict,
+  {k:"verdict", label:"verdict", cls:"l", w:124, sort:r=>W(r).verdict,
    cell:r=>`<td class="l"><span class="v v-${(W(r).verdict||"").replace(/ /g,'-')}">`
      +`${W(r).verdict||"—"}</span></td>`},
 
   {k:"chart", label:()=>`last ${win} sessions`, cls:"l", nosort:true,
+   w:()=>win*(barWidth(win)+2)+30,
    head:()=>`<div class="barhead"><span>last ${win} sessions</span>`
      +`<span class="barkey"><i class="kb u"></i>up<i class="kb d"></i>down</span></div>`,
    cell:r=>`<td class="l">${bars(r)}</td>`},
+
+  {k:"candles", label:()=>`${win}d candles`, cls:"l", nosort:true,
+   w:()=>win*((win<=5?14:win<=15?9:6)+2)+30,
+   cell:r=>`<td class="l">${rowCandles(r,win)}</td>`},
 ];
 
 const keyOf=r=>r.isin||r.symbol;
@@ -569,24 +592,67 @@ const labelOf=c=>typeof c.label==="function"?c.label():c.label;
 --------------------------------------------------------------------------- */
 const CAP=2.5, RECENT=5;
 const barWidth=n=>n<=5?26:n<=15?13:7;
+const rect=(x,y,w,h)=>`M${x.toFixed(1)} ${y.toFixed(1)}h${w.toFixed(1)}v${h.toFixed(1)}`
+  +`h${(-w).toFixed(1)}z`;
+
+/* One bar per session around a zero line: direction by shape, size by height.
+   Every up bar goes into one path, every down bar into another — see the note
+   in the stylesheet for why this is not one element per session. */
 function bars(r){
   series(r);
   const d=r._daily.slice(-win), dt=r._dates.slice(-win);
-  const n=d.length, CW=barWidth(n), CGAP=2;
-  const cols=d.map((v,i)=>{
-    const flat=Math.abs(v)<0.05;
-    const h=Math.max(2,Math.min(1,Math.abs(v)/CAP)*47);
-    const bar=flat?`<i class="fl"></i>`
-                  :`<i class="${v>0?"up":"dn"}" style="height:${h.toFixed(1)}%"></i>`;
-    return `<span class="c" style="width:${CW}px" title="${dt[i]||""} · ${sgn(v)}%">${bar}</span>`;
-  }).join("");
+  const n=d.length, CW=barWidth(n), GAP=2, W=n*(CW+GAP), H=44, mid=H/2;
+  let up="",dn="",fl="";
+  d.forEach((v,i)=>{
+    const x=i*(CW+GAP);
+    if(Math.abs(v)<0.05){ fl+=rect(x,mid-1,CW,2); return; }
+    const h=Math.max(2,Math.min(1,Math.abs(v)/CAP)*(mid-2));
+    if(v>0) up+=rect(x,mid-h,CW,h); else dn+=rect(x,mid,CW,h);
+  });
   // the shaded "most recent 5" block only means something if the window is longer
   let band="";
   if(n>RECENT){
-    const left=(n-RECENT)*(CW+CGAP)-CGAP/2, width=RECENT*CW+(RECENT-1)*CGAP+CGAP;
-    band=`<span class="band" style="left:${Math.max(0,left)}px;width:${width}px"></span>`;
+    const left=(n-RECENT)*(CW+GAP)-GAP/2, width=RECENT*CW+(RECENT-1)*GAP+GAP;
+    band=`<rect class="band" x="${Math.max(0,left).toFixed(1)}" y="0" `
+      +`width="${width.toFixed(1)}" height="${H}" rx="4"/>`;
   }
-  return `<div class="bars">${band}<span class="zline"></span>${cols}</div>`;
+  const span=dt.length?`${dt[0]} to ${dt[dt.length-1]}`:"";
+  return `<svg class="bars" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">`
+    +`<title>Daily moves, ${span}. Open the stock for exact figures.</title>`
+    +band
+    +`<line class="zline" x1="0" x2="${W}" y1="${mid}" y2="${mid}"/>`
+    +(up?`<path class="up" d="${up}"/>`:"")
+    +(dn?`<path class="dn" d="${dn}"/>`:"")
+    +(fl?`<path class="fl" d="${fl}"/>`:"")
+    +`</svg>`;
+}
+
+/* The same candles the dialog draws, shrunk to a table row: price only, no
+   axis, no volume, four paths. Enough to see the shape of the move while
+   scanning; the dialog has the readable version. */
+function rowCandles(r,n){
+  const all=r.ohlcv||[], bs=all.slice(-n);
+  if(bs.length<2) return `<span class="zero">—</span>`;
+  const CW=n<=5?14:n<=15?9:6, GAP=2, W=bs.length*(CW+GAP), H=46, T=3, B=H-3;
+  const lo=Math.min(...bs.map(b=>b[2])), hi=Math.max(...bs.map(b=>b[1]));
+  const rng=(hi-lo)||Math.abs(hi)*0.02||1;
+  const y=v=>T+(hi-v)/rng*(B-T);
+  let bu="",bd="",wu="",wd="";
+  bs.forEach((b,i)=>{
+    const [o,h,l,c]=b, x=i*(CW+GAP), mid=x+CW/2;
+    const top=y(Math.max(o,c)), bot=y(Math.min(o,c));
+    const body=rect(x,top,CW,Math.max(1,bot-top));
+    const wick=`M${mid.toFixed(1)} ${y(h).toFixed(1)}V${y(l).toFixed(1)}`;
+    if(c>=o){ bu+=body; wu+=wick; } else { bd+=body; wd+=wick; }
+  });
+  return `<svg class="rowc" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">`
+    +`<title>Last ${bs.length} sessions, open-high-low-close. `
+    +`Open the stock for the readable chart.</title>`
+    +(wu?`<path class="wick up" d="${wu}"/>`:"")
+    +(wd?`<path class="wick dn" d="${wd}"/>`:"")
+    +(bu?`<path class="body up" d="${bu}"/>`:"")
+    +(bd?`<path class="body dn" d="${bd}"/>`:"")
+    +`</svg>`;
 }
 
 /* ---------------------------------------------------------------------------
@@ -692,6 +758,8 @@ function openStock(key){
       ? `<div class="mchart">${candles(r,n)}<div class="cnote">Last ${n} sessions.`
         +(win<n?` Shaded: the ${win} sessions the board is scoring.`:"")
         +` Hover a candle for its open, high, low, close and volume.</div></div>`
+        +`<div class="mbars"><span class="k">daily moves · ${win} sessions</span>`
+        +bars(r)+`</div>`
       : `<div class="mchart"><div class="cnote">This feed predates the candle data —`
         +` the next scheduled refresh adds it.</div></div>`)
     +`<div class="mlinks">`
@@ -887,8 +955,19 @@ function passes(r){
     && !(noThin&&W(r).thin) && inRanges(r);
 }
 
+const widthOf=c=>typeof c.w==="function"?c.w():(c.w||100);
+
 function renderHead(){
   const cols=shownCols();
+  // fixed layout takes its widths from here; the table is given the sum as a
+  // floor so the columns keep their size and the page scrolls instead
+  const total=cols.reduce((a,c)=>a+widthOf(c),0);
+  const tbl=document.querySelector("table");
+  tbl.style.minWidth=total+"px";
+  let cg=tbl.querySelector("colgroup");
+  if(!cg){ cg=document.createElement("colgroup"); tbl.insertBefore(cg,tbl.firstChild); }
+  cg.innerHTML=cols.map(c=>`<col style="width:${widthOf(c)}px">`).join("");
+
   document.querySelector("thead").innerHTML="<tr>"+cols.map(c=>{
     const sorted=c.k===k, on=!!(ranges[c.k]);
     // the handle opens the range slider; the label itself still sorts, so the
@@ -922,8 +1001,7 @@ function renderRows(){
     if(typeof x==="string") return x.localeCompare(y)*-dir;
     return ((x??-1e9)-(y??-1e9))*dir;});
 
-  document.querySelector("tbody").innerHTML=
-    rows.map(r=>"<tr>"+cols.map(c=>c.cell(r)).join("")+"</tr>").join("");
+  paintRows(rows,cols);
 
   const nr=activeRanges().length;
   document.getElementById("count").textContent=
@@ -936,7 +1014,7 @@ function renderRows(){
   const t=count(base), all=count(DATA.rows);
   const chip=(cl,v)=>{
     const now=t[v]||0, tot=all[v]||0, hid=tot-now, on=picks.has(v);
-    return `<button class="chip ${cl}" type="button" data-no-bounce data-verdict="${v}"`
+    return `<button class="chip ${cl}" type="button" data-verdict="${v}"`
       +` aria-pressed="${on}" title="${on?"Showing":"Click to show"} ${v}`
       +(hid?` · ${hid} more hidden by the filters above`:"")+`">`
       +`${now}${hid?`<span class="of">of ${tot}</span>`:""} ${v}</button>`;
@@ -947,6 +1025,26 @@ function renderRows(){
     chip("gold","one big day")+chip("","no pattern")
     +(picks.size?`<button class="chipclear" type="button" id="vclear">show all</button>`:"");
   syncStickyOffset();
+}
+
+/* Painting 1,800 rows in one go blocks the tab for over a second. The first
+   screenful goes in synchronously and the rest follows a frame at a time, so
+   the board is usable while it fills. A newer render bumps the token and any
+   in-flight tail gives up rather than appending rows nobody asked for. */
+let paintToken=0;
+function paintRows(rows,cols){
+  const tb=document.querySelector("tbody"), token=++paintToken;
+  const html=rs=>rs.map(r=>"<tr>"+cols.map(c=>c.cell(r)).join("")+"</tr>").join("");
+  const FIRST=180, CHUNK=300;
+  tb.innerHTML=html(rows.slice(0,FIRST));
+  let i=FIRST;
+  (function next(){
+    if(token!==paintToken||i>=rows.length) return;
+    const end=Math.min(rows.length,i+CHUNK);
+    tb.insertAdjacentHTML("beforeend",html(rows.slice(i,end)));
+    i=end;
+    requestAnimationFrame(next);
+  })();
 }
 
 function render(){ if(!DATA) return; renderHead(); renderRows(); }
@@ -1059,6 +1157,5 @@ fetch("trend.json?t="+Date.now())
    `<div id="err"><h2>No data</h2><p>${e.message}</p>
     <p>Run <code>python trend_scan.py universe.txt</code> to build trend.json.</p></div>`;});
 </script>
-<script src="../bounce.js"></script>
 </body>
 </html>

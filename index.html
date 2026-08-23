@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="bounce.css">
+<link rel="stylesheet" href="boards.css">
 <style>
   :root{
     --bg:#ffffff; --panel:#ffffff; --panel2:#fafafa; --line:#e6e6e6;
@@ -118,8 +118,6 @@
     <span class="bbtn" aria-current="page">◧ Sectoral Heatmap</span>
     <a class="bbtn" href="trend/">Trend Scanner</a>
     <a class="bbtn" href="quiet/">Quiet Climbers</a>
-    <span class="sep"></span>
-    <button class="bbtn" type="button" data-bounce-toggle>bounce: on</button>
   </nav>
 
   <header class="top">
@@ -321,6 +319,5 @@ document.addEventListener("visibilitychange", ()=>{
   if(!document.hidden && lastLoadedAt && Date.now()-lastLoadedAt.getTime()>5*60*1000) load(false);
 });
 </script>
-<script src="bounce.js"></script>
 </body>
 </html>

@@ -54,12 +54,16 @@ noise about one time in six, so that view will show a screen full of "climbs"
 that are nothing of the sort. It is there to check whether a longer-window climb
 is still going, not to screen on.
 
-## Clicking a stock
+## Getting to a stock
 
-The company name opens a dialog on the page: a **candlestick chart of the last 30
-sessions with volume underneath**, the window's numbers, and two links out —
-**Screener** and **TradingView**. Hover any candle for its open, high, low, close
-and volume. When the board is on a 5- or 15-session window, the chart still shows
+Two small buttons stand in front of every company name — **S** for Screener,
+**T** for TradingView — so the common jump takes one click straight from the
+board. They open in a new tab.
+
+The company name itself opens a dialog on the page: a **candlestick chart of the
+last 30 sessions with volume underneath**, the same daily-moves bar chart the row
+carries, the window's numbers, and the same two links. Hover any candle for its
+open, high, low, close and volume. When the board is on a 5- or 15-session window, the chart still shows
 all 30 and shades the ones being scored. Escape, the ×, or a click outside closes it.
 
 Both links are the same shape: a fixed prefix plus this row's symbol.
@@ -106,6 +110,24 @@ Four gates, all independent:
   filter. Hiding a column clears its slider, so nothing filters invisibly, and
   the funnel lights up on any column that is filtering.
 
+## Why the board renders the way it does
+
+Two charts in every row, on a board that can hold 1,800 of them, is a lot of
+layout. Three things keep it usable:
+
+- **Both row charts are a handful of SVG `<path>`s**, not one element per
+  session. Per-element bars built 170,000 DOM nodes and cost nearly six seconds
+  of layout; the paths draw the same picture for a fraction of that. The trade is
+  per-session hovering in the row, which the dialog does properly anyway.
+- **`table-layout: fixed`** with widths declared in a `<colgroup>` the page
+  builds. Automatic layout has to measure every cell in every row before it can
+  settle on column widths — that alone was most of the cost.
+- **Rows are painted in chunks.** The first screenful goes in synchronously, the
+  rest follows a frame at a time, so the board is usable while it fills.
+
+Together: about half a second before the first rows are on screen, against
+roughly six before.
+
 ## Everything is remembered
 
 The window, which columns are on, the verdict chips, every slider, the sort
@@ -149,6 +171,7 @@ remembered in the browser.
 | `last 5` | up days in the most recent week, to catch one rolling over. Fixed at 5 — it does not follow the window |
 | `verdict` | the label from the table above |
 | `last N sessions` | one bar per session, oldest left, height = size of the move |
+| `Nd candles` | the same window as candlesticks — open, high, low, close per session. The dialog has the readable version with volume and prices |
 
 `best run`, `typical day` and `biggest day` are off the board for now. The scan
 still computes all three and ships them in `trend.json`, so putting a column back
