@@ -35,6 +35,8 @@ h1 span{color:var(--up)}
 .chip.up{color:var(--up);background:var(--upsoft);border-color:#b9e3cd}
 .chip.down{color:var(--down);background:var(--downsoft);border-color:#f6c9c4}
 .chip.gold{color:var(--gold);background:var(--goldsoft);border-color:#efd9a4}
+/* the whole-market figure, shown beside the on-screen one when filters hide rows */
+.chip .of{opacity:.55;font-weight:500;margin:0 4px}
 
 /* ---------- controls ---------- */
 .controls{display:flex;flex-wrap:wrap;gap:10px 14px;padding:12px 22px;
@@ -47,6 +49,22 @@ label.chk{color:var(--dim);cursor:pointer;user-select:none;display:flex;gap:6px;
   align-items:center;font-size:13px}
 label.chk input{accent-color:var(--accent);width:15px;height:15px}
 label.chk:hover{color:var(--ink)}
+
+/* window selector — 5 / 15 / 30 sessions */
+.segs{display:flex;gap:4px;align-items:center}
+.segs .lab{font-size:12px;color:var(--faint)}
+.seg{font:inherit;font-size:12px;font-weight:600;padding:6px 11px;border-radius:8px;
+  border:1px solid var(--line2);background:var(--card);color:var(--dim);cursor:pointer}
+.seg:hover{color:var(--ink);border-color:var(--accent)}
+.seg[aria-pressed=true]{color:var(--accent);border-color:var(--accent);background:var(--hover)}
+.seg:disabled{opacity:.4;cursor:not-allowed}
+.seg:disabled:hover{color:var(--dim);border-color:var(--line2)}
+
+/* column switches — one per column, state kept in localStorage */
+.colbar{display:flex;flex-wrap:wrap;gap:7px 14px;align-items:center;padding:9px 22px;
+  background:var(--card);border-bottom:1px solid var(--line);font-size:12.5px}
+.colbar .collabel{text-transform:uppercase;letter-spacing:.07em;font-size:10.5px;
+  font-weight:600;color:var(--faint)}
 
 /* ---------- table ---------- */
 /* No overflow on .wrap or table at desktop width: either would become a scroll
@@ -84,6 +102,10 @@ tbody tr:last-child td{border-bottom:none}
 thead th:first-child,tbody td:first-child{min-width:250px;white-space:normal}
 .pos{color:var(--up)} .neg{color:var(--down)} .zero{color:var(--faint)}
 .big{color:var(--gold);font-weight:700}
+/* liquidity readings: emphasis tiers for readability, not thresholds to trade on */
+.rv{font-weight:700}
+.rv-hi{color:var(--accent)} .rv-mid{color:var(--dim)} .rv-lo{color:var(--faint)}
+.unit{color:var(--faint);font-size:11px;margin-left:1px}
 
 /* up-days fraction + meter */
 .frac b{font-weight:700;font-size:14px}
@@ -162,7 +184,7 @@ thead th:first-child,tbody td:first-child{min-width:250px;white-space:normal}
   <a class="bbtn" href="../trend/">Trend Scanner</a>
   <span class="bbtn" aria-current="page">Quiet Climbers</span>
   <span class="sep"></span>
-  <span class="hint">30 sessions, pure counting</span>
+  <span class="hint">5 / 15 / 30 sessions, pure counting</span>
   <button class="bbtn" type="button" data-bounce-toggle>bounce: on</button>
 </nav>
 
@@ -173,8 +195,9 @@ thead th:first-child,tbody td:first-child{min-width:250px;white-space:normal}
   </div>
   <div class="ask">
     Looking for stocks that rise <b>a little, most days, for weeks</b> — the ones no one
-    posts about. Two numbers decide it: how many of the last 30 sessions closed up, and
-    whether the gain came in small steps or one jump.
+    posts about. Two numbers decide it: how many sessions in the window closed up, and
+    whether the gain came in small steps or one jump. Pick the window — <b>5, 15 or 30
+    sessions</b> — and every figure below is recomputed on it.
   </div>
   <div class="chips" id="chips"></div>
 </header>
@@ -182,50 +205,70 @@ thead th:first-child,tbody td:first-child{min-width:250px;white-space:normal}
 <div class="controls">
   <input type="search" id="q" placeholder="Filter company, ticker or ISIN…"
          aria-label="Filter by company name, ticker or ISIN">
+  <span class="segs" id="winsel" role="group" aria-label="window length">
+    <span class="lab">window</span>
+    <button class="seg" type="button" data-win="5">5d</button>
+    <button class="seg" type="button" data-win="15">15d</button>
+    <button class="seg" type="button" data-win="30">30d</button>
+  </span>
   <label class="chk"><input type="checkbox" id="only" checked> quiet climbs only</label>
   <label class="chk"><input type="checkbox" id="hideThin" checked> hide illiquid</label>
   <span class="meta" id="count"></span>
 </div>
 
-<div class="wrap"><table>
-<thead><tr>
-  <th class="l" data-k="name" data-label="company">company</th>
-  <th data-k="up_days" data-label="up days">up days</th>
-  <th data-k="streak" data-label="best run">best run</th>
-  <th data-k="total" data-label="30d %">30d %</th>
-  <th data-k="typical" data-label="typical day">typical day</th>
-  <th data-k="biggest" data-label="biggest day">biggest day</th>
-  <th data-k="recent_up" data-label="last 5">last 5</th>
-  <th data-k="turnover_cr" data-label="turnover cr">turnover cr</th>
-  <th class="l" data-k="verdict" data-label="verdict">verdict</th>
-  <th class="l nosort">
-    <div class="barhead"><span>last 30 sessions</span>
-      <span class="barkey"><i class="kb u"></i>up<i class="kb d"></i>down</span>
-    </div>
-  </th>
-</tr></thead><tbody></tbody></table></div>
+<div class="colbar">
+  <span class="collabel">columns</span>
+  <span class="segs" id="cols"></span>
+</div>
+
+<!-- Head and body are both built by render(): column labels change with the window
+     and any column can be switched off, so a static <thead> would go stale. -->
+<div class="wrap"><table><thead></thead><tbody></tbody></table></div>
 
 <div class="legend">
   <h3>How to read this</h3>
   <p>A 10–15% pop is already on Twitter by the time you could act on it. What gets missed
      is the stock adding <b>0.8% a day, most days, for six weeks</b>. That is what this
      finds — by counting, not by fitting curves.</p>
+  <p><b>window</b> — 5, 15 or 30 sessions. Everything except the volume ratio is
+     recomputed on whichever you pick: up days, the total move, the verdict, the liquidity
+     figures and the bar chart. The bar for "most days" scales with it — <b>20 of 30, 10 of
+     15, 4 of 5</b> — so a grind means the same thing at every length. Be sceptical of the
+     5-session view: four up days out of five happens to pure noise about one time in six,
+     which is a screen full of climbs that are not.</p>
   <p><b>up days</b> — sessions closing higher than the day before. <b>23/30 is a grind;
-     16/30 is a coin flip</b> that happened to end higher. <b>best run</b> — longest
-     unbroken streak. <b>typical day</b> — median daily move ignoring direction; under
-     about 1% is the quiet kind. <b>biggest day</b> — largest single move; if it is a big
-     share of the 30-day total it was an <i>event</i>, not a climb. <b>last 5</b> — up days
-     in the most recent week, to catch one rolling over.</p>
-  <p><b>last 30 sessions</b> — one bar per trading day, oldest on the left, rising above
+     16/30 is a coin flip</b> that happened to end higher. <b>last 5</b> — up days in the
+     most recent week, to catch one rolling over. It does not follow the window.</p>
+  <p><b>vol 5d/30d</b> — average daily volume over the last 5 sessions ÷ over the last 30.
+     <b>1.00×</b> means the recent leg traded like the month behind it; <b>2.00×</b> twice
+     as heavily. Rising volume under a rising price is participation arriving; a climb on
+     shrinking volume is fewer and fewer people agreeing. This one is always 5-against-30
+     — comparing the recent leg to the month is its whole job — so it does not change with
+     the window.</p>
+  <p><b>turnover/mcap</b> — average daily turnover over the window ÷ market capitalisation,
+     as a percent: <b>what share of the company changes hands on a normal day</b>. ₹5cr a
+     day is thin for a ₹5,000cr company and enormous for a ₹50cr one; this says which,
+     where a rupee figure cannot. <b>mcap</b> is from <code>stocks.csv</code>, carried
+     forward on price — the share count is taken as fixed, so a stock that has split since
+     the extract keeps the older figure rather than a wrong one.</p>
+  <p><b>last N sessions</b> — one bar per trading day, oldest on the left, rising above
      the centre line on up days and falling below on down days. Bar height is the size of
      the move. The shaded block on the right is the most recent 5 sessions. Hover any bar
      for its date and exact move.</p>
   <div class="lgrid">
-    <div><span class="v v-quiet-climb">quiet climb</span> 20+ up days, positive, no day above 5%</div>
+    <div><span class="v v-quiet-climb">quiet climb</span> two thirds of the window up, positive, no day above 15%</div>
     <div><span class="v v-quiet-slide">quiet slide</span> the same in reverse</div>
-    <div><span class="v v-one-big-day">one big day</span> a single session moved &gt;5%</div>
+    <div><span class="v v-one-big-day">one big day</span> a single session moved &gt;15%</div>
     <div><span class="v v-no-pattern">no pattern</span> neither</div>
   </div>
+  <p>The event threshold is <b>15%</b>. At 5% it was catching ordinary volatility in
+     small caps and calling a genuine six-week grind an event because one session ran hot;
+     15% keeps the label for what it was meant to catch — the single jump you already read
+     about.</p>
+  <p><b>columns</b> — the switches above the table add and remove columns, and the choice
+     is remembered on this browser. <i>best run</i>, <i>typical day</i> and <i>biggest
+     day</i> are off the board for now; the scan still computes all three, so bringing a
+     column back is a change to this page alone.</p>
   <p><b>Every row is identified by its ISIN</b> — the twelve-character code allotted once
      per security and never reissued — shown under the company name with the ticker the
      price was fetched with. Tickers get renamed and BSE-only listings have none, so the
@@ -236,14 +279,25 @@ thead th:first-child,tbody td:first-child{min-width:250px;white-space:normal}
 </div>
 
 <script>
-let DATA=null, k="up_days", dir=-1;
-const sgn=v=>(v>0?"+":"")+v.toFixed(1);
+/* ---------------------------------------------------------------------------
+   The scan ships every window (30 / 15 / 5) for every stock, so switching one
+   is a re-render, not a refetch. `win` is the session count on screen; W(r)
+   pulls that window's block out of a row. Anything read through W() changes
+   when you switch; anything read off `r` directly does not.
+--------------------------------------------------------------------------- */
+let DATA=null, win=30, k="up_days", dir=-1;
+
+const WKEY="quiet:window", CKEY="quiet:columns";
+const store={
+  get(key){ try{ return localStorage.getItem(key); }catch(e){ return null; } },
+  set(key,v){ try{ localStorage.setItem(key,v); }catch(e){ /* private mode */ } },
+};
+
+const sgn=v=>(v==null?"—":(v>0?"+":"")+v.toFixed(1));
 const cls=v=>v>0?"pos":v<0?"neg":"zero";
+const W=r=>r.windows[String(win)]||{};
 // rows scanned before the registry existed carry no name — fall back to the symbol
 const nameOf=r=>r.name||r.symbol;
-// sorting on the company column has to read the fallback too, or a pre-registry
-// row sorts as undefined and lands wherever
-const keyOf=r=>k==="name"?nameOf(r):r[k];
 // ISIN is the identity; the ticker only says how the price was fetched, and a
 // BSE-only listing has no NSE symbol at all — hence the exchange tag.
 const identity=r=>`<span class="ident"><span class="tk">${r.symbol}</span>`
@@ -251,22 +305,97 @@ const identity=r=>`<span class="ident"><span class="tk">${r.symbol}</span>`
   +(r.exchange==="BSE"?`<span class="ex">BSE</span>`:"")
   +`</span>`;
 
-// One bar per session around a zero line. Scaled to 2.5% so the ordinary
-// 0.5-1% day is clearly visible; bigger days saturate.
-const CAP=2.5, CW=7, CGAP=2, RECENT=5;
+// Rs crore with Indian grouping. No unit switching: a column that silently
+// changes between crore and lakh-crore invites reading 12 as bigger than 9.
+const crore=v=>v==null?"—":Math.round(v).toLocaleString("en-IN");
+// share of the company traded per day — small numbers, so keep a third decimal
+// until they are big enough not to need it
+const pctDay=v=>v==null?"—":(v>=1?v.toFixed(2):v.toFixed(3));
+const volCls=v=>v==null?"rv-lo":v>=1.5?"rv-hi":v<=0.8?"rv-lo":"rv-mid";
+const turnCls=v=>v==null?"rv-lo":v>=1?"rv-hi":v<0.05?"rv-lo":"rv-mid";
+
+/* ---------------------------------------------------------------------------
+   Columns. One entry per column: how to label it (a function where the label
+   depends on the window), how to sort it, and how to draw a cell. `always`
+   columns have no switch — the company a row refers to is not optional.
+--------------------------------------------------------------------------- */
+const COLUMNS=[
+  {k:"name", label:"company", cls:"l", always:true,
+   sort:r=>nameOf(r),
+   cell:r=>`<td class="l"><span class="sym">${nameOf(r)}</span>${
+     W(r).thin?'<span class="flag">THIN</span>':''}${identity(r)}</td>`},
+
+  {k:"up_days", label:()=>`up days`, sort:r=>W(r).up_days,
+   cell:r=>{ const w=W(r), pct=w.days?w.up_days/w.days*100:0;
+     return `<td><span class="updays"><span class="frac num"><b>${w.up_days}</b>`
+       +`<span>/${w.days}</span></span><span class="mbar"><b class="${pct>=50?'':'dn'}"`
+       +` style="width:${pct.toFixed(0)}%"></b></span></span></td>`; }},
+
+  {k:"total", label:()=>`${win}d %`, sort:r=>W(r).total,
+   cell:r=>`<td class="num ${cls(W(r).total)}">${sgn(W(r).total)}</td>`},
+
+  {k:"vol_ratio", label:"vol 5d/30d", sort:r=>r.vol_ratio,
+   cell:r=>`<td class="num"><span class="rv ${volCls(r.vol_ratio)}"`
+     +` title="Average daily volume over the last 5 sessions against the last 30.">`
+     +`${r.vol_ratio==null?"—":r.vol_ratio.toFixed(2)+"×"}</span></td>`},
+
+  {k:"turn_mcap", label:()=>`turnover/mcap`, sort:r=>W(r).turn_mcap,
+   cell:r=>{ const v=W(r).turn_mcap;
+     return `<td class="num"><span class="rv ${turnCls(v)}"`
+       +` title="Average daily turnover over ${win} sessions as a share of market cap.">`
+       +`${pctDay(v)}${v==null?"":'<span class="unit">%</span>'}</span></td>`; }},
+
+  {k:"turnover_cr", label:"turnover ₹cr", sort:r=>W(r).turnover_cr,
+   cell:r=>`<td class="num zero" title="Average daily turnover over the window, Rs crore.">`
+     +`${W(r).turnover_cr==null?"—":W(r).turnover_cr.toFixed(1)}</td>`},
+
+  {k:"mcap_cr", label:"mcap ₹cr", sort:r=>r.mcap_cr,
+   cell:r=>`<td class="num zero" title="Market cap from stocks.csv, carried forward on price.">`
+     +`${crore(r.mcap_cr)}</td>`},
+
+  {k:"recent_up", label:"last 5", sort:r=>r.recent_up,
+   cell:r=>`<td class="frac num" title="Up days in the most recent week — does not follow the window.">`
+     +`<b>${r.recent_up}</b><span>/5</span></td>`},
+
+  {k:"verdict", label:"verdict", cls:"l", sort:r=>W(r).verdict,
+   cell:r=>`<td class="l"><span class="v v-${(W(r).verdict||"").replace(/ /g,'-')}">`
+     +`${W(r).verdict||"—"}</span></td>`},
+
+  {k:"chart", label:()=>`last ${win} sessions`, cls:"l", nosort:true,
+   head:()=>`<div class="barhead"><span>last ${win} sessions</span>`
+     +`<span class="barkey"><i class="kb u"></i>up<i class="kb d"></i>down</span></div>`,
+   cell:r=>`<td class="l">${bars(r)}</td>`},
+];
+
+let hidden=new Set();
+try{ const saved=store.get(CKEY); if(saved) hidden=new Set(JSON.parse(saved)); }catch(e){}
+const shownCols=()=>COLUMNS.filter(c=>c.always||!hidden.has(c.k));
+const labelOf=c=>typeof c.label==="function"?c.label():c.label;
+
+/* ---------------------------------------------------------------------------
+   One bar per session around a zero line, for the selected window. Scaled to
+   2.5% so the ordinary 0.5-1% day is clearly visible; bigger days saturate.
+   Bars widen as the window shortens — five 7px bars would be a smudge.
+--------------------------------------------------------------------------- */
+const CAP=2.5, RECENT=5;
+const barWidth=n=>n<=5?26:n<=15?13:7;
 function bars(r){
-  const n=r.daily.length;
-  const cols=r.daily.map((v,i)=>{
+  const d=r.daily.slice(-win), dt=r.dates.slice(-win);
+  const n=d.length, CW=barWidth(n), CGAP=2;
+  const cols=d.map((v,i)=>{
     const flat=Math.abs(v)<0.05;
     const h=Math.max(2,Math.min(1,Math.abs(v)/CAP)*47);
     const bar=flat?`<i class="fl"></i>`
                   :`<i class="${v>0?"up":"dn"}" style="height:${h.toFixed(1)}%"></i>`;
-    return `<span class="c" title="${r.dates[i]} · ${sgn(v)}%">${bar}</span>`;
+    return `<span class="c" style="width:${CW}px" title="${dt[i]} · ${sgn(v)}%">${bar}</span>`;
   }).join("");
-  const kk=Math.min(RECENT,n);
-  const left=(n-kk)*(CW+CGAP)-CGAP/2, width=kk*CW+(kk-1)*CGAP+CGAP;
-  return `<div class="bars"><span class="band" style="left:${Math.max(0,left)}px;`
-       + `width:${width}px"></span><span class="zline"></span>${cols}</div>`;
+  // the shaded "most recent 5" block only means something if the window is longer
+  let band="";
+  if(n>RECENT){
+    const left=(n-RECENT)*(CW+CGAP)-CGAP/2, width=RECENT*CW+(RECENT-1)*CGAP+CGAP;
+    band=`<span class="band" style="left:${Math.max(0,left)}px;width:${width}px"></span>`;
+  }
+  return `<div class="bars">${band}<span class="zline"></span>${cols}</div>`;
 }
 
 function render(){
@@ -274,45 +403,92 @@ function render(){
   const q=document.getElementById("q").value.trim().toUpperCase();
   const only=document.getElementById("only").checked;
   const noThin=document.getElementById("hideThin").checked;
-  let rows=DATA.rows.filter(r=>
+
+  // split out from the verdict toggle so the chips below can count the same
+  // board without "quiet climbs only" zeroing every other verdict by definition
+  const passes=r=>
     (!q||r.symbol.includes(q)||nameOf(r).toUpperCase().includes(q)||(r.isin||"").includes(q))
-    && !(only && r.verdict!=="quiet climb") && !(noThin&&r.thin));
-  rows.sort((a,b)=>{const x=keyOf(a),y=keyOf(b);
+    && !(noThin&&W(r).thin);
+  let rows=DATA.rows.filter(r=>passes(r) && !(only && W(r).verdict!=="quiet climb"));
+
+  const col=COLUMNS.find(c=>c.k===k)||COLUMNS[1];
+  rows.sort((a,b)=>{const x=col.sort(a),y=col.sort(b);
     if(typeof x==="string") return x.localeCompare(y)*-dir;
     return ((x??-1e9)-(y??-1e9))*dir;});
 
-  document.querySelector("tbody").innerHTML=rows.map(r=>`<tr>
-    <td class="l"><span class="sym">${nameOf(r)}</span>${
-      r.thin?'<span class="flag">THIN</span>':''}${identity(r)}</td>
-    <td><span class="updays"><span class="frac num"><b>${r.up_days}</b><span>/${r.days}</span></span>
-      <span class="mbar"><b class="${r.up_days*2>=r.days?'':'dn'}"
-        style="width:${(r.up_days/r.days*100).toFixed(0)}%"></b></span></span></td>
-    <td class="num zero">${r.streak}</td>
-    <td class="num ${cls(r.total)}">${sgn(r.total)}</td>
-    <td class="num zero">${r.typical.toFixed(2)}</td>
-    <td class="num ${r.biggest>5?'big':'zero'}">${r.biggest.toFixed(1)}</td>
-    <td class="frac num"><b>${r.recent_up}</b><span>/5</span></td>
-    <td class="num zero">${r.turnover_cr===null?'—':r.turnover_cr.toFixed(1)}</td>
-    <td class="l"><span class="v v-${r.verdict.replace(/ /g,'-')}">${r.verdict}</span></td>
-    <td class="l">${bars(r)}</td></tr>`).join("");
+  const cols=shownCols();
+  document.querySelector("thead").innerHTML="<tr>"+cols.map(c=>{
+    const sorted=c.k===k;
+    return `<th class="${c.cls||""}${c.nosort?" nosort":""}${sorted?" sorted":""}"`
+      +(c.nosort?"":` data-k="${c.k}"`)+`>`
+      +(c.head?c.head():labelOf(c)+(sorted?(dir<0?" ↓":" ↑"):""))+`</th>`;
+  }).join("")+"</tr>";
+
+  document.querySelector("tbody").innerHTML=
+    rows.map(r=>"<tr>"+cols.map(c=>c.cell(r)).join("")+"</tr>").join("");
+
+  document.querySelectorAll("th[data-k]").forEach(th=>th.onclick=()=>{
+    const nk=th.dataset.k; if(nk===k) dir*=-1; else {k=nk;dir=-1;} render();});
 
   document.getElementById("count").textContent=
-    `${rows.length} shown of ${DATA.rows.length} scored`;
+    `${rows.length} shown of ${DATA.rows.length} scored · ${win}-session window`;
 
-  // tally across everything scored, not just the filtered view
-  const t=DATA.rows.reduce((a,r)=>{a[r.verdict]=(a[r.verdict]||0)+1;return a;},{});
+  // The chips count the board as filtered — minus the verdict toggle, which
+  // would otherwise zero every chip but one. Where rows are hidden, the chip
+  // carries both numbers.
+  const count=rs=>rs.reduce((a,r)=>{const v=W(r).verdict;a[v]=(a[v]||0)+1;return a;},{});
+  const t=count(DATA.rows.filter(passes)), all=count(DATA.rows);
+  const chip=(cl,v)=>{
+    const now=t[v]||0, tot=all[v]||0, hid=tot-now;
+    return `<span class="chip ${cl}"${hid?` title="${hid} more ${v} hidden by the`
+      +` filters above. Untick them to see all ${tot}."`:""}>`
+      +`${now}${hid?`<span class="of">of ${tot}</span>`:""} ${v}</span>`;
+  };
   document.getElementById("chips").innerHTML=
-    `<span class="chip up">${t["quiet climb"]||0} quiet climb</span>`+
-    `<span class="chip down">${t["quiet slide"]||0} quiet slide</span>`+
-    `<span class="chip gold">${t["one big day"]||0} one big day</span>`+
-    `<span class="chip">${t["no pattern"]||0} no pattern</span>`;
+    chip("up","quiet climb")+chip("down","quiet slide")+
+    chip("gold","one big day")+chip("","no pattern");
+
+  syncStickyOffset();
 }
 
-document.querySelectorAll("th[data-k]").forEach(th=>th.onclick=()=>{
-  const nk=th.dataset.k; if(nk===k) dir*=-1; else {k=nk;dir=-1;}
-  document.querySelectorAll("th[data-k]").forEach(o=>{
-    o.classList.toggle("sorted",o===th); o.textContent=o.dataset.label;});
-  th.textContent=th.dataset.label+(dir<0?" ↓":" ↑"); render();});
+/* ---------------------------------------------------------------------------
+   Window selector. Feeds built before the windows existed carry one length
+   only; the buttons for the others are disabled rather than hidden, so it is
+   obvious they exist and why they are unavailable.
+--------------------------------------------------------------------------- */
+function buildWindows(){
+  const have=(DATA.windows||[DATA.days||30]).map(Number);
+  document.querySelectorAll("#winsel .seg").forEach(b=>{
+    const n=Number(b.dataset.win), ok=have.includes(n);
+    b.disabled=!ok;
+    if(!ok) b.title="This feed predates the window selector — the next scheduled "
+      +"refresh adds it.";
+    b.setAttribute("aria-pressed", String(n===win));
+    b.onclick=()=>{ if(b.disabled) return;
+      win=n; store.set(WKEY,String(n));
+      document.querySelectorAll("#winsel .seg").forEach(o=>
+        o.setAttribute("aria-pressed", String(Number(o.dataset.win)===win)));
+      // three switch labels carry the window ("15d %", "last 15 sessions"), so
+      // the switches are rebuilt with it rather than left describing the old one
+      buildColumnSwitches();
+      render(); };
+  });
+}
+
+function buildColumnSwitches(){
+  document.getElementById("cols").innerHTML=COLUMNS.filter(c=>!c.always).map(c=>
+    `<label class="chk"><input type="checkbox" data-col="${c.k}"`
+    +`${hidden.has(c.k)?"":" checked"}> ${labelOf(c)}</label>`).join("");
+  document.querySelectorAll("#cols input").forEach(cb=>cb.onchange=()=>{
+    cb.checked?hidden.delete(cb.dataset.col):hidden.add(cb.dataset.col);
+    store.set(CKEY,JSON.stringify([...hidden]));
+    // sorting on a column you just switched off would leave the order
+    // unexplainable — fall back to the default sort
+    if(hidden.has(k)){ k="up_days"; dir=-1; }
+    render();
+  });
+}
+
 ["q","only","hideThin"].forEach(id=>{const e=document.getElementById(id);
   e.addEventListener(e.type==="checkbox"?"change":"input",render);});
 
@@ -323,13 +499,34 @@ function syncStickyOffset(){
 }
 addEventListener("resize",syncStickyOffset); syncStickyOffset();
 
+/* A feed written before the multi-window scan has its numbers flat on the row.
+   Wrap them as a single window so one code path draws both, rather than
+   littering every accessor with a fallback. */
+function adapt(d){
+  if(!d.rows||!d.rows.length||d.rows[0].windows) return d;
+  const n=d.days||30;
+  d.windows=[n]; d.base_window=n; d.legacy=true;
+  d.rows.forEach(r=>{
+    r.windows={[String(n)]:{up_days:r.up_days, days:r.days||n, total:r.total,
+      biggest:r.biggest, verdict:r.verdict, turnover_cr:r.turnover_cr,
+      turn_mcap:null, thin:r.thin, typical:r.typical, streak:r.streak}};
+    if(r.vol_ratio===undefined) r.vol_ratio=null;
+    if(r.mcap_cr===undefined) r.mcap_cr=null;
+  });
+  return d;
+}
+
 fetch("trend.json?t="+Date.now())
  .then(r=>{if(!r.ok)throw new Error("HTTP "+r.status);return r.json();})
- .then(d=>{DATA=d;
+ .then(d=>{DATA=adapt(d);
+   const have=(DATA.windows||[30]).map(Number);
+   const saved=Number(store.get(WKEY));
+   win=have.includes(saved)?saved:(have.includes(DATA.base_window)?DATA.base_window:have[0]);
    const built=d.generated?`built ${new Date(d.generated).toLocaleString()}`
                           :"seed — not yet refreshed";
    document.getElementById("meta").textContent=
-     `${d.days} sessions · ${d.resolved}/${d.requested} resolved · ${built}`;
+     `${have.join("/")}-session windows · ${d.resolved}/${d.requested} resolved · ${built}`
+     +(DATA.legacy?" · pre-window feed":"");
    if(!d.rows||!d.rows.length){
      document.querySelector(".wrap").innerHTML=
        `<div id="err"><h2>Awaiting first refresh</h2>
@@ -339,10 +536,7 @@ fetch("trend.json?t="+Date.now())
      document.getElementById("count").textContent="0 scored";
      return;
    }
-   // default sort marker
-   const th0=document.querySelector('th[data-k="up_days"]');
-   th0.classList.add("sorted"); th0.textContent=th0.dataset.label+" ↓";
-   render();})
+   buildWindows(); buildColumnSwitches(); render();})
  .catch(e=>{document.querySelector(".wrap").innerHTML=
    `<div id="err"><h2>No data</h2><p>${e.message}</p>
     <p>Run <code>python trend_scan.py universe.txt</code> to build trend.json.</p></div>`;});
