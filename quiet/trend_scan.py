@@ -16,13 +16,21 @@ Same return. Only the first is a trend.
 
 No regressions, no log scales, no statistics. Just counting.
 
+Identity: rows are keyed on ISIN, read from the repo-root registry `stocks.csv`.
+The Yahoo symbol is only how the price is fetched — a rename or a BSE-only
+listing must not change which company a row refers to.
+
 Data: Yahoo Finance via yfinance. EOD.
 Output: trend.json
 """
 
-import json, sys
+import json, os, sys
 from datetime import datetime, timezone
 import numpy as np, pandas as pd, yfinance as yf
+
+# stocks.csv and its loader live at the repo root; this script runs from quiet/
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import stock_registry as registry  # noqa: E402
 
 DAYS = 30                # sessions in the window
 FETCH = "4mo"
@@ -49,7 +57,7 @@ def verdict(up_days, total, biggest, days):
     return "no pattern"
 
 
-def analyse(symbol, df):
+def analyse(symbol, df, meta=None):
     if df is None or df.empty:
         return None
     df = df.dropna(subset=["Close"])
@@ -80,8 +88,19 @@ def analyse(symbol, df):
         if len(tv):
             turnover = float(tv.median()) / 1e7
 
+    meta = meta or {}
+    # BSE-only listings have no NSE symbol — their scrip code is the right short
+    # label there, and the exchange field below tells the UI to say so.
+    display = (meta.get("nse") or meta.get("bse")
+               or meta.get("isin") or symbol.rsplit(".", 1)[0])
+
     return {
-        "symbol": symbol.replace(".NS", ""),
+        "isin": meta.get("isin"),          # the identity — stable across renames
+        "symbol": display,
+        "yahoo": symbol,                   # only how the price was fetched
+        "exchange": "BSE" if symbol.endswith(".BO") else "NSE",
+        "name": meta.get("name") or display,
+        "industry": meta.get("industry_group") or None,
         "up_days": up_days,
         "days": DAYS,
         "total": round(total, 1),
@@ -121,14 +140,25 @@ def fetch(tickers):
 def main():
     universe = UNIVERSE
     if len(sys.argv) > 1:
-        universe = [l.strip() for l in open(sys.argv[1])
-                    if l.strip() and not l.lstrip().startswith("#")]
+        universe = registry.read_universe(sys.argv[1])
     print(f"{len(universe)} symbols, {DAYS}-session window")
+
+    # Identity comes from stocks.csv. A symbol the registry does not know is
+    # still scanned — it just carries no ISIN, and the run says how many.
+    try:
+        meta = registry.by_yahoo()
+        print(f"  registry: {len(meta)} companies with a price symbol")
+    except FileNotFoundError:
+        meta = {}
+        print("  note: stocks.csv not found — rows will carry no ISIN")
+    unknown = sum(1 for t in universe if t not in meta)
+    if unknown:
+        print(f"  {unknown} symbols not in the registry (no ISIN)")
 
     frames = fetch(universe)
     rows, failed = [], []
     for t in universe:
-        r = analyse(t, frames.get(t))
+        r = analyse(t, frames.get(t), meta.get(t))
         (rows.append(r) if r else failed.append(t))
 
     # sort: quiet climbs first, then by up-day count, then by size of move
@@ -136,6 +166,7 @@ def main():
     rows.sort(key=lambda r: (order[r["verdict"]], -r["up_days"], -r["total"]))
 
     json.dump({"generated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+               "identity": "isin",         # rows are keyed on ISIN, not ticker
                "days": DAYS, "requested": len(universe), "resolved": len(rows),
                "failed": failed, "rows": rows},
               open("trend.json", "w"), separators=(",", ":"))
