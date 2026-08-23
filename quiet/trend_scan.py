@@ -21,6 +21,25 @@ ship in trend.json, so the page switches between them with no refetch. The
 up-day bar scales with the window (two thirds of it), so "most days" means the
 same thing at 5 sessions as at 30.
 
+Two readings are borrowed from the trend scanner, which measures the same move a
+different way — counting says "most days went up", these say "and it travelled in
+a straight line":
+
+  eff (consistency)  efficiency ratio: net move / total distance travelled, 0..1.
+                     A stock that goes up 10% in a straight line reads 1.00; one
+                     that zigzags to the same place reads 0.3. Preferred over
+                     R-squared, which reads a median 0.44 on pure noise and does
+                     not improve with a longer window.
+  score              annualised log drift x consistency squared. Meaningful *and*
+                     tidy. Squaring consistency is what stops a violent move that
+                     happens to end higher from outranking a quiet grind.
+
+Both are computed on a winsorised log path (daily steps capped at WINSOR_PCT), so
+one limit-up session cannot manufacture a trend. They sit on the same window as
+everything else in the row, which is one close wider than the trend board's
+version of the same window — that board fits n closes, this one fits the n+1
+that bound n sessions of movement.
+
 Two liquidity readings ride along, because a clean climb in something you cannot
 buy is not an opportunity:
 
@@ -63,6 +82,7 @@ BASE_WINDOW = 30         # longest window: sets the chart, the sort and the vol 
 VOL_RECENT = 5           # "now" leg of the volume ratio
 FETCH = "4mo"
 QUIET_DAY = 15.0         # a single move above this is an "event", not a grind
+WINSOR_PCT = 6.0         # daily cap applied before fitting score/consistency
 STRONG_UP_FRAC = 2 / 3   # share of the window that must close up to call it a grind
 MIN_TURNOVER_CR = 1.0
 BATCH = 40
@@ -83,6 +103,44 @@ def strong_up(days):
     to noise about one time in six — which is why the page says so.
     """
     return math.ceil(STRONG_UP_FRAC * days)
+
+
+def winsorise(log_prices):
+    """Rebuild the log path with each daily step capped at +/- WINSOR_PCT.
+
+    Without this a single limit-up session sets the slope and the whole window
+    reads as a powerful trend on the strength of one day — exactly the thing the
+    "one big day" verdict exists to call out.
+    """
+    steps = np.diff(log_prices)
+    cap = math.log(1 + WINSOR_PCT / 100.0)
+    return np.concatenate([[log_prices[0]],
+                           log_prices[0] + np.cumsum(np.clip(steps, -cap, cap))])
+
+
+def drift_and_eff(closes):
+    """Annualised log drift, consistency, and the score that combines them.
+
+    drift  slope of ln(price) against session number, x252x100 — a percent per
+           year, so a 15-session window and a 30-session one are comparable.
+    eff    net move / total distance travelled. 1.00 is a straight line; a path
+           that wanders to the same place reads far lower.
+    score  drift x eff^2. Squaring is deliberate: a big move that arrived by
+           thrashing scores below a smaller one that walked there.
+    """
+    if len(closes) < 3 or np.any(closes <= 0):
+        return None, None, None
+    y = winsorise(np.log(closes))
+    x = np.arange(len(y), dtype=float)
+
+    slope = float(np.polyfit(x, y, 1)[0])
+    drift = max(-2000.0, min(2000.0, slope * 252 * 100.0))
+
+    distance = float(np.abs(np.diff(y)).sum())
+    eff = abs(y[-1] - y[0]) / distance if distance > 0 else 0.0
+    eff = max(0.0, min(1.0, eff))
+
+    return round(drift, 1), round(eff, 3), round(drift * eff * eff, 1)
 
 
 def verdict(up_days, total, biggest, days):
@@ -144,6 +202,7 @@ def window_stats(closes, turnover, days, mcap):
         best = max(best, run)
 
     turn = float(np.mean(turnover[-days:])) if turnover is not None and len(turnover) >= days else None
+    drift, eff, score = drift_and_eff(w)
 
     return {
         "up_days": up_days,
@@ -152,6 +211,9 @@ def window_stats(closes, turnover, days, mcap):
         "biggest": round(biggest, 1),
         "verdict": verdict(up_days, total, biggest, days),
         "strong_up": strong_up(days),
+        "score": score,          # drift x consistency^2, from the trend scanner
+        "eff": eff,              # consistency: 0..1, 1.00 is a straight line
+        "drift": drift,          # annualised log drift, percent per year
         "turnover_cr": round(turn, 2) if turn is not None else None,
         # turnover as a share of the company, in percent per day
         "turn_mcap": round(turn / mcap * 100, 3) if (turn is not None and mcap) else None,

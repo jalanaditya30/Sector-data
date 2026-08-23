@@ -76,19 +76,47 @@ label.chk:hover{color:var(--ink)}
   background:var(--card);border-bottom:1px solid var(--line);font-size:12.5px}
 .colbar .collabel{text-transform:uppercase;letter-spacing:.07em;font-size:10.5px;
   font-weight:600;color:var(--faint)}
-/* range filters: one min-max pair per visible numeric column */
-.fbar{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;padding:10px 22px;
-  background:var(--zebra);border-bottom:1px solid var(--line);font-size:12px}
-.fgrp{display:flex;align-items:center;gap:4px}
-.fgrp .flab{color:var(--dim);font-weight:600;margin-right:2px}
-.fgrp .dash{color:var(--faint)}
-.fgrp input{width:62px;font:inherit;font-size:12px;padding:4px 6px;border-radius:6px;
-  border:1px solid var(--line2);background:var(--card);color:var(--ink);
-  font-variant-numeric:tabular-nums}
-.fgrp input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
-.fgrp input.set{border-color:var(--accent);background:var(--hover)}
-.badge{display:inline-block;min-width:16px;padding:0 5px;margin-left:5px;border-radius:99px;
-  background:var(--accent);color:#fff;font-size:10.5px;font-weight:700;text-align:center}
+/* the filter handle that lives in a column header */
+.fx{font:inherit;line-height:0;background:none;border:1px solid transparent;
+  color:var(--faint);cursor:pointer;padding:3px 4px;border-radius:4px;margin-left:6px;
+  vertical-align:-1px}
+th:hover .fx{color:var(--dim);border-color:var(--line2)}
+.fx:hover{color:var(--accent);border-color:var(--accent)}
+.fx.on{color:var(--accent);border-color:var(--accent);background:var(--hover)}
+
+/* the range popover */
+.pop[hidden]{display:none}
+.pop{position:fixed;z-index:60;width:266px;background:var(--card);border:1px solid var(--line2);
+  border-radius:10px;box-shadow:0 10px 34px rgba(19,25,34,.22);padding:13px 15px 14px}
+.pop h4{margin:0 0 2px;font-size:11px;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--faint)}
+.pop .vals{display:flex;justify-content:space-between;align-items:baseline;gap:8px;
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:13px;font-weight:700;
+  margin:6px 0 2px}
+.pop .vals .sep{color:var(--faint);font-weight:400}
+.pop .ends{display:flex;justify-content:space-between;color:var(--faint);font-size:10.5px;
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;margin-top:2px}
+.pop .act{display:flex;justify-content:space-between;align-items:center;margin-top:11px}
+.pop .hint{color:var(--faint);font-size:10.5px}
+
+/* dual-handle slider: two range inputs stacked over one drawn track. The inputs
+   themselves are transparent and click-through; only the thumbs take the pointer,
+   so the lower handle stays grabbable when the two are close together. */
+.rs{position:relative;height:26px;margin-top:8px}
+.rs .track,.rs .fill{position:absolute;top:11px;height:4px;border-radius:2px}
+.rs .track{left:0;right:0;background:var(--grid)}
+.rs .fill{background:var(--accent)}
+.rs input[type=range]{position:absolute;top:0;left:0;width:100%;height:26px;margin:0;
+  background:none;pointer-events:none;-webkit-appearance:none;appearance:none}
+.rs input[type=range]:focus{outline:none}
+.rs input[type=range]::-webkit-slider-thumb{pointer-events:auto;-webkit-appearance:none;
+  width:15px;height:15px;border-radius:50%;background:var(--card);
+  border:2px solid var(--accent);cursor:grab;box-shadow:0 1px 3px rgba(19,25,34,.2)}
+.rs input[type=range]::-moz-range-thumb{pointer-events:auto;width:15px;height:15px;
+  border-radius:50%;background:var(--card);border:2px solid var(--accent);cursor:grab;
+  box-shadow:0 1px 3px rgba(19,25,34,.2)}
+.rs input[type=range]:focus-visible::-webkit-slider-thumb{outline:2px solid var(--accent);
+  outline-offset:2px}
 
 /* ---------- table ---------- */
 /* No overflow on .wrap or table at desktop width: either would become a scroll
@@ -136,6 +164,11 @@ thead th:first-child,tbody td:first-child{min-width:250px;white-space:normal}
 .rv{font-weight:700}
 .rv-hi{color:var(--accent)} .rv-mid{color:var(--dim)} .rv-lo{color:var(--faint)}
 .unit{color:var(--faint);font-size:11px;margin-left:1px}
+
+/* consistency meter, same shape as the trend board's */
+.meter{display:inline-flex;align-items:center;gap:8px;justify-content:flex-end}
+.meter .mbar b{background:var(--accent)}
+td.score{font-weight:700}
 
 /* up-days fraction + meter */
 .frac b{font-weight:700;font-size:14px}
@@ -290,12 +323,13 @@ thead th:first-child,tbody td:first-child{min-width:250px;white-space:normal}
     <button class="seg" type="button" data-win="30">30d</button>
   </span>
   <label class="chk"><input type="checkbox" id="hideThin" checked> hide illiquid</label>
-  <button class="seg" type="button" id="fbtn" aria-pressed="false">range filters</button>
+  <button class="seg" type="button" id="reset" title="Clear filters and restore the default view">reset view</button>
   <span class="meta" id="count"></span>
 </div>
 
-<!-- one min-max pair per visible numeric column; hidden until asked for -->
-<div class="fbar" id="fbar" hidden></div>
+<!-- Range filter, anchored under whichever column header opened it. One popover
+     reused for every column rather than one per column sitting in the DOM. -->
+<div class="pop" id="pop" hidden role="dialog" aria-label="Range filter"></div>
 
 <div class="colbar">
   <span class="collabel">columns</span>
@@ -374,17 +408,43 @@ thead th:first-child,tbody td:first-child{min-width:250px;white-space:normal}
    pulls that window's block out of a row. Anything read through W() changes
    when you switch; anything read off `r` directly does not.
 --------------------------------------------------------------------------- */
-let DATA=null, INDEX={}, win=30, k="up_days", dir=-1;
+let DATA=null, INDEX={}, win=30;
 
-const WKEY="quiet:window", CKEY="quiet:columns",
-      FKEY="quiet:filterbar", VKEY="quiet:verdicts";
+/* ---------------------------------------------------------------------------
+   The view is remembered — window, columns, verdict picks, range filters, sort,
+   search text and the liquidity switch — in one blob under one key. It used to
+   be four keys covering three of those, which is why a reload kept your columns
+   and threw away your filters. Written on every change, debounced.
+--------------------------------------------------------------------------- */
+const SKEY="quiet:view";
 const store={
   get(key){ try{ return localStorage.getItem(key); }catch(e){ return null; } },
   set(key,v){ try{ localStorage.setItem(key,v); }catch(e){ /* private mode */ } },
 };
-const readJSON=(key,fallback)=>{
-  try{ const v=store.get(key); return v?JSON.parse(v):fallback; }catch(e){ return fallback; }
-};
+function loadState(){
+  let st=null;
+  try{ st=JSON.parse(store.get(SKEY)||"null"); }catch(e){ st=null; }
+  if(st && st.v===2) return st;
+  // carry over what the first version remembered, so an upgrade is not a reset
+  const j=(key,d)=>{ try{ return JSON.parse(store.get(key)) ?? d; }catch(e){ return d; } };
+  return {v:2, win:Number(store.get("quiet:window"))||null,
+          hidden:j("quiet:columns",[]), picks:j("quiet:verdicts",["quiet climb"]),
+          ranges:{}, thin:true, k:"up_days", dir:-1, q:""};
+}
+const S=loadState();
+let hidden=new Set(Array.isArray(S.hidden)?S.hidden:[]);
+let picks=new Set(Array.isArray(S.picks)?S.picks:["quiet climb"]);
+let ranges=(S.ranges&&typeof S.ranges==="object")?S.ranges:{};
+let k=S.k||"up_days", dir=S.dir===1?1:-1;
+
+let saveT=null;
+function save(){
+  clearTimeout(saveT);
+  saveT=setTimeout(()=>store.set(SKEY,JSON.stringify({
+    v:2, win, hidden:[...hidden], picks:[...picks], ranges,
+    thin:document.getElementById("hideThin").checked, k, dir,
+    q:document.getElementById("q").value })),200);
+}
 
 const sgn=v=>(v==null?"—":(v>0?"+":"")+v.toFixed(1));
 const cls=v=>v>0?"pos":v<0?"neg":"zero";
@@ -440,35 +500,51 @@ const COLUMNS=[
      +` data-stock="${esc(keyOf(r))}" title="Open chart and links">${esc(nameOf(r))}</button>${
      W(r).thin?'<span class="flag">THIN</span>':''}${identity(r)}</td>`},
 
-  {k:"up_days", label:()=>`up days`, num:true, sort:r=>W(r).up_days,
+  {k:"up_days", label:()=>`up days`, num:true, fmt:v=>`${v}/${win}`, sort:r=>W(r).up_days,
    cell:r=>{ const w=W(r), pct=w.days?w.up_days/w.days*100:0;
      return `<td><span class="updays"><span class="frac num"><b>${w.up_days}</b>`
        +`<span>/${w.days}</span></span><span class="mbar"><b class="${pct>=50?'':'dn'}"`
        +` style="width:${pct.toFixed(0)}%"></b></span></span></td>`; }},
 
-  {k:"total", label:()=>`${win}d %`, num:true, unit:"%", sort:r=>W(r).total,
+  {k:"total", label:()=>`${win}d %`, num:true, fmt:v=>sgn(v)+"%", sort:r=>W(r).total,
    cell:r=>`<td class="num ${cls(W(r).total)}">${sgn(W(r).total)}</td>`},
 
-  {k:"vol_ratio", label:"vol 5d/30d", num:true, unit:"×", sort:r=>r.vol_ratio,
+  // borrowed from the trend scanner: drift x consistency squared
+  {k:"score", label:()=>`${win}d score`, num:true, fmt:v=>v.toFixed(0),
+   sort:r=>W(r).score,
+   cell:r=>{ const v=W(r).score;
+     return `<td class="num score ${cls(v)}" title="Annualised log drift × consistency².`
+       +` A move that was both meaningful and travelled in a straight line.">`
+       +`${v==null?"—":v.toFixed(0)}</td>`; }},
+
+  {k:"eff", label:"consistency", num:true, fmt:v=>v.toFixed(2), sort:r=>W(r).eff,
+   cell:r=>{ const e=W(r).eff;
+     return `<td><span class="meter" title="Net move ÷ total distance travelled.`
+       +` 1.00 is a straight line."><span class="num">${e==null?"—":e.toFixed(2)}</span>`
+       +`<span class="mbar"><b style="width:${((e||0)*100).toFixed(0)}%"></b></span></span></td>`; }},
+
+  {k:"vol_ratio", label:"vol 5d/30d", num:true, fmt:v=>v.toFixed(2)+"×", sort:r=>r.vol_ratio,
    cell:r=>`<td class="num"><span class="rv ${volCls(r.vol_ratio)}"`
      +` title="Average daily volume over the last 5 sessions against the last 30.">`
      +`${r.vol_ratio==null?"—":r.vol_ratio.toFixed(2)+"×"}</span></td>`},
 
-  {k:"turn_mcap", label:()=>`turnover/mcap`, num:true, unit:"%", sort:r=>W(r).turn_mcap,
+  {k:"turn_mcap", label:()=>`turnover/mcap`, num:true, fmt:v=>pctDay(v)+"%",
+   sort:r=>W(r).turn_mcap,
    cell:r=>{ const v=W(r).turn_mcap;
      return `<td class="num"><span class="rv ${turnCls(v)}"`
        +` title="Average daily turnover over ${win} sessions as a share of market cap.">`
        +`${pctDay(v)}${v==null?"":'<span class="unit">%</span>'}</span></td>`; }},
 
-  {k:"turnover_cr", label:"turnover ₹cr", num:true, unit:"₹cr", sort:r=>W(r).turnover_cr,
+  {k:"turnover_cr", label:"turnover ₹cr", num:true, fmt:v=>"₹"+v.toFixed(1)+"cr",
+   sort:r=>W(r).turnover_cr,
    cell:r=>`<td class="num zero" title="Average daily turnover over the window, Rs crore.">`
      +`${W(r).turnover_cr==null?"—":W(r).turnover_cr.toFixed(1)}</td>`},
 
-  {k:"mcap_cr", label:"mcap ₹cr", num:true, unit:"₹cr", sort:r=>r.mcap_cr,
+  {k:"mcap_cr", label:"mcap ₹cr", num:true, fmt:v=>"₹"+crore(v)+"cr", sort:r=>r.mcap_cr,
    cell:r=>`<td class="num zero" title="Market cap from stocks.csv, carried forward on price.">`
      +`${crore(r.mcap_cr)}</td>`},
 
-  {k:"recent_up", label:"last 5", num:true, sort:r=>r.recent_up,
+  {k:"recent_up", label:"last 5", num:true, fmt:v=>`${v}/5`, sort:r=>r.recent_up,
    cell:r=>`<td class="frac num" title="Up days in the most recent week — does not follow the window.">`
      +`<b>${r.recent_up}</b><span>/5</span></td>`},
 
@@ -483,9 +559,6 @@ const COLUMNS=[
 ];
 
 const keyOf=r=>r.isin||r.symbol;
-let hidden=new Set(readJSON(CKEY,[]));
-let picks=new Set(readJSON(VKEY,["quiet climb"]));   // verdict chips; empty = all
-const ranges={};                                      // column key -> {min,max}
 const shownCols=()=>COLUMNS.filter(c=>c.always||!hidden.has(c.k));
 const labelOf=c=>typeof c.label==="function"?c.label():c.label;
 
@@ -668,55 +741,138 @@ function inRanges(r){
     const rg=ranges[c.k], v=c.sort(r);
     // a row with no reading cannot satisfy a range — a blank is not a number
     if(typeof v!=="number"||!isFinite(v)) return false;
-    if(rg.min!=null&&v<rg.min) return false;
-    if(rg.max!=null&&v>rg.max) return false;
+    if(rg.min!=null&&v<rg.min-1e-9) return false;
+    if(rg.max!=null&&v>rg.max+1e-9) return false;
   }
   return true;
 }
 
-function buildFilterBar(){
-  const bar=document.getElementById("fbar");
-  const numeric=shownCols().filter(c=>c.num);
-  bar.innerHTML=numeric.map(c=>{
-    const rg=ranges[c.k]||{};
-    const inp=(b,ph)=>`<input type="number" step="any" inputmode="decimal"`
-      +` data-f="${c.k}" data-b="${b}" placeholder="${ph}"`
-      +` class="${rg[b]!=null?"set":""}" value="${rg[b]??""}"`
-      +` aria-label="${labelOf(c)} ${ph}">`;
-    return `<span class="fgrp"><span class="flab">${labelOf(c)}</span>`
-      +inp("min","min")+`<span class="dash">–</span>`+inp("max","max")
-      +(c.unit?`<span class="dash">${c.unit}</span>`:"")+`</span>`;
-  }).join("")
-    +`<button class="chipclear" type="button" id="fclear">clear ranges</button>`;
-
-  let t=null;
-  bar.querySelectorAll("input").forEach(inp=>inp.oninput=()=>{
-    const key=inp.dataset.f, bound=inp.dataset.b;
-    const v=inp.value.trim()===""?null:Number(inp.value);
-    ranges[key]=ranges[key]||{min:null,max:null};
-    ranges[key][bound]=(v==null||isNaN(v))?null:v;
-    inp.classList.toggle("set",ranges[key][bound]!=null);
-    // rows only — rebuilding the bar here would pull focus out of the field
-    clearTimeout(t); t=setTimeout(()=>renderRows(),150);
-  });
-  bar.querySelector("#fclear").onclick=()=>{
-    for(const key of Object.keys(ranges)) delete ranges[key];
-    buildFilterBar(); renderRows();
-  };
+/* ---------------------------------------------------------------------------
+   The range slider runs over the column's DISTINCT SORTED VALUES, not over a
+   straight line from lowest to highest. On a linear track, market cap would put
+   every company below Rs 20,000cr — which is most of them — inside the first
+   pixel, and the handle would be useless exactly where the data lives. Stepping
+   through the actual values instead spreads the track evenly over the companies,
+   every stop lands on a real reading, and both ends are exact.
+--------------------------------------------------------------------------- */
+let DOMAINS={};
+function domainOf(c){
+  const key=c.k+"|"+win;
+  if(DOMAINS[key]) return DOMAINS[key];
+  const vals=[];
+  for(const r of DATA.rows){
+    const v=c.sort(r);
+    if(typeof v==="number"&&isFinite(v)) vals.push(v);
+  }
+  vals.sort((a,b)=>a-b);
+  const uniq=[];
+  for(const v of vals) if(!uniq.length||uniq[uniq.length-1]!==v) uniq.push(v);
+  return DOMAINS[key]=uniq;
+}
+// nearest index whose value is >= (or <=) the remembered bound, so a filter set
+// yesterday still means the same thing after the numbers move overnight
+function idxFor(dom,v,high){
+  if(v==null) return high?dom.length-1:0;
+  let best=0, bd=Infinity;
+  for(let i=0;i<dom.length;i++){ const d=Math.abs(dom[i]-v); if(d<bd){bd=d;best=i;} }
+  return best;
 }
 
-function syncFilterButton(){
-  const n=activeRanges().length, btn=document.getElementById("fbtn");
-  const open=!document.getElementById("fbar").hidden;
-  btn.setAttribute("aria-pressed",String(open));
-  btn.innerHTML="range filters"+(n?`<span class="badge">${n}</span>`:"");
+let popCol=null;
+function closePop(){
+  const el=document.getElementById("pop");
+  if(el.hidden) return;
+  el.hidden=true; popCol=null;
+  document.querySelectorAll(".fx").forEach(b=>b.setAttribute("aria-expanded","false"));
+}
+function openPop(colKey, anchor){
+  const c=COLUMNS.find(x=>x.k===colKey); if(!c) return;
+  const dom=domainOf(c), el=document.getElementById("pop");
+  if(popCol===colKey && !el.hidden){ closePop(); return; }
+  popCol=colKey;
+
+  if(dom.length<2){
+    el.innerHTML=`<h4>${labelOf(c)}</h4><div class="hint">Not enough readings in this`
+      +` column to filter on.</div>`;
+  }else{
+    const rg=ranges[colKey]||{};
+    let lo=idxFor(dom,rg.min,false), hi=idxFor(dom,rg.max,true);
+    if(lo>hi){ const t=lo; lo=hi; hi=t; }
+    const fmt=c.fmt||(v=>String(v));
+    el.innerHTML=
+      `<h4>${labelOf(c)}</h4>`
+      +`<div class="vals"><span id="pv0">${fmt(dom[lo])}</span>`
+      +`<span class="sep">to</span><span id="pv1">${fmt(dom[hi])}</span></div>`
+      +`<div class="rs"><span class="track"></span><span class="fill" id="pfill"></span>`
+      +`<input type="range" id="pr0" min="0" max="${dom.length-1}" step="1" value="${lo}"`
+      +` aria-label="${labelOf(c)} lower bound">`
+      +`<input type="range" id="pr1" min="0" max="${dom.length-1}" step="1" value="${hi}"`
+      +` aria-label="${labelOf(c)} upper bound"></div>`
+      +`<div class="ends"><span>${fmt(dom[0])}</span><span>${fmt(dom[dom.length-1])}</span></div>`
+      +`<div class="act"><span class="hint">${dom.length} values</span>`
+      +`<button class="chipclear" type="button" id="preset">reset column</button></div>`;
+
+    const r0=el.querySelector("#pr0"), r1=el.querySelector("#pr1"),
+          fill=el.querySelector("#pfill");
+    const paint=()=>{
+      const a=Math.min(+r0.value,+r1.value), b=Math.max(+r0.value,+r1.value),
+            span=dom.length-1;
+      fill.style.left=(a/span*100)+"%";
+      fill.style.width=((b-a)/span*100)+"%";
+      el.querySelector("#pv0").textContent=fmt(dom[a]);
+      el.querySelector("#pv1").textContent=fmt(dom[b]);
+      // a slider pushed back to both ends is not a filter — drop it entirely so
+      // the column stops counting as filtered
+      if(a===0&&b===span) delete ranges[colKey];
+      else ranges[colKey]={min:dom[a], max:dom[b]};
+      // the head is not rebuilt on a row re-render, so light the handle here or
+      // it stays grey while its own slider is filtering
+      if(anchor){
+        anchor.classList.toggle("on",!!ranges[colKey]);
+        anchor.title=ranges[colKey]?"Filtering this column — click to adjust":"Filter by range";
+      }
+      renderRows(); save();
+    };
+    // the handles may cross; whichever is being dragged wins and the pair is
+    // read as min/max rather than first/second
+    r0.oninput=paint; r1.oninput=paint;
+    el.querySelector("#preset").onclick=()=>{
+      delete ranges[colKey];
+      r0.value=0; r1.value=dom.length-1; paint();
+    };
+    paint();
+  }
+
+  el.hidden=false;
+  const b=anchor.getBoundingClientRect(), w=el.offsetWidth;
+  const left=Math.max(8, Math.min(window.innerWidth-w-8, b.left+b.width/2-w/2));
+  el.style.left=left+"px";
+  el.style.top=Math.min(window.innerHeight-el.offsetHeight-8, b.bottom+6)+"px";
+  anchor.setAttribute("aria-expanded","true");
+  const first=el.querySelector("input"); if(first) first.focus();
 }
 
-document.getElementById("fbtn").onclick=()=>{
-  const bar=document.getElementById("fbar");
-  bar.hidden=!bar.hidden;
-  store.set(FKEY,bar.hidden?"off":"on");
-  syncFilterButton(); syncStickyOffset();
+document.addEventListener("mousedown",e=>{
+  if(document.getElementById("pop").hidden) return;
+  if(e.target.closest("#pop")||e.target.closest(".fx")) return;
+  closePop();
+});
+addEventListener("keydown",e=>{ if(e.key==="Escape") closePop(); });
+// a fixed-position popover would drift away from its header on scroll
+addEventListener("scroll",closePop,true);
+addEventListener("resize",closePop);
+
+document.getElementById("reset").onclick=()=>{
+  ranges={}; picks=new Set(["quiet climb"]); hidden=new Set();
+  k="up_days"; dir=-1;
+  const have=(DATA.windows||[30]).map(Number);
+  win=have.includes(DATA.base_window)?DATA.base_window:have[0];
+  DOMAINS={};
+  document.getElementById("q").value="";
+  document.getElementById("hideThin").checked=true;
+  document.querySelectorAll("#winsel .seg").forEach(o=>
+    o.setAttribute("aria-pressed", String(Number(o.dataset.win)===win)));
+  closePop(); buildColumnSwitches(); render(); save();
 };
 
 /* ---------------------------------------------------------------------------
@@ -734,13 +890,25 @@ function passes(r){
 function renderHead(){
   const cols=shownCols();
   document.querySelector("thead").innerHTML="<tr>"+cols.map(c=>{
-    const sorted=c.k===k;
+    const sorted=c.k===k, on=!!(ranges[c.k]);
+    // the handle opens the range slider; the label itself still sorts, so the
+    // click people already know keeps doing what it did
+    // a drawn funnel rather than a glyph: no font to be missing, and it cannot
+    // be mistaken for the sort arrow sitting next to it
+    const fx=c.num?`<button class="fx${on?" on":""}" type="button" data-filter="${c.k}"`
+      +` aria-expanded="false" title="${on?"Filtering this column — click to adjust"
+      :"Filter by range"}"><svg viewBox="0 0 12 12" width="9" height="9" aria-hidden="true">`
+      +`<path d="M1 2h10L7 6.6V11L5 9.5V6.6z" fill="currentColor"/></svg></button>`:"";
     return `<th class="${c.cls||""}${c.nosort?" nosort":""}${sorted?" sorted":""}"`
       +(c.nosort?"":` data-k="${c.k}"`)+`>`
-      +(c.head?c.head():labelOf(c)+(sorted?(dir<0?" ↓":" ↑"):""))+`</th>`;
+      +(c.head?c.head():labelOf(c)+(sorted?(dir<0?" ↓":" ↑"):""))+fx+`</th>`;
   }).join("")+"</tr>";
-  document.querySelectorAll("th[data-k]").forEach(th=>th.onclick=()=>{
-    const nk=th.dataset.k; if(nk===k) dir*=-1; else {k=nk;dir=-1;} render();});
+  document.querySelectorAll("thead th").forEach(th=>th.onclick=e=>{
+    const f=e.target.closest(".fx");
+    if(f){ openPop(f.dataset.filter,f); return; }
+    const nk=th.dataset.k; if(!nk) return;
+    if(nk===k) dir*=-1; else {k=nk;dir=-1;}
+    closePop(); render(); save();});
 }
 
 function renderRows(){
@@ -760,7 +928,7 @@ function renderRows(){
   const nr=activeRanges().length;
   document.getElementById("count").textContent=
     `${rows.length} shown of ${DATA.rows.length} scored · ${win}-session window`
-    +(nr?` · ${nr} range filter${nr>1?"s":""}`:"");
+    +(nr?` · ${nr} column${nr>1?"s":""} filtered`:"");
 
   // The chips are the verdict filter AND the tally. They count `base` — the
   // board minus the verdict pick — so picking one does not zero the other three.
@@ -778,7 +946,6 @@ function renderRows(){
   chips.innerHTML=chip("up","quiet climb")+chip("down","quiet slide")+
     chip("gold","one big day")+chip("","no pattern")
     +(picks.size?`<button class="chipclear" type="button" id="vclear">show all</button>`:"");
-  syncFilterButton();
   syncStickyOffset();
 }
 
@@ -789,12 +956,9 @@ document.getElementById("chips").addEventListener("click",e=>{
   if(c){
     const v=c.dataset.verdict;
     picks.has(v)?picks.delete(v):picks.add(v);
-    store.set(VKEY,JSON.stringify([...picks]));
-    renderRows(); return;
+    renderRows(); save(); return;
   }
-  if(e.target.id==="vclear"){
-    picks.clear(); store.set(VKEY,"[]"); renderRows();
-  }
+  if(e.target.id==="vclear"){ picks.clear(); renderRows(); save(); }
 });
 
 /* ---------------------------------------------------------------------------
@@ -811,13 +975,16 @@ function buildWindows(){
       +"refresh adds it.";
     b.setAttribute("aria-pressed", String(n===win));
     b.onclick=()=>{ if(b.disabled) return;
-      win=n; store.set(WKEY,String(n));
+      win=n;
+      // every window-following column has a different spread, so the sliders
+      // must be rebuilt against the new one
+      DOMAINS={}; closePop();
       document.querySelectorAll("#winsel .seg").forEach(o=>
         o.setAttribute("aria-pressed", String(Number(o.dataset.win)===win)));
       // three switch labels carry the window ("15d %", "last 15 sessions"), so
       // the switches are rebuilt with it rather than left describing the old one
-      buildColumnSwitches(); buildFilterBar();
-      render(); };
+      buildColumnSwitches();
+      render(); save(); };
   });
 }
 
@@ -828,18 +995,17 @@ function buildColumnSwitches(){
   document.querySelectorAll("#cols input").forEach(cb=>cb.onchange=()=>{
     const key=cb.dataset.col;
     cb.checked?hidden.delete(key):hidden.add(key);
-    store.set(CKEY,JSON.stringify([...hidden]));
     // a range filter on a column you just switched off would keep filtering
     // invisibly — drop it with the column
     if(!cb.checked) delete ranges[key];
     // sorting on a hidden column would leave the order unexplainable
     if(hidden.has(k)){ k="up_days"; dir=-1; }
-    buildFilterBar(); render();
+    closePop(); render(); save();
   });
 }
 
 ["q","hideThin"].forEach(id=>{const e=document.getElementById(id);
-  e.addEventListener(e.type==="checkbox"?"change":"input",renderRows);});
+  e.addEventListener(e.type==="checkbox"?"change":"input",()=>{renderRows();save();});});
 
 // the column header parks under the sticky controls bar — measure, don't guess
 function syncStickyOffset(){
@@ -870,7 +1036,7 @@ fetch("trend.json?t="+Date.now())
  .then(d=>{DATA=adapt(d);
    DATA.rows.forEach(r=>{ series(r); INDEX[keyOf(r)]=r; });
    const have=(DATA.windows||[30]).map(Number);
-   const saved=Number(store.get(WKEY));
+   const saved=Number(S.win);
    win=have.includes(saved)?saved:(have.includes(DATA.base_window)?DATA.base_window:have[0]);
    const built=d.generated?`built ${new Date(d.generated).toLocaleString()}`
                           :"seed — not yet refreshed";
@@ -886,8 +1052,9 @@ fetch("trend.json?t="+Date.now())
      document.getElementById("count").textContent="0 scored";
      return;
    }
-   if(store.get(FKEY)==="on") document.getElementById("fbar").hidden=false;
-   buildWindows(); buildColumnSwitches(); buildFilterBar(); render();})
+   document.getElementById("q").value=S.q||"";
+   document.getElementById("hideThin").checked=S.thin!==false;
+   buildWindows(); buildColumnSwitches(); render();})
  .catch(e=>{document.querySelector(".wrap").innerHTML=
    `<div id="err"><h2>No data</h2><p>${e.message}</p>
     <p>Run <code>python trend_scan.py universe.txt</code> to build trend.json.</p></div>`;});

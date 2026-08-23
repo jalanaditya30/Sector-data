@@ -89,13 +89,33 @@ Four gates, all independent:
   board *before* the verdict pick, so picking one does not zero the other three.
 - **the search box** matches company name, ticker or ISIN.
 - **hide illiquid** drops anything under ₹1cr median daily turnover.
-- **range filters** — the button opens a min–max pair for every visible numeric
-  column. Type 2 and 3 into `turnover/mcap` to see only stocks trading between 2%
-  and 3% of their market cap a day. Bounds are inclusive and either can be left
-  blank for an open-ended range. A row with no reading for that column is dropped
-  while a bound is set — a blank is not a number. Hiding a column clears its
-  range, so nothing filters invisibly, and the button carries a count of how many
-  are active.
+- **range sliders** — the funnel in a numeric column's header opens a two-handle
+  slider already set to that column's full spread. Drag the ends in; the board
+  narrows as you drag. The header text still sorts, so the click you already knew
+  still does what it did.
+
+  The slider steps through the column's **distinct sorted values**, not evenly
+  from lowest to highest. On a straight linear track, market cap would cram every
+  company under ₹20,000cr — which is most of them — into the first few pixels,
+  and the handle would be useless exactly where the data lives. Stepping through
+  the readings themselves spreads the track over the companies instead: every
+  stop lands on a real value and both ends are exact.
+
+  A row with no reading for that column is dropped while its slider is narrowed —
+  a blank is not a number. Pushing both handles back to the ends clears the
+  filter. Hiding a column clears its slider, so nothing filters invisibly, and
+  the funnel lights up on any column that is filtering.
+
+## Everything is remembered
+
+The window, which columns are on, the verdict chips, every slider, the sort
+column and direction, the search text and the liquidity switch are all saved in
+the browser and restored on the next visit — under one key, written on every
+change. **reset view** puts the whole board back to defaults, which is the way
+out of a filter that has hidden everything.
+
+A slider is remembered by its *values*, not by handle positions, so a range set
+today still means the same thing tomorrow after the numbers have moved.
 
 ## Verdicts
 
@@ -120,6 +140,8 @@ remembered in the browser.
 |---|---|
 | `up days` | sessions in the window closing higher than the day before |
 | `Nd %` | total move over the window |
+| `Nd score` | annualised log drift × consistency², borrowed from the trend scanner. A move that was both **meaningful and tidy**. Squaring consistency is what stops a violent move that happens to end higher from outranking a quiet grind |
+| `consistency` | efficiency ratio: net move ÷ total distance travelled, 0–1. **1.00 is a straight line**; a path that wanders to the same place reads far lower. Both it and the score are computed on a winsorised log path — daily steps capped at 6% — so one limit-up session cannot manufacture a trend |
 | `vol 5d/30d` | average daily **volume** over the last 5 sessions ÷ over the last 30. 1.00× means the recent leg traded like the month behind it. Always 5-against-30 — comparing the recent leg to the month is the whole point — so it does not follow the window |
 | `turnover/mcap` | average daily **turnover** over the window ÷ market cap, as a percent: what share of the company changes hands on a normal day. ₹5cr a day is thin for a ₹5,000cr company and enormous for a ₹50cr one |
 | `turnover ₹cr` | the same turnover in rupees, average per session over the window |
