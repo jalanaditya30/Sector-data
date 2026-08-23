@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Trend Scanner — NSE</title>
-<link rel="stylesheet" href="../bounce.css">
+<link rel="stylesheet" href="../boards.css">
 <style>
 :root{
   /* cool, low-glare paper on a soft slate ground — high contrast for long reads */
@@ -183,7 +183,6 @@ th[data-k=s5]{opacity:.62}
   <a class="bbtn" href="../quiet/">Quiet Climbers</a>
   <span class="sep"></span>
   <span class="hint">ranked on 15-session score</span>
-  <button class="bbtn" type="button" data-bounce-toggle>bounce: on</button>
 </nav>
 
 <header>
@@ -469,6 +468,5 @@ fetch("trend.json?t="+Date.now())
       ? "Opened straight from disk, so the page cannot read trend.json. Serve the folder over HTTP instead."
       : "trend.json is missing or unreadable ("+e.message+")."));
 </script>
-<script src="../bounce.js"></script>
 </body>
 </html>

@@ -15,7 +15,7 @@ row *is*. The filter box on all three boards searches it.
 
 Each has its own script, data file, page and refresh workflow. What they share is
 deliberately small: the ISIN registry (`stocks.csv`) that says which company a row
-is, and the board switcher in `bounce.css` / `bounce.js`.
+is, and the board switcher in `boards.css`.
 
 | board | path | what it answers | refresh |
 |---|---|---|---|
@@ -27,12 +27,7 @@ Both stock boards scan the same universe — **every listed company** in
 `stocks.csv` that has a tradable listing (1,989 names), written out as
 `trend/universe.txt` and `quiet/universe.txt` by `python build_universe.py`.
 
-Every board carries a row of buttons switching between the three, and those
-buttons bounce. `bounce.js` gives each one its own path, period and phase, so
-they scatter rather than pulse together; the movement is pure `transform`, so
-nothing on the page reflows. Point at the bar and the whole group stops dead so
-you can click; the `bounce: on` button turns it off for good and the choice is
-remembered. Pages start still for anyone whose system asks for reduced motion.
+Every board carries a row of buttons switching between the three.
 
 ## The one thing that matters: the data feed
 
@@ -56,7 +51,7 @@ symbol intact. What's left is a price feed, and that dictates every design choic
 | `build_universe.py` | regenerates `trend/universe.txt` and `quiet/universe.txt` from the registry. |
 | `sectors_config.json` | sector → constituents → NSE ticker + weight. The curated Tijori export; left untouched. |
 | `build_heatmap.py` | pulls prices, computes returns, aggregates both taxonomies, writes `data.json`. |
-| `bounce.css`, `bounce.js` | the shared board switcher and the bouncing buttons, used by all three pages. |
+| `boards.css` | the shared board switcher, used by all three pages. |
 | `.github/workflows/refresh.yml` | GitHub Actions cron: rebuild after close, commit `data.json`. |
 | `requirements.txt` | `yfinance`, `pandas`. |
 
