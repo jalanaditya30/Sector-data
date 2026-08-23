@@ -39,6 +39,13 @@ The Yahoo symbol is only how the price is fetched — a rename or a BSE-only
 listing must not change which company a row refers to. Market cap comes from the
 same registry, carried forward on price (see live_mcap).
 
+The page draws a candlestick chart when you open a stock, so the row carries the
+raw bars — `ohlcv`, one [open, high, low, close, volume] per session — rather than
+the percent moves it used to. Those moves are one division away from consecutive
+closes, so shipping both would be shipping the same numbers twice. There are
+BASE_WINDOW + 1 bars: the extra leading one is the reference close that makes the
+first session's move computable.
+
 Data: Yahoo Finance via yfinance. EOD.
 Output: trend.json
 """
@@ -194,6 +201,17 @@ def analyse(symbol, df, meta=None):
 
     daily = (closes[1:] / closes[:-1] - 1) * 100
 
+    # One bar per session for the candlestick chart. Prices to 2dp (paise), volume
+    # as a whole number of shares — the JSON is served to a browser and a stock
+    # priced at 138.4237 helps nobody.
+    bars = frame[["Open", "High", "Low", "Close", "Volume"]] if \
+        all(c in frame for c in ("Open", "High", "Low", "Close", "Volume")) else None
+    ohlcv = None
+    if bars is not None:
+        ohlcv = [[round(float(o), 2), round(float(h), 2), round(float(l), 2),
+                  round(float(c), 2), int(v) if v == v else 0]
+                 for o, h, l, c, v in bars.to_numpy()]
+
     # BSE-only listings have no NSE symbol — their scrip code is the right short
     # label there, and the exchange field below tells the UI to say so.
     display = (meta.get("nse") or meta.get("bse")
@@ -211,8 +229,12 @@ def analyse(symbol, df, meta=None):
         "recent_up": int((daily[-VOL_RECENT:] > 0).sum()),
         "windows": windows,
         "last": round(float(closes[-1]), 2),
-        "daily": [round(float(v), 2) for v in daily],
-        "dates": [d.strftime("%Y-%m-%d") for d in frame.index[1:]],
+        # ohlcv and dates are the same length and aligned; the page derives the
+        # daily moves from the closes. A row whose feed had no OHLC keeps the old
+        # percent series so the board still draws its bar chart.
+        "ohlcv": ohlcv,
+        "dates": [d.strftime("%Y-%m-%d") for d in frame.index],
+        **({} if ohlcv else {"daily": [round(float(v), 2) for v in daily]}),
     }
 
 

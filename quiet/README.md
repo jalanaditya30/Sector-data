@@ -54,6 +54,49 @@ noise about one time in six, so that view will show a screen full of "climbs"
 that are nothing of the sort. It is there to check whether a longer-window climb
 is still going, not to screen on.
 
+## Clicking a stock
+
+The company name opens a dialog on the page: a **candlestick chart of the last 30
+sessions with volume underneath**, the window's numbers, and two links out —
+**Screener** and **TradingView**. Hover any candle for its open, high, low, close
+and volume. When the board is on a 5- or 15-session window, the chart still shows
+all 30 and shades the ones being scored. Escape, the ×, or a click outside closes it.
+
+Both links are the same shape: a fixed prefix plus this row's symbol.
+
+    https://www.screener.in/company/ASIANTILES/
+    https://www.tradingview.com/chart/?symbol=NSE:ASIANTILES
+
+For the 128 companies with no NSE listing, the symbol is the BSE scrip code and
+both links carry that instead (`.../company/543225/`, `?symbol=BSE:543225`); the
+dialog says so when it happens.
+
+Drawing candles means the scan now ships raw bars — `ohlcv`, one
+`[open, high, low, close, volume]` per session, 31 of them so the first session's
+move is computable. The daily percent moves are no longer shipped: they are one
+division away from consecutive closes, and sending both would be sending the same
+numbers twice. `trend.json` grows from roughly 1.6 MB to 4 MB (about 1 MB over the
+wire, gzipped).
+
+## Filtering
+
+Four gates, all independent:
+
+- **the verdict chips** at the top are buttons. Click one to show that verdict,
+  click again to drop it, pick several at once. `quiet climb` is on by default —
+  the same board the old "quiet climbs only" checkbox gave you, which the chips
+  replace. "show all" clears the pick. The counts stay live: each chip counts the
+  board *before* the verdict pick, so picking one does not zero the other three.
+- **the search box** matches company name, ticker or ISIN.
+- **hide illiquid** drops anything under ₹1cr median daily turnover.
+- **range filters** — the button opens a min–max pair for every visible numeric
+  column. Type 2 and 3 into `turnover/mcap` to see only stocks trading between 2%
+  and 3% of their market cap a day. Bounds are inclusive and either can be left
+  blank for an open-ended range. A row with no reading for that column is dropped
+  while a bound is set — a blank is not a number. Hiding a column clears its
+  range, so nothing filters invisibly, and the button carries a count of how many
+  are active.
+
 ## Verdicts
 
 | verdict | means |
