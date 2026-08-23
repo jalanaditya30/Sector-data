@@ -27,11 +27,15 @@ Measured on driftless random walks, the share of pure noise clearing the
 consistency gate falls sharply with window length: 53% at n=5, 30% at n=10,
 18% at n=15. That is why 15 is the ranking window.
 
+Identity: every scanned row is keyed on its ISIN, read from the repo-root
+registry `stocks.csv`. The Yahoo symbol is only how the price is fetched — it can
+be renamed (MACROTECH -> LODHA) or absent (BSE-only listings fetch as <code>.BO),
+and neither event should change which company a row refers to.
+
 Data source: Yahoo Finance via yfinance (server-side, no CORS). EOD.
 Output     : trend.json
 """
 
-import csv
 import json
 import math
 import os
@@ -41,6 +45,10 @@ from datetime import datetime, timezone
 import numpy as np
 import pandas as pd
 import yfinance as yf
+
+# stocks.csv and its loader live at the repo root; this script runs from trend/
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import stock_registry as registry  # noqa: E402
 
 # ----------------------------------------------------------------------------
 # Config
@@ -58,14 +66,14 @@ TURNOVER_LOOKBACK = 20     # sessions for the median turnover liquidity floor
 BENCHMARK = "^NSEI"
 WINSOR_PCT = 6.0           # daily cap applied before fitting (display stays raw)
 GAP_FLAG_PCT = 15.0        # single session beyond this = event, not trend
-NAMES_FILE = "names.csv"   # Symbol -> Company Name; optional, falls back to ticker
 MIN_TURNOVER_CR = 1.0      # median 20d turnover floor, Rs crore
 MAX_STALE_FRAC = 0.30      # share of unchanged closes above which it is untradeable
 TREND_MIN_SCORE = 10.0     # tiny floor, only to confirm a direction exists
 # Consistency gate. Was 0.45, calibrated when the ranking window was 30 sessions.
-# At n=15 that let ~18% of driftless random walks through — about 130 false trend
-# badges per 752 names. 0.75 cuts that to ~1.7% (~12 names) at the cost of calling
-# some genuine-but-untidy trends "choppy", which is the right trade for a screen.
+# At n=15 that let ~18% of driftless random walks through — about 364 false trend
+# badges across the 1,989-name universe. 0.75 cuts that to ~1.7% (~34 names) at the
+# cost of calling some genuine-but-untidy trends "choppy", which is the right trade
+# for a screen — and it matters more now the scan covers every listed company.
 TREND_MIN_EFF = 0.75
 TURN_MIN_SCORE = 25.0      # short-window score needed to call a turn
 BATCH = 40
@@ -83,17 +91,6 @@ UNIVERSE = [
 # ----------------------------------------------------------------------------
 # Core maths
 # ----------------------------------------------------------------------------
-
-def load_names(path: str = NAMES_FILE) -> dict:
-    """Map bare NSE symbol -> company name. Missing file is not fatal: the UI
-    falls back to the ticker, so a scan still works without it."""
-    if not os.path.exists(path):
-        print(f"  note: {path} not found — rows will carry no company name")
-        return {}
-    with open(path, newline="", encoding="utf-8") as fh:
-        return {r["Symbol"].strip(): r["Company Name"].strip()
-                for r in csv.DictReader(fh) if r.get("Symbol", "").strip()}
-
 
 def winsorise(log_prices: np.ndarray) -> np.ndarray:
     """Rebuild the log path with each daily step capped at +/- WINSOR_PCT."""
@@ -189,7 +186,7 @@ def classify(win: dict) -> str:
 
 
 def analyse(symbol: str, df: pd.DataFrame, bench_ret: float | None,
-            names: dict | None = None):
+            meta: dict | None = None):
     if df is None or df.empty:
         return None
     df = df.dropna(subset=["Close"])
@@ -224,9 +221,20 @@ def analyse(symbol: str, df: pd.DataFrame, bench_ret: float | None,
     up_days = int((daily > 0).sum())
     biggest = float(np.abs(daily).max())
 
+    meta = meta or {}
+    # A BSE-only listing has no NSE symbol — its scrip code is the right short
+    # label there, and the exchange field below tells the UI to say so. Only a
+    # symbol the registry does not know at all falls through to the raw ticker.
+    display = (meta.get("nse") or meta.get("bse")
+               or meta.get("isin") or symbol.rsplit(".", 1)[0])
+
     return {
-        "symbol": symbol.replace(".NS", ""),
-        "name": (names or {}).get(symbol.replace(".NS", "")) or symbol.replace(".NS", ""),
+        "isin": meta.get("isin"),          # the identity — stable across renames
+        "symbol": display,
+        "yahoo": symbol,                   # only how the price was fetched
+        "exchange": "BSE" if symbol.endswith(".BO") else "NSE",
+        "name": meta.get("name") or display,
+        "industry": meta.get("industry_group") or None,
         "windows": windows,
         "score": windows[str(RANK_WINDOW)]["score"],   # default sort key
         "state": classify(windows),
@@ -274,14 +282,23 @@ def fetch(tickers):
 def main():
     universe = UNIVERSE
     if len(sys.argv) > 1:
-        with open(sys.argv[1]) as fh:
-            universe = [ln.strip() for ln in fh
-                        if ln.strip() and not ln.lstrip().startswith("#")]
+        universe = registry.read_universe(sys.argv[1])
 
     print(f"universe: {len(universe)} symbols · windows {WINDOWS} · rank on {RANK_WINDOW}")
 
-    names = load_names()
-    print(f"  {len(names)} company names loaded")
+    # Identity comes from stocks.csv, not from the ticker. A symbol the registry
+    # does not know still gets scanned — it just carries no ISIN, and says so.
+    try:
+        rows_reg = registry.load()
+        meta = registry.by_yahoo(rows_reg)
+        print(f"  registry: {len(rows_reg)} companies, {len(meta)} with a price symbol")
+    except FileNotFoundError:
+        meta = {}
+        print("  note: stocks.csv not found — rows will carry no ISIN")
+    unknown = [t for t in universe if t not in meta]
+    if unknown:
+        print(f"  {len(unknown)} symbols not in the registry (no ISIN): "
+              + ", ".join(unknown[:8]) + ("…" if len(unknown) > 8 else ""))
 
     print("benchmark…")
     bench_ret = None
@@ -296,12 +313,13 @@ def main():
 
     rows, failed = [], []
     for t in universe:
-        r = analyse(t, frames.get(t), bench_ret, names)
+        r = analyse(t, frames.get(t), bench_ret, meta.get(t))
         (rows.append(r) if r else failed.append(t))
     rows.sort(key=lambda r: r["score"], reverse=True)
 
     payload = {
         "generated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "identity": "isin",                # rows are keyed on ISIN, not ticker
         "windows": WINDOWS,
         "rank_window": RANK_WINDOW,
         "short_window": SHORT_WINDOW,

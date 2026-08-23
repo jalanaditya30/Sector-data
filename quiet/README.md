@@ -3,12 +3,13 @@
 Finds stocks that rise **a little, most days, for weeks**.
 
 Lives in `quiet/` so it does not collide with the sectoral heatmap at the repo root or
-the trend scanner in `trend/`. Shares nothing with either — separate script, separate
-JSON, separate workflow.
+the trend scanner in `trend/`. Separate script, separate JSON, separate workflow — the
+only things shared are the ISIN registry (`../stocks.csv`) and the board switcher.
 
 Live at: https://jalanaditya30.github.io/Sector-data/quiet/
 
-Scans the full **Nifty Total Market** list (752 NSE symbols) in `universe.txt`.
+Scans **every listed company** with a tradable listing — 1,989 names in
+`universe.txt`, generated from the repo-root ISIN registry `../stocks.csv`.
 The `refresh-quiet` GitHub Action rebuilds `trend.json` at least hourly while NSE is
 open (two cron slots per hour, offset from `refresh-trend` so the two jobs don't hit
 Yahoo in the same minute). Trigger one on demand from
@@ -67,8 +68,21 @@ weeks and cannot see one. 30 sessions is about six calendar weeks. Raise `DAYS` 
 
 ## Adding stocks
 
-`universe.txt`, one NSE ticker per line in Yahoo format (`SYMBOL.NS`). Unresolved
+Edit `../stocks.csv` — the ISIN-keyed registry of every listed company — and run
+`python build_universe.py` from the repo root. That rewrites `universe.txt`, one
+company per line as `<ISIN>,<Yahoo symbol>`:
+
+    INE002A01018,RELIANCE.NS
+    INE0BWS23018,543225.BO
+
+(A bare ticker per line still parses, so an older file keeps working.) Unresolved
 tickers are printed at the end of the Actions log, never silently dropped.
+
+## Identity
+
+Rows are keyed on **ISIN**, not ticker: tickers get renamed and the 128 BSE-only
+companies never had one. Each row shows the company name with its ticker and ISIN
+beneath, and the filter box matches any of the three.
 
 ## Data
 

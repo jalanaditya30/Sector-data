@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="bounce.css">
 <style>
   :root{
     --bg:#ffffff; --panel:#ffffff; --panel2:#fafafa; --line:#e6e6e6;
@@ -35,6 +36,10 @@
     font-family:var(--mono);font-size:11px;padding:6px 10px;border-radius:6px;cursor:pointer}
   button.btn:hover{color:var(--ink);border-color:var(--dim2)}
   button.btn:disabled{opacity:.5;cursor:default}
+  button.btn[aria-pressed=true]{color:var(--accent);border-color:var(--accent);background:#f3f7fe}
+  .segs{display:flex;gap:4px}
+  /* the shared board switcher sits inside .wrap here, so drop its full-width chrome */
+  .boards{padding:0 0 12px;border-bottom:none;background:transparent}
 
   /* banners */
   .banner{font-family:var(--mono);font-size:12px;padding:9px 12px;border-radius:6px;margin-top:12px;
@@ -93,6 +98,11 @@
   tr.stock td.name-col .tk{color:var(--dim2);font-size:10px;margin-left:auto;padding-left:8px}
   .stag{font-size:9px;text-transform:uppercase;letter-spacing:.3px;color:var(--warn);
     border:1px solid rgba(201,138,26,.4);border-radius:3px;padding:0 4px;margin-left:6px;cursor:help}
+  /* which taxonomy a sector comes from — curated Tijori list, or every listed company */
+  .tax{font-size:9px;text-transform:uppercase;letter-spacing:.3px;color:var(--dim2);
+    border:1px solid var(--line);border-radius:3px;padding:0 4px;margin-left:7px;
+    font-weight:400;cursor:help}
+  .isin{font-family:var(--mono);font-size:10px;color:var(--dim2);letter-spacing:.2px}
   tr.stock.stale td.name-col .lbl{color:var(--dim)}
   tr.stock:hover td{filter:brightness(.97)}
   td.cell{color:#1f2937;text-align:right;padding:6px 8px}
@@ -104,12 +114,25 @@
 </head>
 <body>
 <div class="wrap">
+  <nav class="boards" aria-label="boards">
+    <span class="bbtn" aria-current="page">◧ Sectoral Heatmap</span>
+    <a class="bbtn" href="trend/">Trend Scanner</a>
+    <a class="bbtn" href="quiet/">Quiet Climbers</a>
+    <span class="sep"></span>
+    <button class="bbtn" type="button" data-bounce-toggle>bounce: on</button>
+  </nav>
+
   <header class="top">
     <span class="brand"><b>◧</b> SECTORAL&nbsp;HEATMAP</span>
     <span class="meta" id="meta">—</span>
     <span class="spacer"></span>
     <div class="controls">
-      <input type="search" id="q" placeholder="filter sector / stock…" autocomplete="off">
+      <input type="search" id="q" placeholder="filter sector / stock / ISIN…" autocomplete="off">
+      <span class="segs" id="segs" role="group" aria-label="which sectors">
+        <button class="btn seg" data-tax="all" aria-pressed="true">all</button>
+        <button class="btn seg" data-tax="tijori" aria-pressed="false">curated</button>
+        <button class="btn seg" data-tax="all-listed" aria-pressed="false">all listed</button>
+      </span>
       <button class="btn" id="expandAll">expand all</button>
       <button class="btn" id="refresh">↻ refresh</button>
     </div>
@@ -145,6 +168,12 @@
     <span class="pill">breadth</span> left/right = constituents down / up on the sorted horizon.
     &nbsp;·&nbsp; <span class="pill">ltp vs 52wh</span> distance below 52-week high.
     &nbsp;·&nbsp; click a header to sort · click a sector to expand.
+    <br><span class="pill">curated</span> the 80 hand-weighted Tijori sectors.
+    &nbsp;·&nbsp; <span class="pill">all listed</span> every listed company in
+    <code>stocks.csv</code>, grouped by industry and weighted by market cap — the two
+    taxonomies overlap on purpose, so a stock can appear in both.
+    &nbsp;·&nbsp; every constituent is identified by its <b>ISIN</b>, which the filter
+    box also searches.
   </footer>
 </div>
 
@@ -152,6 +181,9 @@
 const COLNAMES={ltp52:"LTP vs 52WH","1D":"1D","1M":"1M","3M":"3M","6M":"6M","1Y":"1Y","2Y":"2Y","3Y":"3Y","5Y":"5Y"};
 const CLAMP={ltp52:.5,"1D":.03,"1M":.10,"3M":.20,"6M":.30,"1Y":.50,"2Y":.60,"3Y":.80,"5Y":1.0};
 let DATA=null, COLS=[], sortKey="1D", sortDir=-1, expanded=new Set(), allOpen=false;
+// which taxonomy to show: "all" | "tijori" (curated Tijori sectors)
+// | "all-listed" (every listed company, grouped by industry)
+let taxonomy="all";
 
 const $=id=>document.getElementById(id);
 function pct(v){ if(v===null||v===undefined) return "–"; return (v>=0?"+":"")+(v*100).toFixed(1)+"%"; }
@@ -175,37 +207,58 @@ function buildHead(){ const tr=$("head"); tr.innerHTML="";
 function render(){
   if(!DATA) return;
   buildHead();
+  // A feed built before the all-listed taxonomy existed (the bundled snapshot)
+  // holds curated sectors only — offering a filter that can only empty the board
+  // would be a dead end, so hide it until the data has both.
+  const kinds=new Set(DATA.sectors.map(s=>s.taxonomy||"tijori"));
+  if(kinds.size<2) taxonomy="all";
+  $("segs").style.display = kinds.size>1 ? "" : "none";
+
   const q=($("q").value||"").toLowerCase().trim(), body=$("body"); body.innerHTML="";
-  let secs=[...DATA.sectors].sort((a,b)=>{ let av=a.agg[sortKey],bv=b.agg[sortKey];
+  // a stock is findable by name, by ticker, or by the identity that never changes
+  const hit=x=>x.name.toLowerCase().includes(q)
+    || (x.ticker||"").toLowerCase().includes(q)
+    || (x.isin||"").toLowerCase().includes(q);
+  let secs=DATA.sectors.filter(s=>taxonomy==="all"||(s.taxonomy||"tijori")===taxonomy);
+  secs=secs.sort((a,b)=>{ let av=a.agg[sortKey],bv=b.agg[sortKey];
     // sectors with no data always sort LAST regardless of direction
     if(av==null) av=Infinity*sortDir; if(bv==null) bv=Infinity*sortDir; return (av-bv)*sortDir; });
-  let shown=0;
+  let shown=0, nStocks=0;
   for(const s of secs){
     const secMatch=s.sector.toLowerCase().includes(q);
-    const ms=q?s.stocks.filter(x=>x.name.toLowerCase().includes(q)||(x.ticker||"").toLowerCase().includes(q)):s.stocks;
-    if(q && !secMatch && ms.length===0) continue; shown++;
+    const ms=q?s.stocks.filter(hit):s.stocks;
+    if(q && !secMatch && ms.length===0) continue;
+    shown++; nStocks += (q && !secMatch) ? ms.length : s.stocks.length;
     const open=allOpen||expanded.has(s.sector)||(q&&ms.length>0&&!secMatch);
     const tr=document.createElement("tr"); tr.className="sector";
     const total=s.up+s.down, upPct=total?(s.up/total*100):50;
     let c=`<td class="name-col"><div class="secname">
       <span class="car0" style="transform:rotate(${open?90:0}deg)">▶</span>
-      <span class="lbl">${s.sector.replace(/^TJI\s*/,'')}</span></div></td>
+      <span class="lbl">${s.sector.replace(/^TJI\s*/,'')}</span>${
+        (s.taxonomy||"tijori")==="all-listed"
+          ? `<span class="tax" title="Every listed company in this industry group, weighted by market cap — from stocks.csv.">all listed</span>`
+          : `<span class="tax" title="Curated Tijori sector with its own constituent weights.">curated</span>`
+      }</div></td>
       <td class="name-col"><div class="wbar"><span class="cnt d">${s.down}</span>
       <span class="track"><span class="rd" style="width:${100-upPct}%"></span><span class="gr" style="width:${upPct}%"></span></span>
       <span class="cnt u">${s.up}</span></div></td>`;
     for(const k of COLS){ const v=s.agg[k]; c+=`<td class="cell num" style="background:${cellBg(v,k)};color:${txtColor(v,k)}">${pct(v)}</td>`; }
     tr.innerHTML=c; tr.onclick=()=>{ expanded.has(s.sector)?expanded.delete(s.sector):expanded.add(s.sector); render(); };
     body.appendChild(tr);
-    const list=q&&!secMatch?ms:s.stocks;
+    // Only build rows for a sector that is actually open. With every listed
+    // company on the board that is ~3,500 constituent rows; creating them all on
+    // every render just to leave them display:none made each keystroke in the
+    // filter box rebuild the entire market.
+    const list=!open?[]:(q&&!secMatch?ms:s.stocks);
     for(const st of list){ const trs=document.createElement("tr"); trs.className="stock"+(open?" open":"")+(st.stale?" stale":"");
       const staleTag=st.stale?`<span class="stag" title="Live price unavailable for this symbol — showing the last bundled snapshot, not current data.">snapshot</span>`:"";
-      let cc=`<td class="name-col"><div class="secname"><span class="lbl">${st.name}</span>${staleTag}<span class="tk">${st.ticker||""}</span></div></td>
+      let cc=`<td class="name-col"><div class="secname"><span class="lbl">${st.name}</span>${staleTag}<span class="tk">${st.ticker||""}${st.isin?` · <span class="isin">${st.isin}</span>`:""}</span></div></td>
         <td class="name-col"><div class="wbar"><span class="wt">${st.weight!=null?(st.weight*100).toFixed(1)+"%":""}</span></div></td>`;
       for(const k of COLS){ const v=st.vals[k]; cc+=`<td class="cell num" style="background:${cellBg(v,k)};color:${txtColor(v,k)}">${pct(v)}</td>`; }
       trs.innerHTML=cc; body.appendChild(trs); }
   }
   const live=DATA.source!=="snapshot";
-  $("meta").innerHTML=`<span class="${live?'live':'snap'}">${live?'● live':'■ bundled snapshot'}</span> · <b>Last updated:</b> ${DATA.generated_at} · ${shown} sectors`;
+  $("meta").innerHTML=`<span class="${live?'live':'snap'}">${live?'● live':'■ bundled snapshot'}</span> · <b>Last updated:</b> ${DATA.generated_at} · ${shown} sectors · ${nStocks} rows`;
   // amber note only if the served file is the bundled seed (not a real live pull)
   if(!live) showBanner("warn","Serving the bundled snapshot — run the refresh job for live prices.");
 }
@@ -244,7 +297,15 @@ async function load(isManual){
   }finally{ btn.disabled=false; btn.textContent=prev; }
 }
 
-$("q").oninput=render;
+// Debounced: expanding a sector can put thousands of rows on screen, and
+// re-rendering that on every keypress makes typing feel like wading.
+let qTimer=null;
+$("q").oninput=()=>{ clearTimeout(qTimer); qTimer=setTimeout(render,120); };
+document.querySelectorAll(".seg").forEach(b=>b.onclick=()=>{
+  taxonomy=b.dataset.tax;
+  document.querySelectorAll(".seg").forEach(o=>o.setAttribute("aria-pressed",o===b));
+  expanded.clear(); render();
+});
 $("expandAll").onclick=e=>{ allOpen=!allOpen; e.target.textContent=allOpen?"collapse all":"expand all"; render(); };
 $("refresh").onclick=()=>load(true);
 $("errRetry").onclick=()=>load(false);
@@ -260,5 +321,6 @@ document.addEventListener("visibilitychange", ()=>{
   if(!document.hidden && lastLoadedAt && Date.now()-lastLoadedAt.getTime()>5*60*1000) load(false);
 });
 </script>
+<script src="bounce.js"></script>
 </body>
 </html>

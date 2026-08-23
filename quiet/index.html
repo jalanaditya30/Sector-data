@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Quiet Climbers — NSE</title>
+<link rel="stylesheet" href="../bounce.css">
 <style>
 :root{
   --bg:#eef1f6; --card:#ffffff; --line:#e2e8f1; --line2:#cbd5e4;
@@ -74,6 +75,13 @@ tbody tr:nth-child(even){background:var(--zebra)}
 tbody tr:hover{background:var(--hover)}
 tbody tr:last-child td{border-bottom:none}
 .sym{font-weight:700;font-size:13.5px;letter-spacing:.01em}
+/* identity line: ISIN is what the row IS, the ticker only says how it was fetched */
+.ident{display:block;margin-top:2px;font-size:10.5px;color:var(--faint);
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.02em}
+.ident .tk{color:var(--dim);font-weight:600}
+.ident .ex{border:1px solid var(--line2);border-radius:3px;padding:0 4px;margin-left:5px;
+  font-size:9.5px;letter-spacing:.06em}
+thead th:first-child,tbody td:first-child{min-width:250px;white-space:normal}
 .pos{color:var(--up)} .neg{color:var(--down)} .zero{color:var(--faint)}
 .big{color:var(--gold);font-weight:700}
 
@@ -149,6 +157,15 @@ tbody tr:last-child td{border-bottom:none}
 </style>
 </head>
 <body>
+<nav class="boards" aria-label="boards">
+  <a class="bbtn" href="../">Sectoral Heatmap</a>
+  <a class="bbtn" href="../trend/">Trend Scanner</a>
+  <span class="bbtn" aria-current="page">Quiet Climbers</span>
+  <span class="sep"></span>
+  <span class="hint">30 sessions, pure counting</span>
+  <button class="bbtn" type="button" data-bounce-toggle>bounce: on</button>
+</nav>
+
 <header>
   <div class="hrow">
     <h1>Quiet <span>Climbers</span></h1>
@@ -163,7 +180,8 @@ tbody tr:last-child td{border-bottom:none}
 </header>
 
 <div class="controls">
-  <input type="search" id="q" placeholder="Filter symbol…" aria-label="Filter by symbol">
+  <input type="search" id="q" placeholder="Filter company, ticker or ISIN…"
+         aria-label="Filter by company name, ticker or ISIN">
   <label class="chk"><input type="checkbox" id="only" checked> quiet climbs only</label>
   <label class="chk"><input type="checkbox" id="hideThin" checked> hide illiquid</label>
   <span class="meta" id="count"></span>
@@ -171,7 +189,7 @@ tbody tr:last-child td{border-bottom:none}
 
 <div class="wrap"><table>
 <thead><tr>
-  <th class="l" data-k="symbol" data-label="symbol">symbol</th>
+  <th class="l" data-k="name" data-label="company">company</th>
   <th data-k="up_days" data-label="up days">up days</th>
   <th data-k="streak" data-label="best run">best run</th>
   <th data-k="total" data-label="30d %">30d %</th>
@@ -208,6 +226,11 @@ tbody tr:last-child td{border-bottom:none}
     <div><span class="v v-one-big-day">one big day</span> a single session moved &gt;5%</div>
     <div><span class="v v-no-pattern">no pattern</span> neither</div>
   </div>
+  <p><b>Every row is identified by its ISIN</b> — the twelve-character code allotted once
+     per security and never reissued — shown under the company name with the ticker the
+     price was fetched with. Tickers get renamed and BSE-only listings have none, so the
+     ISIN is what the filter box searches. The universe is <b>every listed company</b> in
+     <code>stocks.csv</code>, not a chosen index.</p>
   <p><code>THIN</code> means median turnover under ₹1cr — it may look great and still be
      untradeable. Left on by default.</p>
 </div>
@@ -216,6 +239,17 @@ tbody tr:last-child td{border-bottom:none}
 let DATA=null, k="up_days", dir=-1;
 const sgn=v=>(v>0?"+":"")+v.toFixed(1);
 const cls=v=>v>0?"pos":v<0?"neg":"zero";
+// rows scanned before the registry existed carry no name — fall back to the symbol
+const nameOf=r=>r.name||r.symbol;
+// sorting on the company column has to read the fallback too, or a pre-registry
+// row sorts as undefined and lands wherever
+const keyOf=r=>k==="name"?nameOf(r):r[k];
+// ISIN is the identity; the ticker only says how the price was fetched, and a
+// BSE-only listing has no NSE symbol at all — hence the exchange tag.
+const identity=r=>`<span class="ident"><span class="tk">${r.symbol}</span>`
+  +(r.isin?` · ${r.isin}`:"")
+  +(r.exchange==="BSE"?`<span class="ex">BSE</span>`:"")
+  +`</span>`;
 
 // One bar per session around a zero line. Scaled to 2.5% so the ordinary
 // 0.5-1% day is clearly visible; bigger days saturate.
@@ -240,15 +274,16 @@ function render(){
   const q=document.getElementById("q").value.trim().toUpperCase();
   const only=document.getElementById("only").checked;
   const noThin=document.getElementById("hideThin").checked;
-  let rows=DATA.rows.filter(r=>(!q||r.symbol.includes(q))
+  let rows=DATA.rows.filter(r=>
+    (!q||r.symbol.includes(q)||nameOf(r).toUpperCase().includes(q)||(r.isin||"").includes(q))
     && !(only && r.verdict!=="quiet climb") && !(noThin&&r.thin));
-  rows.sort((a,b)=>{const x=a[k],y=b[k];
+  rows.sort((a,b)=>{const x=keyOf(a),y=keyOf(b);
     if(typeof x==="string") return x.localeCompare(y)*-dir;
     return ((x??-1e9)-(y??-1e9))*dir;});
 
   document.querySelector("tbody").innerHTML=rows.map(r=>`<tr>
-    <td class="l"><span class="sym">${r.symbol}</span>${
-      r.thin?'<span class="flag">THIN</span>':''}</td>
+    <td class="l"><span class="sym">${nameOf(r)}</span>${
+      r.thin?'<span class="flag">THIN</span>':''}${identity(r)}</td>
     <td><span class="updays"><span class="frac num"><b>${r.up_days}</b><span>/${r.days}</span></span>
       <span class="mbar"><b class="${r.up_days*2>=r.days?'':'dn'}"
         style="width:${(r.up_days/r.days*100).toFixed(0)}%"></b></span></span></td>
@@ -312,5 +347,6 @@ fetch("trend.json?t="+Date.now())
    `<div id="err"><h2>No data</h2><p>${e.message}</p>
     <p>Run <code>python trend_scan.py universe.txt</code> to build trend.json.</p></div>`;});
 </script>
+<script src="../bounce.js"></script>
 </body>
 </html>

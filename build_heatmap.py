@@ -4,8 +4,22 @@ Refreshes data.json (the sectoral heatmap feed) from live NSE prices.
 
 Data source : Yahoo Finance via yfinance  (server-side, no CORS, free).
               EOD + ~15-min-delayed intraday. NOT true tick real-time.
-Constituents: sectors_config.json  (extracted from the Tijori export;
-              80 sectors, 1,473 NSE symbols, sector weights).
+
+The board carries TWO taxonomies, built from two files and clearly labelled:
+
+  tijori      sectors_config.json — the curated Tijori export (80 sectors with
+              hand-set weights). The valuable extracted asset; left untouched.
+  all-listed  stocks.csv — every listed company, grouped by NSE industry group
+              and weighted by market capitalisation. This is what makes the
+              board cover the whole market rather than a chosen subset.
+
+The two overlap on purpose: a stock can sit in a curated sector and in its
+industry group, and each sector aggregate is correct within its own taxonomy.
+The all-listed sectors are assembled at run time from stocks.csv, so adding a
+company to that file is all it takes to put it on the board.
+
+Identity: constituents carry their ISIN wherever stocks.csv knows the symbol.
+Tickers are how Yahoo is queried; the ISIN is what the row IS.
 
 Run:  python build_heatmap.py
 Out:  data.json   (consumed by index.html)
@@ -14,6 +28,8 @@ import json, math, time, sys, datetime as dt
 from zoneinfo import ZoneInfo
 import pandas as pd
 import yfinance as yf
+
+import stock_registry as registry
 
 IST = ZoneInfo("Asia/Kolkata")
 
@@ -83,6 +99,64 @@ def ysymbol(t, suffix=SUFFIX):
 
 def load_config(path="sectors_config.json"):
     return json.load(open(path))
+
+
+def all_listed_sectors(reg):
+    """Build the all-listed taxonomy from stocks.csv: one sector per NSE
+    industry group, every tradable company in it, weighted by market cap.
+
+    Weight is mcap / (sum of mcap in the group), so a group's aggregate is a
+    real cap-weighted index of that group rather than an equal-weight average
+    in which a Rs 200cr microcap moves the sector as much as a Rs 2 lakh cr
+    heavyweight. Tickers are what Yahoo answers to — the NSE symbol, or the BSE
+    scrip code for the 128 companies listed only there (fetch() tries .NS then
+    .BO, so a numeric code resolves on the second pass).
+    """
+    groups = {}
+    for r in registry.scannable(reg):
+        groups.setdefault(r["industry_group"] or "Unclassified", []).append(r)
+
+    out = []
+    for group, members in sorted(groups.items()):
+        total = sum(m["mcap"] for m in members)
+        members.sort(key=lambda m: -m["mcap"])
+        out.append({
+            "sector": group,
+            "taxonomy": "all-listed",
+            "stocks": [{
+                "name": m["name"],
+                "ticker": m["nse"] or m["bse"],
+                "isin": m["isin"],
+                # equal weight if a whole group somehow has no market caps —
+                # a zero-weight sector would aggregate to null and read as
+                # "no data" when the constituents are fine
+                "weight": (m["mcap"] / total) if total > 0 else 1.0 / len(members),
+            } for m in members],
+        })
+    return out
+
+
+def attach_identity(cfg, reg):
+    """Give every curated constituent its ISIN, looked up by ticker.
+
+    Tijori codes are matched through SYMBOL_OVERRIDES first, so a renamed stock
+    (MACROTECH -> LODHA) resolves to the same ISIN it always had. Constituents
+    stocks.csv has never heard of — delisted names, and codes the export uses
+    that no longer trade — keep isin=None rather than being dropped: the board
+    still shows their snapshot, it just cannot claim an identity for them.
+    """
+    # index once: lookup() rebuilds its maps per call, which is fine for a
+    # handful of codes and wasteful across ~1,500 constituents
+    by_nse, by_bse = registry.by_nse(reg), registry.by_bse(reg)
+    hit = 0
+    for sector in cfg:
+        sector.setdefault("taxonomy", "tijori")
+        for st in sector["stocks"]:
+            t = (st["ticker"] or "").strip()
+            row = by_nse.get(ybase(t)) or by_nse.get(t) or by_bse.get(t)
+            st["isin"] = row["isin"] if row else None
+            hit += bool(row)
+    return hit
 
 def all_tickers(cfg):
     seen, out = set(), []
@@ -176,7 +250,19 @@ def wavg(pairs):
     return (num / den) if den > 0 else None
 
 def main():
-    cfg = load_config()
+    curated = load_config()
+    try:
+        reg = registry.load()
+    except FileNotFoundError:
+        reg = []
+        print("stocks.csv not found — curated sectors only, no ISINs", file=sys.stderr)
+    matched = attach_identity(curated, reg)
+    listed = all_listed_sectors(reg) if reg else []
+    cfg = curated + listed
+    print(f"sectors: {len(curated)} curated ({matched}/{sum(len(s['stocks']) for s in curated)} "
+          f"constituents matched to an ISIN) + {len(listed)} all-listed "
+          f"({sum(len(s['stocks']) for s in listed)} companies)", file=sys.stderr)
+
     tickers = all_tickers(cfg)
     print(f"tickers: {len(tickers)}", file=sys.stderr)
     prices = fetch(tickers)
@@ -208,17 +294,20 @@ def main():
             if d1 is not None:
                 up += d1 > 0; down += d1 < 0
             rows.append({"name": st["name"], "ticker": st["ticker"],
+                         "isin": st.get("isin"),
                          "weight": st["weight"], "stale": stale,
                          "vals": {k: v.get(k) for k in COLS}})
         agg = {}
         for k in COLS:
             agg[k] = wavg([(r["vals"][k], r["weight"]) for r in rows])
-        out_sectors.append({"sector": s["sector"], "agg": agg,
+        out_sectors.append({"sector": s["sector"],
+                            "taxonomy": s.get("taxonomy", "tijori"), "agg": agg,
                             "up": up, "down": down, "n": len(rows), "stocks": rows})
 
     data = {
         "generated_at": dt.datetime.now(IST).strftime("%Y-%m-%d %H:%M IST") + " · yfinance EOD/delayed",
         "source": "yfinance",
+        "identity": "isin",
         "columns": COLS,
         "missing": missing,
         "sectors": out_sectors,
