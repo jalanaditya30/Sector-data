@@ -21,7 +21,7 @@ is, and the board switcher in `bounce.css` / `bounce.js`.
 |---|---|---|---|
 | **Sectoral Heatmap** | [`/`](https://jalanaditya30.github.io/Sector-data/) | which *sectors* are moving, across 8 horizons | `refresh-heatmap` |
 | **Trend Scanner** | [`/trend/`](https://jalanaditya30.github.io/Sector-data/trend/) | which stocks are moving *cleanly* (drift × consistency², 10/5 sessions) | `refresh-trend` |
-| **Quiet Climbers** | [`/quiet/`](https://jalanaditya30.github.io/Sector-data/quiet/) | which stocks rise *a little, most days, for weeks* (30 sessions, pure counting) | `refresh-quiet` |
+| **Quiet Climbers** | [`/quiet/`](https://jalanaditya30.github.io/Sector-data/quiet/) | which stocks rise *a little, most days, for weeks* (5 / 15 / 30 sessions, pure counting) | `refresh-quiet` |
 
 Both stock boards scan the same universe — **every listed company** in
 `stocks.csv` that has a tradable listing (1,989 names), written out as

@@ -2,29 +2,48 @@
 """
 trend_scan.py — finds stocks that grind quietly upward.
 
-The goal: a big 10-15% pop is already all over Twitter. What gets missed is the stock
-that adds 0.8% a day, most days, for six weeks. This finds those.
+The goal: a big pop is already all over Twitter. What gets missed is the stock that
+adds 0.8% a day, most days, for weeks. This finds those.
 
 Two numbers do all the work, both of which you can check by eye on a chart:
 
-  up_days      how many of the last 30 sessions closed higher than the day before
+  up_days      how many sessions in the window closed higher than the day before
   biggest_day  the largest single-day move in the window
 
-A stock up 18% where no day moved more than 2.5% climbed in thirty small steps.
-A stock up 18% where one day moved 15% had one event and 29 days of nothing.
+A stock up 18% where no day moved more than 2.5% climbed in small steps.
+A stock up 18% where one day moved 20% had one event and the rest nothing.
 Same return. Only the first is a trend.
 
 No regressions, no log scales, no statistics. Just counting.
 
+Every window is computed for every stock — 30, 15 and 5 sessions — and all three
+ship in trend.json, so the page switches between them with no refetch. The
+up-day bar scales with the window (two thirds of it), so "most days" means the
+same thing at 5 sessions as at 30.
+
+Two liquidity readings ride along, because a clean climb in something you cannot
+buy is not an opportunity:
+
+  vol_ratio    average daily volume over the last 5 sessions / over the last 30.
+               Above 1 means more shares are changing hands as the move runs.
+               Always 5-against-30 regardless of the window on screen — its whole
+               job is to compare the recent leg to the month behind it.
+  turn_mcap    average daily turnover over the window / market capitalisation,
+               as a percent. What share of the company trades on a normal day —
+               comparable across a Rs 500cr microcap and a Rs 5 lakh cr major in
+               a way that a raw rupee turnover never is. This one does follow the
+               window: it describes the same stretch the rest of the row does.
+
 Identity: rows are keyed on ISIN, read from the repo-root registry `stocks.csv`.
 The Yahoo symbol is only how the price is fetched — a rename or a BSE-only
-listing must not change which company a row refers to.
+listing must not change which company a row refers to. Market cap comes from the
+same registry, carried forward on price (see live_mcap).
 
 Data: Yahoo Finance via yfinance. EOD.
 Output: trend.json
 """
 
-import json, os, sys
+import json, math, os, sys
 from datetime import datetime, timezone
 import numpy as np, pandas as pd, yfinance as yf
 
@@ -32,10 +51,12 @@ import numpy as np, pandas as pd, yfinance as yf
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import stock_registry as registry  # noqa: E402
 
-DAYS = 30                # sessions in the window
+WINDOWS = [30, 15, 5]    # every one is computed; the page picks
+BASE_WINDOW = 30         # longest window: sets the chart, the sort and the vol baseline
+VOL_RECENT = 5           # "now" leg of the volume ratio
 FETCH = "4mo"
-QUIET_DAY = 5.0          # a single move above this is an "event", not a grind
-STRONG_UP = 20           # up-days out of DAYS needed to call it a grind
+QUIET_DAY = 15.0         # a single move above this is an "event", not a grind
+STRONG_UP_FRAC = 2 / 3   # share of the window that must close up to call it a grind
 MIN_TURNOVER_CR = 1.0
 BATCH = 40
 
@@ -46,49 +67,133 @@ UNIVERSE = ["IONEXCHANG.NS","WABAG.NS","JASH.NS","KSB.NS","KIRLOSBROS.NS",
  "RELIANCE.NS","HDFCBANK.NS","TCS.NS","SUNPHARMA.NS","LT.NS"]
 
 
+def strong_up(days):
+    """Up-days needed to call a window a grind: two thirds of it, rounded up.
+
+    Fixing this at 20 would have meant 20-of-30 (a real bar) but 20-of-15
+    (impossible). As a fraction it reads the same at every length: 20/30, 10/15,
+    4/5. Five sessions is still a coin flip dressed as a signal — 4-of-5 happens
+    to noise about one time in six — which is why the page says so.
+    """
+    return math.ceil(STRONG_UP_FRAC * days)
+
+
 def verdict(up_days, total, biggest, days):
     """Plain-English label. Deliberately only four outcomes."""
     if biggest > QUIET_DAY:
-        return "one big day"           # an event, not a grind — you already heard about it
-    if up_days >= STRONG_UP and total > 0:
+        return "one big day"          # an event, not a grind — you already heard about it
+    if up_days >= strong_up(days) and total > 0:
         return "quiet climb"          # the thing we are hunting
-    if (days - up_days) >= STRONG_UP and total < 0:
+    if (days - up_days) >= strong_up(days) and total < 0:
         return "quiet slide"
     return "no pattern"
+
+
+def live_mcap(meta, last_close):
+    """Market cap in Rs crore, at today's price.
+
+    stocks.csv holds a market cap and the price it was taken at. The share count
+    implied by those two (mcap / price) is what does not move day to day, so
+    carrying it forward on the latest close gives a cap that tracks the stock
+    instead of freezing at the extract date. Without a usable price we fall back
+    to the stored figure and let it be slightly stale rather than wrong.
+    """
+    try:
+        mcap = float(meta.get("mcap_cr") or 0)
+        price = float(meta.get("price") or 0)
+    except (TypeError, ValueError):
+        return None
+    if mcap <= 0:
+        return None
+    if price > 0 and last_close > 0:
+        moved = last_close / price
+        # A close sitting far from the extract price is more likely a split or a
+        # bonus issue than a genuine re-rating, and rolling the cap forward through
+        # one would divide the company by the split factor. Outside a plausible
+        # band, keep the figure that was true at the extract instead of publishing
+        # a confidently wrong one.
+        if 0.2 <= moved <= 5.0:
+            return mcap * moved
+    return mcap
+
+
+def window_stats(closes, turnover, days, mcap):
+    """Everything the board shows for one window length."""
+    if len(closes) < days + 1:
+        return None
+    w = closes[-(days + 1):]
+    daily = (w[1:] / w[:-1] - 1) * 100
+    total = (w[-1] / w[0] - 1) * 100
+
+    up_days = int((daily > 0).sum())
+    biggest = float(np.abs(daily).max())
+
+    # longest run of consecutive up days, and the median daily move ignoring
+    # direction. Neither has a column at the moment; both are two lines to compute
+    # and would need a rescan to bring back, so they ride along in the JSON.
+    best = run = 0
+    for v in daily:
+        run = run + 1 if v > 0 else 0
+        best = max(best, run)
+
+    turn = float(np.mean(turnover[-days:])) if turnover is not None and len(turnover) >= days else None
+
+    return {
+        "up_days": up_days,
+        "days": days,
+        "total": round(total, 1),
+        "biggest": round(biggest, 1),
+        "verdict": verdict(up_days, total, biggest, days),
+        "strong_up": strong_up(days),
+        "turnover_cr": round(turn, 2) if turn is not None else None,
+        # turnover as a share of the company, in percent per day
+        "turn_mcap": round(turn / mcap * 100, 3) if (turn is not None and mcap) else None,
+        "thin": bool(turn is not None and turn < MIN_TURNOVER_CR),
+        "typical": round(float(np.median(np.abs(daily))), 2),
+        "streak": best,
+    }
 
 
 def analyse(symbol, df, meta=None):
     if df is None or df.empty:
         return None
     df = df.dropna(subset=["Close"])
-    if len(df) < DAYS + 1:
+    if len(df) < BASE_WINDOW + 1:
         return None
 
-    w = df.iloc[-(DAYS + 1):]
-    closes = w["Close"].to_numpy(float)
-    daily = (closes[1:] / closes[:-1] - 1) * 100
-    total = (closes[-1] / closes[0] - 1) * 100
-
-    up_days = int((daily > 0).sum())
-    biggest = float(np.abs(daily).max())
-    typical = float(np.median(np.abs(daily)))
-
-    # longest run of consecutive up days — the most literal reading of "continuously up"
-    best = run = 0
-    for v in daily:
-        run = run + 1 if v > 0 else 0
-        best = max(best, run)
-
-    # how much of the whole move came from the single largest day
-    biggest_share = min(100.0, abs(biggest / total) * 100) if abs(total) > 0.01 else 100.0
-
-    turnover = None
-    if "Volume" in w:
-        tv = (w["Close"] * w["Volume"]).dropna().tail(20)
-        if len(tv):
-            turnover = float(tv.median()) / 1e7
-
+    frame = df.iloc[-(BASE_WINDOW + 1):]
+    closes = frame["Close"].to_numpy(float)
     meta = meta or {}
+    mcap = live_mcap(meta, float(closes[-1]))
+
+    # Turnover in Rs crore per session, over the whole fetched history so a
+    # 30-session window still has 30 sessions of it to average.
+    turnover = volume = None
+    if "Volume" in df:
+        vol = df["Volume"].astype(float)
+        turnover = ((df["Close"] * vol).dropna() / 1e7).to_numpy(float)
+        volume = vol.dropna().to_numpy(float)
+
+    windows = {}
+    for n in WINDOWS:
+        st = window_stats(closes, turnover, n, mcap)
+        if st is not None:
+            windows[str(n)] = st
+    if str(BASE_WINDOW) not in windows:
+        return None
+
+    # Volume ratio: the recent leg against the month behind it. Averages, not
+    # sums — a sum of 5 sessions over a sum of 30 would read 0.17 for a stock
+    # trading perfectly evenly, which tells you nothing without dividing it back
+    # out. At 1.00 the last week traded like the month; at 2.00, twice as heavily.
+    vol_ratio = None
+    if volume is not None and len(volume) >= BASE_WINDOW:
+        base = float(np.mean(volume[-BASE_WINDOW:]))
+        if base > 0:
+            vol_ratio = float(np.mean(volume[-VOL_RECENT:])) / base
+
+    daily = (closes[1:] / closes[:-1] - 1) * 100
+
     # BSE-only listings have no NSE symbol — their scrip code is the right short
     # label there, and the exchange field below tells the UI to say so.
     display = (meta.get("nse") or meta.get("bse")
@@ -101,20 +206,13 @@ def analyse(symbol, df, meta=None):
         "exchange": "BSE" if symbol.endswith(".BO") else "NSE",
         "name": meta.get("name") or display,
         "industry": meta.get("industry_group") or None,
-        "up_days": up_days,
-        "days": DAYS,
-        "total": round(total, 1),
-        "typical": round(typical, 2),
-        "biggest": round(biggest, 1),
-        "biggest_share": round(biggest_share),
-        "streak": best,
-        "recent_up": int((daily[-5:] > 0).sum()),
-        "verdict": verdict(up_days, total, biggest, DAYS),
-        "turnover_cr": round(turnover, 1) if turnover is not None else None,
-        "thin": bool(turnover is not None and turnover < MIN_TURNOVER_CR),
+        "mcap_cr": round(mcap, 1) if mcap else None,
+        "vol_ratio": round(vol_ratio, 2) if vol_ratio is not None else None,
+        "recent_up": int((daily[-VOL_RECENT:] > 0).sum()),
+        "windows": windows,
         "last": round(float(closes[-1]), 2),
         "daily": [round(float(v), 2) for v in daily],
-        "dates": [d.strftime("%Y-%m-%d") for d in w.index[1:]],
+        "dates": [d.strftime("%Y-%m-%d") for d in frame.index[1:]],
     }
 
 
@@ -141,19 +239,20 @@ def main():
     universe = UNIVERSE
     if len(sys.argv) > 1:
         universe = registry.read_universe(sys.argv[1])
-    print(f"{len(universe)} symbols, {DAYS}-session window")
+    print(f"{len(universe)} symbols, windows {WINDOWS} (base {BASE_WINDOW})")
 
-    # Identity comes from stocks.csv. A symbol the registry does not know is
-    # still scanned — it just carries no ISIN, and the run says how many.
+    # Identity — and market cap — come from stocks.csv. A symbol the registry does
+    # not know is still scanned; it just carries no ISIN and no cap, and the run
+    # says how many.
     try:
         meta = registry.by_yahoo()
         print(f"  registry: {len(meta)} companies with a price symbol")
     except FileNotFoundError:
         meta = {}
-        print("  note: stocks.csv not found — rows will carry no ISIN")
+        print("  note: stocks.csv not found — rows will carry no ISIN or market cap")
     unknown = sum(1 for t in universe if t not in meta)
     if unknown:
-        print(f"  {unknown} symbols not in the registry (no ISIN)")
+        print(f"  {unknown} symbols not in the registry (no ISIN, no market cap)")
 
     frames = fetch(universe)
     rows, failed = [], []
@@ -161,24 +260,34 @@ def main():
         r = analyse(t, frames.get(t), meta.get(t))
         (rows.append(r) if r else failed.append(t))
 
-    # sort: quiet climbs first, then by up-day count, then by size of move
+    # sort on the base window: quiet climbs first, then by up-day count, then by
+    # size of move. The page re-sorts when you switch windows.
     order = {"quiet climb": 0, "no pattern": 1, "one big day": 2, "quiet slide": 3}
-    rows.sort(key=lambda r: (order[r["verdict"]], -r["up_days"], -r["total"]))
+    base = lambda r: r["windows"][str(BASE_WINDOW)]
+    rows.sort(key=lambda r: (order[base(r)["verdict"]], -base(r)["up_days"], -base(r)["total"]))
 
     json.dump({"generated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                "identity": "isin",         # rows are keyed on ISIN, not ticker
-               "days": DAYS, "requested": len(universe), "resolved": len(rows),
+               "windows": WINDOWS, "base_window": BASE_WINDOW,
+               "vol_recent": VOL_RECENT, "quiet_day": QUIET_DAY,
+               "days": BASE_WINDOW,        # legacy key: length of the shipped chart
+               "requested": len(universe), "resolved": len(rows),
                "failed": failed, "rows": rows},
               open("trend.json", "w"), separators=(",", ":"))
 
     print(f"\n{len(rows)} scored, {len(failed)} unresolved")
     if failed:
         print("unresolved: " + ", ".join(failed))
-    print(f"\n{'symbol':<15}{'up days':>9}{'30d %':>8}{'typical':>9}{'biggest':>9}{'streak':>8}  verdict")
+    print(f"\n{'symbol':<15}{'up days':>9}{str(BASE_WINDOW)+'d %':>8}{'biggest':>9}"
+          f"{'vol5/30':>9}{'turn/mcap':>11}{'mcap cr':>12}  verdict")
     for r in rows:
-        print(f"{r['symbol']:<15}{str(r['up_days'])+'/'+str(DAYS):>9}{r['total']:>8.1f}"
-              f"{r['typical']:>9.2f}{r['biggest']:>9.1f}{r['streak']:>8}  {r['verdict']}"
-              f"{'  THIN' if r['thin'] else ''}")
+        b = base(r)
+        vr = f"{r['vol_ratio']:>9.2f}" if r["vol_ratio"] is not None else f"{'-':>9}"
+        tm = f"{b['turn_mcap']:>10.3f}%" if b["turn_mcap"] is not None else f"{'-':>11}"
+        mc = f"{r['mcap_cr']:>12,.0f}" if r["mcap_cr"] else f"{'-':>12}"
+        print(f"{r['symbol']:<15}{str(b['up_days'])+'/'+str(BASE_WINDOW):>9}"
+              f"{b['total']:>8.1f}{b['biggest']:>9.1f}{vr}{tm}{mc}  {b['verdict']}"
+              f"{'  THIN' if b['thin'] else ''}")
 
 
 if __name__ == "__main__":
