@@ -8,8 +8,8 @@ only things shared are the ISIN registry (`../stocks.csv`) and the board switche
 
 Live at: https://jalanaditya30.github.io/Sector-data/quiet/
 
-Scans **every listed company** with a tradable listing — 1,989 names in
-`universe.txt`, generated from the repo-root ISIN registry `../stocks.csv`.
+Scans **every NSE-listed company** — 1,861 names in `universe.txt`, generated
+from the repo-root ISIN registry `../stocks.csv`.
 Three windows — **5, 15 and 30 sessions** — are computed for every stock and
 switchable on the page.
 The `refresh-quiet` GitHub Action rebuilds `trend.json` at least hourly while NSE is
@@ -56,14 +56,29 @@ is still going, not to screen on.
 
 ## Getting to a stock
 
-Two small buttons stand in front of every company name — **S** for Screener,
-**T** for TradingView — so the common jump takes one click straight from the
-board. They open in a new tab.
+Two small buttons sit just after every company name — **S** for Screener, **T**
+for TradingView — so the common jump takes one click straight from the board.
+They open in a new tab.
 
-The company name itself opens a dialog on the page: a **candlestick chart of the
-last 30 sessions with volume underneath**, the same daily-moves bar chart the row
-carries, the window's numbers, and the same two links. Hover any candle for its
-open, high, low, close and volume. When the board is on a 5- or 15-session window, the chart still shows
+The company name itself opens the dialog: a **60-session candlestick chart with
+volume welded underneath**, the daily-moves bar chart, the window's numbers, and
+the same two links.
+
+The chart is modelled on TradingView, because that is what it is read against:
+
+- **One chart, not two.** Price and volume share an x scale in a single SVG, so a
+  candle and its volume bar line up by construction. The volume pane sits
+  directly beneath the candles with a hairline between them.
+- **A crosshair** follows the pointer across both panes. It reads out the
+  session's date, open, high, low, close, percent change and volume in the legend
+  above the chart, and drops a price chip on the right axis and a date chip on the
+  bottom one. Drag along it on a touchscreen.
+- **A dashed line across the volume pane at the 60-session average**, labelled, so
+  today's bar can be judged against normal at a glance.
+- **It stays dark** whichever way the site theme is set — flipping a chart's
+  polarity changes how the candles read, and this one is meant to look like the
+  thing you would check it against. Its colours are TradingView's literals, not
+  the site's variables. When the board is on a 5- or 15-session window, the chart still shows
 all 30 and shades the ones being scored. Escape, the ×, or a click outside closes it.
 
 Both links are the same shape: a fixed prefix plus this row's symbol.
@@ -71,16 +86,26 @@ Both links are the same shape: a fixed prefix plus this row's symbol.
     https://www.screener.in/company/ASIANTILES/
     https://www.tradingview.com/chart/?symbol=NSE:ASIANTILES
 
-For the 128 companies with no NSE listing, the symbol is the BSE scrip code and
-both links carry that instead (`.../company/543225/`, `?symbol=BSE:543225`); the
-dialog says so when it happens.
+Every stock on the board is NSE-listed, so both links always carry a real ticker.
 
-Drawing candles means the scan now ships raw bars — `ohlcv`, one
-`[open, high, low, close, volume]` per session, 31 of them so the first session's
-move is computable. The daily percent moves are no longer shipped: they are one
-division away from consecutive closes, and sending both would be sending the same
-numbers twice. `trend.json` grows from roughly 1.6 MB to 4 MB (about 1 MB over the
-wire, gzipped).
+## Two files, and why
+
+A run writes **two** feeds:
+
+| file | holds | size |
+|---|---|---|
+| `trend.json` | everything the board draws, including `daily` for the row bar chart | ~1.9 MB raw, **0.4 MB gzipped** |
+| `bars.json` | 60 sessions of OHLCV per stock, columnar, keyed on ISIN | ~3.9 MB raw, 1.4 MB gzipped |
+
+Keeping the bars in `trend.json` would have meant waiting on a 6 MB download
+before the first row appeared, for a chart most rows never open. The board blocks
+only on the small file; the bars are fetched in the background once the table is
+up, and merged in when they land. Open a dialog before they arrive and it shows a
+placeholder and fills itself in.
+
+Dates ship once as a shared calendar rather than per stock — every stock is NSE
+now, so nearly all of them trade the same sessions; the handful that differ carry
+their own.
 
 ## Filtering
 
@@ -105,6 +130,10 @@ Four gates, all independent:
   the readings themselves spreads the track over the companies instead: every
   stop lands on a real value and both ends are exact.
 
+  **Dragging does not filter.** The handles and the readout track your finger,
+  and the board is recomputed once, when you let go. Recomputing on every step of
+  a drag made the handle stutter and threw away every result but the last one.
+
   A row with no reading for that column is dropped while its slider is narrowed —
   a blank is not a number. Pushing both handles back to the ends clears the
   filter. Hiding a column clears its slider, so nothing filters invisibly, and
@@ -127,6 +156,14 @@ layout. Three things keep it usable:
 
 Together: about half a second before the first rows are on screen, against
 roughly six before.
+
+## Day and night
+
+The button at the end of the board switcher flips the whole site between light
+and dark; the choice is remembered and applied before the first paint, so no page
+flashes white on the way in. With nothing chosen yet it follows the operating
+system. The dialog's candlestick chart is the one thing that ignores it — see
+above.
 
 ## Everything is remembered
 
@@ -171,7 +208,6 @@ remembered in the browser.
 | `last 5` | up days in the most recent week, to catch one rolling over. Fixed at 5 — it does not follow the window |
 | `verdict` | the label from the table above |
 | `last N sessions` | one bar per session, oldest left, height = size of the move |
-| `Nd candles` | the same window as candlesticks — open, high, low, close per session. The dialog has the readable version with volume and prices |
 
 `best run`, `typical day` and `biggest day` are off the board for now. The scan
 still computes all three and ships them in `trend.json`, so putting a column back
@@ -203,21 +239,21 @@ current. 15 is the check that it is still running; 5 is a glance, not a screen.
 
 ## Adding stocks
 
-Edit `../stocks.csv` — the ISIN-keyed registry of every listed company — and run
-`python build_universe.py` from the repo root. That rewrites `universe.txt`, one
-company per line as `<ISIN>,<Yahoo symbol>`:
+Edit `../stocks.csv` — the ISIN-keyed registry of every NSE-listed company — and
+run `python build_universe.py` from the repo root. That rewrites `universe.txt`,
+one company per line as `<ISIN>,<Yahoo symbol>`:
 
     INE002A01018,RELIANCE.NS
-    INE0BWS23018,543225.BO
+    INE467B01029,TCS.NS
 
 (A bare ticker per line still parses, so an older file keeps working.) Unresolved
 tickers are printed at the end of the Actions log, never silently dropped.
 
 ## Identity
 
-Rows are keyed on **ISIN**, not ticker: tickers get renamed and the 128 BSE-only
-companies never had one. Each row shows the company name with its ticker and ISIN
-beneath, and the filter box matches any of the three.
+Rows are keyed on **ISIN**, not ticker: tickers get renamed, and the identity
+should not move when they do. Each row shows the company name with its ticker and
+ISIN beneath, and the filter box matches any of the three.
 
 ## Data
 

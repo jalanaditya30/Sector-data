@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Trend Scanner — NSE</title>
+<script>/* set the theme before first paint, so the page never flashes light */
+(function(){try{var t=localStorage.getItem("sector-data:theme");if(!t)t=window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 <link rel="stylesheet" href="../boards.css">
 <style>
 :root{
@@ -15,6 +17,25 @@
   --hover:#f5f8fd; --zebra:#fafcff; --grid:#dbe3ee; --recent:#eff4fb;
   --shadow:0 1px 2px rgba(19,25,34,.05),0 4px 16px rgba(19,25,34,.06);
 }
+
+/* ---------- night ----------
+   Same variable names, different values: nothing below this line in the
+   stylesheet has to know which way the theme is set. */
+:root[data-theme=dark]{
+  --bg:#0e1117; --card:#161a21; --line:#222833; --line2:#303845;
+  --ink:#e6e9ef; --dim:#9aa4b2; --faint:#6d7885;
+  --up:#2ea36a; --down:#e5564a; --accent:#5b9cf6; --gold:#d3a04a;
+  --upsoft:#12281e; --downsoft:#2a1513; --goldsoft:#282013;
+  --hover:#1b212b; --zebra:#131820; --grid:#2a313d; --recent:#1a2130;
+  --shadow:0 1px 2px rgba(0,0,0,.45),0 4px 16px rgba(0,0,0,.4);
+}
+:root[data-theme=dark] .chip.up{border-color:#22513a}
+:root[data-theme=dark] .chip.down{border-color:#5a2a25}
+:root[data-theme=dark] .chip.gold{border-color:#4d3d1c}
+:root[data-theme=dark] .v-quiet-climb,:root[data-theme=dark] .st-up{border-color:#22513a}
+:root[data-theme=dark] .v-quiet-slide,:root[data-theme=dark] .st-down{border-color:#5a2a25}
+:root[data-theme=dark] .v-one-big-day,:root[data-theme=dark] .st-turn{border-color:#4d3d1c;color:#d3a04a;background:#282013}
+:root[data-theme=dark] .modal-back{background:rgba(0,0,0,.6)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);
   font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
@@ -183,6 +204,9 @@ th[data-k=s5]{opacity:.62}
   <a class="bbtn" href="../quiet/">Quiet Climbers</a>
   <span class="sep"></span>
   <span class="hint">ranked on 15-session score</span>
+
+  <button class="bbtn thbtn" type="button" id="theme" aria-pressed="false"
+          title="Switch between day and night"><span class="ic">◐</span></button>
 </nav>
 
 <header>
@@ -468,5 +492,6 @@ fetch("trend.json?t="+Date.now())
       ? "Opened straight from disk, so the page cannot read trend.json. Serve the folder over HTTP instead."
       : "trend.json is missing or unreadable ("+e.message+")."));
 </script>
+<script src="../theme.js"></script>
 </body>
 </html>

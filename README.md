@@ -6,10 +6,13 @@ market. 139 sectors, ~3,460 constituent rows, weighted sector aggregates across
 breadth.
 
 Every stock on every board is identified by its **ISIN**, from the registry in
-[`stocks.csv`](stocks.csv) — 1,999 listed companies, 1,989 of them with a tradable
-NSE or BSE listing. Tickers get renamed (MACROTECH → LODHA) and BSE-only companies
-have none at all, so the ticker is only how a price is fetched; the ISIN is what a
-row *is*. The filter box on all three boards searches it.
+[`stocks.csv`](stocks.csv) — **1,861 NSE-listed companies**. Tickers get renamed
+(MACROTECH → LODHA), so the ticker is only how a price is fetched; the ISIN is
+what a row *is*. The filter box on all three boards searches it.
+
+The registry was cut to NSE-only: 138 rows were dropped, 128 listed on BSE alone
+and 10 on neither. They had no NSE ticker, which meant no usable Screener or
+TradingView link and thinner coverage on the price feed.
 
 ## Three independent boards in this repo
 
@@ -23,11 +26,14 @@ is, and the board switcher in `boards.css`.
 | **Trend Scanner** | [`/trend/`](https://jalanaditya30.github.io/Sector-data/trend/) | which stocks are moving *cleanly* (drift × consistency², 10/5 sessions) | `refresh-trend` |
 | **Quiet Climbers** | [`/quiet/`](https://jalanaditya30.github.io/Sector-data/quiet/) | which stocks rise *a little, most days, for weeks* (5 / 15 / 30 sessions, pure counting) | `refresh-quiet` |
 
-Both stock boards scan the same universe — **every listed company** in
-`stocks.csv` that has a tradable listing (1,989 names), written out as
-`trend/universe.txt` and `quiet/universe.txt` by `python build_universe.py`.
+Both stock boards scan the same universe — **every NSE-listed company** in
+`stocks.csv` (1,861 names), written out as `trend/universe.txt` and
+`quiet/universe.txt` by `python build_universe.py`.
 
-Every board carries a row of buttons switching between the three.
+Every board carries a row of buttons switching between the three, and a
+**day/night toggle**. The theme is remembered and applied before first paint, so
+no page flashes white on the way in; with nothing chosen it follows the operating
+system.
 
 ## The one thing that matters: the data feed
 
@@ -51,7 +57,7 @@ symbol intact. What's left is a price feed, and that dictates every design choic
 | `build_universe.py` | regenerates `trend/universe.txt` and `quiet/universe.txt` from the registry. |
 | `sectors_config.json` | sector → constituents → NSE ticker + weight. The curated Tijori export; left untouched. |
 | `build_heatmap.py` | pulls prices, computes returns, aggregates both taxonomies, writes `data.json`. |
-| `boards.css` | the shared board switcher, used by all three pages. |
+| `boards.css`, `theme.js` | the shared board switcher and the day/night toggle, used by all three pages. |
 | `.github/workflows/refresh.yml` | GitHub Actions cron: rebuild after close, commit `data.json`. |
 | `requirements.txt` | `yfinance`, `pandas`. |
 
@@ -63,7 +69,7 @@ The heatmap shows both, labelled per sector and switchable with the
 | | sectors | constituents | weights |
 |---|---|---|---|
 | **curated** | the 80 Tijori sectors from `sectors_config.json` | 1,473 | hand-set in the export |
-| **all listed** | 59 NSE industry groups built from `stocks.csv` | 1,989 — every listed company | market capitalisation |
+| **all listed** | 59 NSE industry groups built from `stocks.csv` | 1,861 — every listed company | market capitalisation |
 
 They overlap on purpose: a stock sits in its curated sector *and* in its industry
 group, and each sector aggregate is correct within its own taxonomy. Adding a
@@ -96,9 +102,8 @@ full 80-sector board, use path A/B.
 ## Caveats (read before trusting a number)
 - **Coverage:** a handful of symbols may not resolve on Yahoo (renames, thin small-caps,
   recent listings). Unresolved tickers fall back to your snapshot value and are listed in
-  `data.json → missing`. Check that list after the first run. Microcaps and BSE-only
-  names resolve less reliably than the large caps — the wider the universe, the longer
-  that list.
+  `data.json → missing`. Check that list after the first run. Microcaps resolve less
+  reliably than large caps — the wider the universe, the longer that list.
 - **Identity gaps:** ~320 curated constituents are codes `stocks.csv` has never seen
   (delisted, merged, or Tijori codes that no longer trade). They still show, with their
   snapshot, but carry no ISIN.

@@ -12,6 +12,9 @@
   border-bottom:1px solid var(--line,#e2e8f1);
 }
 .boards .sep{flex:1}
+/* theme toggle: one button, shown on every board */
+.thbtn{font-size:13px;line-height:1;padding:6px 9px}
+.thbtn .ic{display:inline-block;width:14px;text-align:center}
 .boards .hint{
   font-size:11.5px;color:var(--faint,#93a0b4);white-space:nowrap;
 }
