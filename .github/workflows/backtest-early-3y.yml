@@ -1,0 +1,43 @@
+name: backtest-early-3y
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: backtest-early-3y
+  cancel-in-progress: false
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install "yfinance>=0.2.40" "pandas>=2.0" "numpy>=1.24"
+      - name: run three-year V4 walk-forward model lab
+        working-directory: early
+        run: python three_year_backtest.py
+      - name: commit results safely
+        run: |
+          git config user.name "early-radar-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add -f early/three_year_backtest.json
+          if git diff --cached --quiet; then
+            echo "No backtest changes to commit"
+            exit 0
+          fi
+          git commit -m "early: 3y V4 model lab $(date -u +%FT%TZ)"
+          for attempt in 1 2 3 4; do
+            echo "push attempt $attempt"
+            git fetch origin main
+            git rebase origin/main || { git rebase --abort || true; sleep 4; continue; }
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            sleep $((attempt * 4))
+          done
+          echo "Failed to push 3y backtest results after retries"
+          exit 1
