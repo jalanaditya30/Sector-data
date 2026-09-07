@@ -1,0 +1,32 @@
+name: refresh-early
+on:
+  schedule:
+    # Discovery signals are based on completed daily bars. Run once after NSE close.
+    - cron: "35 10 * * 1-5"   # ~16:05 IST
+  workflow_dispatch:
+  repository_dispatch:
+    types: [refresh-early]
+permissions:
+  contents: write
+concurrency:
+  group: refresh-early
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install "yfinance>=0.2.40" "pandas>=2.0" "numpy>=1.24"
+      - name: build full-universe radar
+        working-directory: early
+        run: python early_scan.py ../trend/universe.txt
+      - name: commit
+        run: |
+          git config user.name "early-radar-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add -f early/early.json
+          git diff --cached --quiet || git commit -m "early: refresh $(date -u +%FT%TZ)"
+          git push
