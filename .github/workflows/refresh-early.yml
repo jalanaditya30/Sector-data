@@ -14,19 +14,22 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 50
+    timeout-minutes: 55
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - run: pip install "yfinance>=0.2.40" "pandas>=2.0" "numpy>=1.24"
-      - name: build full-universe radar
+      - name: build full-universe radar and archive today's signals
         working-directory: early
         run: python early_scan.py ../trend/universe.txt
+      - name: update prospective forward-performance test
+        working-directory: early
+        run: python backtest.py
       - name: commit
         run: |
           git config user.name "early-radar-bot"
           git config user.email "bot@users.noreply.github.com"
-          git add -f early/early.json
+          git add -f early/early.json early/backtest.json early/history/
           git diff --cached --quiet || git commit -m "early: refresh $(date -u +%FT%TZ)"
           git push
