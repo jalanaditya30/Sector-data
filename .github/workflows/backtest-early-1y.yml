@@ -14,16 +14,32 @@ jobs:
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - run: pip install "yfinance>=0.2.40" "pandas>=2.0" "numpy>=1.24"
-      - name: run one-year daily walk-forward test
+      - name: run one-year daily walk-forward model lab
         working-directory: early
         run: python one_year_backtest.py
-      - name: commit results
+      - name: commit results safely
         run: |
           git config user.name "early-radar-bot"
           git config user.email "bot@users.noreply.github.com"
           git add -f early/one_year_backtest.json
-          git diff --cached --quiet || git commit -m "early: 1y backtest $(date -u +%FT%TZ)"
-          git push
+          if git diff --cached --quiet; then
+            echo "No backtest changes to commit"
+            exit 0
+          fi
+          git commit -m "early: 1y model lab $(date -u +%FT%TZ)"
+          for attempt in 1 2 3 4; do
+            echo "push attempt $attempt"
+            git fetch origin main
+            git rebase origin/main || { git rebase --abort || true; sleep 4; continue; }
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            sleep $((attempt * 4))
+          done
+          echo "Failed to push backtest results after retries"
+          exit 1
