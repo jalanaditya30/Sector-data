@@ -11,17 +11,13 @@ Independent evidence families:
   * relative strength vs Nifty and own industry group
   * trend efficiency and proximity to a 60-session breakout
 
-V2 adds an explicit lifecycle:
+V2 lifecycle:
   DISCOVERY -> CONFIRMING -> MOMENTUM -> LATE/EVENT
 
-A large move is therefore not automatically a better result. The ranking rewards
-participation and improving price behaviour while price is still in a reasonable
-"discovery zone", and penalises event candles, extreme extension, stale trading,
-and impractically thin liquidity.
-
-Universe: ../trend/universe.txt. If Yahoo fails for an NSE ticker and stocks.csv
-contains a BSE code, the scanner makes a second attempt through <code>.BO so that
-small/micro-cap coverage does not disappear silently because of a symbol problem.
+The current board is overwritten for convenience, but every run also writes a
+compact dated signal snapshot under early/history/. That archive is the evidence
+base used by backtest.py; it prevents hindsight from rewriting when a stock was
+first discovered.
 """
 import json, math, os, sys
 from datetime import datetime, timezone
@@ -40,11 +36,12 @@ MIN_HISTORY = 66
 RECENT = 5
 BASE = 20
 LIQ_LOOKBACK = 20
-MIN_TURNOVER_CR = 0.25       # retain microcaps, but ranking penalises below this
-PRACTICAL_TURNOVER_CR = 0.75 # soft preference, not an exclusion
+MIN_TURNOVER_CR = 0.25
+PRACTICAL_TURNOVER_CR = 0.75
 MAX_STALE_FRAC = 0.35
 EVENT_DAY = 15.0
 WINSOR_PCT = 6.0
+ARCHIVE_STAGES = {"Discovery", "Confirming", "Watch"}
 
 
 def fetch(tickers):
@@ -115,7 +112,6 @@ def analyse(symbol, df, meta, bench, source_symbol=None):
         return None
 
     r5, r10, r20, r60 = (ret(close, n) for n in (5, 10, 20, 60))
-    # Dailyised acceleration: recent pace minus the longer background pace.
     accel = (r5/5) - (r20/20)
     accel_mid = (r10/10) - (r60/60)
     rvol, turn = turnover_metrics(df)
@@ -135,8 +131,7 @@ def analyse(symbol, df, meta, bench, source_symbol=None):
 
     return {
       "isin": meta.get("isin"), "symbol": display,
-      "yahoo": source_symbol or symbol,
-      "requested_yahoo": symbol,
+      "yahoo": source_symbol or symbol, "requested_yahoo": symbol,
       "exchange": "BSE" if (source_symbol or symbol).endswith(".BO") else "NSE",
       "fallback": bool(source_symbol and source_symbol != symbol),
       "name": meta.get("name") or display,
@@ -151,8 +146,7 @@ def analyse(symbol, df, meta, bench, source_symbol=None):
       "eff20": round(eff, 3) if eff is not None else None,
       "market_rs": round(market_rs, 2) if market_rs is not None else None,
       "from_high60": round(from_high, 2) if from_high is not None else None,
-      "near_breakout": near_breakout,
-      "biggest20": round(biggest, 2),
+      "near_breakout": near_breakout, "biggest20": round(biggest, 2),
       "event": bool(biggest > EVENT_DAY),
       "thin": bool(turn is not None and turn < MIN_TURNOVER_CR),
       "stale": bool(stale > MAX_STALE_FRAC)
@@ -160,16 +154,8 @@ def analyse(symbol, df, meta, bench, source_symbol=None):
 
 
 def discovery_quality(r):
-    """Return transparent component score and lifecycle stage.
-
-    Score intentionally peaks before the move becomes extreme. Thresholds are
-    hypotheses to be validated prospectively; they are kept readable so we can
-    later see exactly why a name ranked rather than fitting an opaque model.
-    """
     flags = []
     score = 0.0
-
-    # 1) Participation: useful when increasing, but 20x is not 10x better than 2x.
     rv = r["rvol"]
     if rv is not None:
         if 1.25 <= rv <= 4.0:
@@ -179,7 +165,6 @@ def discovery_quality(r):
         elif rv > 8.0:
             flags.append("turnover_extreme"); score += 0.35
 
-    # 2) OBV: give divergence extra weight because participation can lead price.
     if r["obv_slope"] is not None and r["obv_slope"] > 0.15:
         flags.append("obv_rising"); score += 1.0
     if r["obv_div"]:
@@ -187,38 +172,28 @@ def discovery_quality(r):
     elif r["obv_high"]:
         flags.append("obv_high"); score += 0.55
 
-    # 3) Price awakening. We prefer positive acceleration before a huge extension.
     if r["accel"] > 0.20 and r["r5"] > 0:
         flags.append("price_waking"); score += 1.0
     if r["accel_mid"] > 0 and r["r10"] > 0:
         flags.append("medium_accel"); score += 0.55
-
-    # 4) Relative strength.
     if r["market_rs"] is not None and r["market_rs"] > 2:
         flags.append("beats_market"); score += 0.8
     if r["sector_rs"] is not None and r["sector_rs"] > 2:
         flags.append("beats_sector"); score += 0.8
-
-    # 5) Structure / location.
     if r["eff20"] is not None and r["eff20"] >= 0.40 and r["r20"] > 0:
         flags.append("cleaning_up"); score += 0.65
     if r["near_breakout"]:
         flags.append("near_breakout"); score += 0.75
 
-    # Discovery-zone reward. A stock up 7-12% with participation is more aligned
-    # with this screen than one already up 35% in a month.
     if 2 <= r["r20"] <= 15:
         flags.append("discovery_zone"); score += 1.35
     elif 15 < r["r20"] <= 22:
         score += 0.45
-
     if 0 < r["r5"] <= 8:
         score += 0.6
     elif r["r5"] > 12:
         score -= 0.7
 
-    # Liquidity stays a SOFT penalty: keep microcaps visible, but do not let a
-    # Rs 6 lakh/day chart outrank a similarly good, actually tradable candidate.
     turn = r["turnover_cr"]
     if turn is not None:
         if turn < MIN_TURNOVER_CR:
@@ -228,18 +203,12 @@ def discovery_quality(r):
         elif turn >= 2:
             score += 0.2
 
-    # Extension/event penalties define the lifecycle rather than deleting names.
     late = (r["r20"] > 30 or r["r5"] > 15 or
             (r["from_high60"] is not None and r["from_high60"] > 5))
-    if r["event"]:
-        score -= 2.0
-    if late:
-        score -= 1.25
-    if r["stale"]:
-        score -= 2.0
+    if r["event"]: score -= 2.0
+    if late: score -= 1.25
+    if r["stale"]: score -= 2.0
 
-    # Lifecycle classification. It describes where the setup is NOW; score ranks
-    # within the useful stages.
     if r["event"] or late:
         stage = "Late / Event"
     elif r["stale"]:
@@ -256,7 +225,6 @@ def discovery_quality(r):
     else:
         stage = "No setup"
 
-    # Stage bonus makes the default ranking explicitly favour early lifecycle.
     score += {"Discovery": 1.5, "Confirming": 1.0, "Watch": 0.2,
               "Momentum": -0.3, "Review": -1.0, "Late / Event": -2.0,
               "No setup": -0.5}.get(stage, 0)
@@ -267,30 +235,24 @@ def add_sector_and_signals(rows):
     groups = {}
     for r in rows:
         groups.setdefault(r["sector"], []).append(r)
-
     sector_stats = {}
     for s, rr in groups.items():
         vals = [x["r20"] for x in rr if x["r20"] is not None]
         rv = [x["rvol"] for x in rr if x["rvol"] is not None]
         sector_stats[s] = {
-          "count": len(rr),
-          "ret20": round(float(np.median(vals)), 2) if vals else None,
+          "count": len(rr), "ret20": round(float(np.median(vals)), 2) if vals else None,
           "rvol": round(float(np.median(rv)), 2) if rv else None,
           "positive20": round(sum(x["r20"] > 0 for x in rr)/len(rr)*100, 1) if rr else None
         }
-
     for r in rows:
         sr = sector_stats[r["sector"]]["ret20"]
         r["sector_rs"] = round(r["r20"]-sr, 2) if sr is not None else None
         flags, score, stage = discovery_quality(r)
-        r["flags"] = flags
-        r["radar_score"] = score
-        r["stage"] = stage
+        r["flags"], r["radar_score"], r["stage"] = flags, score, stage
     return sector_stats
 
 
 def fallback_map(rows_reg):
-    """Map NSE Yahoo ticker -> BSE Yahoo ticker using the stable registry row."""
     out = {}
     for m in rows_reg:
         nse = str(m.get("nse") or "").strip()
@@ -298,6 +260,26 @@ def fallback_map(rows_reg):
         if nse and bse:
             out[nse + ".NS"] = bse + ".BO"
     return out
+
+
+def write_history(payload):
+    """Archive only actionable lifecycle rows; one compact file per UTC date."""
+    day = payload["generated"][:10]
+    hist_dir = os.path.join(os.path.dirname(__file__), "history")
+    os.makedirs(hist_dir, exist_ok=True)
+    keep_fields = ("isin","symbol","yahoo","requested_yahoo","exchange","fallback",
+                   "name","sector","last","stage","radar_score","r5","r20","r60",
+                   "rvol","turnover_cr","obv_slope","obv_div","market_rs","sector_rs",
+                   "eff20","from_high60","flags")
+    signals = [{k:r.get(k) for k in keep_fields} for r in payload["rows"]
+               if r.get("stage") in ARCHIVE_STAGES]
+    snap = {"date": day, "generated": payload["generated"],
+            "method": payload["method"], "benchmark": payload["benchmark"],
+            "requested": payload["requested"], "resolved": payload["resolved"],
+            "signals": signals}
+    with open(os.path.join(hist_dir, day + ".json"), "w") as f:
+        json.dump(snap, f, separators=(",", ":"))
+    return len(signals)
 
 
 def main():
@@ -312,12 +294,9 @@ def main():
     bench = {}
     if bench_df is not None:
         bc = bench_df["Close"].dropna().to_numpy(float)
-        for n in (5, 10, 20, 60):
-            bench[n] = ret(bc, n)
+        for n in (5, 10, 20, 60): bench[n] = ret(bc, n)
 
     frames = fetch(universe)
-
-    # Second chance for unresolved NSE names using a registry BSE code.
     first_failed = [t for t in universe if t not in frames]
     fallback_requested = {t: fb[t] for t in first_failed if t in fb}
     fallback_frames = fetch(list(fallback_requested.values())) if fallback_requested else {}
@@ -327,14 +306,20 @@ def main():
         frame = frames.get(t)
         source = t
         m = meta.get(t, {})
+        used_fallback = False
         if frame is None and t in fallback_requested:
             alt = fallback_requested[t]
             frame = fallback_frames.get(alt)
             if frame is not None:
                 source = alt
-                recovered.append(t)
+                used_fallback = True
         r = analyse(t, frame, m, bench, source_symbol=source) if frame is not None else None
-        (rows.append(r) if r else failed.append(t))
+        if r:
+            rows.append(r)
+            if used_fallback:
+                recovered.append(t)  # count only if fallback ALSO passed analyse()
+        else:
+            failed.append(t)
 
     sectors = add_sector_and_signals(rows)
     stage_order = {"Discovery": 0, "Confirming": 1, "Watch": 2,
@@ -351,9 +336,11 @@ def main():
     }
     with open("early.json", "w") as f:
         json.dump(payload, f, separators=(",", ":"))
+    archived = write_history(payload)
 
     counts = {s: sum(r["stage"] == s for r in rows) for s in stage_order}
-    print(f"wrote early.json — {len(rows)} resolved, {len(failed)} failed, {len(recovered)} recovered via BSE")
+    print(f"wrote early.json — {len(rows)} resolved, {len(failed)} failed, {len(recovered)} truly recovered via BSE")
+    print(f"archived {archived} Discovery/Confirming/Watch signals")
     print("stages: " + ", ".join(f"{k}={v}" for k, v in counts.items()))
     for r in rows[:30]:
         print(f"{r['symbol']:<16} {r['stage']:<13} {r['radar_score']:>5.2f} "
