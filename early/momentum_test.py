@@ -25,6 +25,7 @@ from datetime import datetime, timezone
 
 import numpy as np
 import pandas as pd
+import yfinance as yf
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -35,6 +36,7 @@ import portfolio_sim as base
 SPEC_PATH = os.path.join(HERE, "momentum_decision_rule.json")
 OUT = os.path.join(HERE, "momentum_test_result.json")
 PANEL_CACHE = os.path.join(HERE, ".cache", "momentum_panel.pkl")
+RAW_FRAME_CACHE = os.path.join(HERE, ".cache", "momentum_frames_raw.pkl")
 
 
 def load_spec() -> dict:
@@ -45,6 +47,46 @@ def load_spec() -> dict:
     if not spec.get("registered_before_results"):
         sys.exit("ABORT: specification is not marked as registered before results.")
     return spec
+
+
+def _norm_df(d):
+    if d is None or d.empty:
+        return None
+    d = d.copy()
+    d.index = pd.DatetimeIndex(d.index).tz_localize(None)
+    d = d[~d.index.duplicated(keep="last")].sort_index()
+    return d.dropna(subset=["Close"])
+
+
+def fetch_raw(tickers):
+    """Fetch unadjusted OHLCV for trade prices/turnover, retaining Adj Close for momentum."""
+    os.makedirs(os.path.dirname(RAW_FRAME_CACHE), exist_ok=True)
+    tickers = list(dict.fromkeys(tickers))
+    cached = {}
+    if os.path.exists(RAW_FRAME_CACHE):
+        try:
+            cached = pickle.load(open(RAW_FRAME_CACHE, "rb"))
+        except Exception:
+            cached = {}
+    missing = [t for t in tickers if t not in cached]
+    for i in range(0, len(missing), base.BATCH):
+        ch = missing[i:i + base.BATCH]
+        print(f"fetch raw {i+1}-{i+len(ch)}/{len(missing)}", flush=True)
+        z = yf.download(ch, period=base.PERIOD, interval="1d", group_by="ticker",
+                        auto_adjust=False, progress=False, threads=True)
+        if z is None or z.empty:
+            continue
+        for t in ch:
+            try:
+                d = z[t] if isinstance(z.columns, pd.MultiIndex) else z
+                d = _norm_df(d)
+                if d is not None and not d.empty:
+                    cached[t] = d
+            except Exception:
+                pass
+        with open(RAW_FRAME_CACHE, "wb") as fh:
+            pickle.dump(cached, fh, protocol=pickle.HIGHEST_PROTOCOL)
+    return {t: cached[t] for t in tickers if t in cached}
 
 
 def order_key(day, ticker, seed):
@@ -93,16 +135,19 @@ def build_panel(frames, universe, meta, mid, small, spec):
             p = base.pos(d, day)
             if p < need_hist:
                 continue
-            c = d["Close"].to_numpy(float)[:p + 1]
+            c_raw = d["Close"].to_numpy(float)[:p + 1]
             v = d["Volume"].to_numpy(float)[:p + 1]
-            turn = median_turnover_cr(c, v, inv["turnover_window_sessions"])
+            turn = median_turnover_cr(c_raw, v, inv["turnover_window_sessions"])
             if turn is None or turn < inv["min_turnover_cr_per_day"]:
                 continue
             m = meta.get(t) or {}
             if float(m.get("mcap", 0.0)) < inv["min_mcap_cr"]:
                 continue
-            # 12-1 momentum: return from t-(form+skip) to t-skip.
-            base_px, end_px = c[-(form + skip)], c[-(skip + 1)]
+            # 12-1 momentum uses adjusted close for splits/dividends; turnover and
+            # execution use raw traded prices from the same auto_adjust=False frame.
+            mom_col = "Adj Close" if "Adj Close" in d.columns else "Close"
+            c_mom = d[mom_col].to_numpy(float)[:p + 1]
+            base_px, end_px = c_mom[-(form + skip)], c_mom[-(skip + 1)]
             if not (np.isfinite(base_px) and base_px > 0 and np.isfinite(end_px)):
                 continue
             rows.append({
@@ -232,7 +277,7 @@ def main():
     reg = base.registry.load()
     meta = base.registry.by_yahoo(reg)
     universe = base.registry.read_universe(os.path.join(ROOT, "trend", "universe.txt"))
-    frames = base.fetch(universe + [base.MID] + base.SMALL_CANDIDATES)
+    frames = fetch_raw(universe + [base.MID] + base.SMALL_CANDIDATES)
     mid = frames.get(base.MID)
     if mid is None:
         raise RuntimeError("Midcap benchmark unavailable")
