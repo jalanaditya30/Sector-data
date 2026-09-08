@@ -1,0 +1,48 @@
+{
+  "hypothesis_id": "MOM_12_1_TOPDECILE_V1",
+  "registered_before_results": true,
+  "registered_date": "2026-09-08",
+  "question": "Does a plain 12-1 momentum ranking, applied to the liquid NSE universe and run as a real portfolio after costs, beat random picks from that same universe on the same days?",
+  "why_this_specification": "Externally specified, not mined from this dataset. 12-month formation with a 1-month skip is the standard academic construction and involves no fitting to Indian data. No variants are tested. The prior V6.2 failure showed that price location carried whatever edge R2 appeared to have; this test asks whether that price-location effect stands on its own once measured properly.",
+  "signal": {
+    "formation_return_sessions": 252,
+    "skip_recent_sessions": 21,
+    "selection": "top decile by formation return, computed cross-sectionally within the investable set on each sample date",
+    "sampling": "every 5th benchmark session",
+    "entry": "next benchmark session open",
+    "holding_sessions": 40
+  },
+  "investable_set": {
+    "min_mcap_cr": 1000.0,
+    "min_turnover_cr_per_day": 5.0,
+    "turnover_window_sessions": 60,
+    "note": "Only point-in-time computable filters are applied historically. EQ-series and ASM/GSM screens are today-only and are deliberately NOT applied to the backtest universe."
+  },
+  "costs": {"turnover_ge_2cr": 0.005, "turnover_0.75_to_2cr": 0.015, "below_0.75cr": "excluded"},
+  "control": {
+    "type": "unmatched random draw from the same day's investable set",
+    "rationale": "Deliberately NOT matched on price location. Matching on the very effect under test would define the answer to zero. Sector is also left unmatched: any sector tilt momentum produces is part of the strategy, not a confound to be removed.",
+    "repetitions": 1000
+  },
+  "nuisance_seeds": 30,
+  "caps": [10, 20, 40],
+  "primary_cap": 20,
+  "gate": {
+    "conditions": [
+      {"id": "primary", "metric": "median_percentile_in_control", "cap": 20, "operator": ">=", "threshold": 95},
+      {"id": "no_sign_flip_low", "metric": "median_percentile_in_control", "cap": 10, "operator": ">=", "threshold": 50},
+      {"id": "no_sign_flip_high", "metric": "median_percentile_in_control", "cap": 40, "operator": ">=", "threshold": 50},
+      {"id": "effect_size", "metric": "prob_strategy_seed_beats_control", "cap": 20, "operator": ">=", "threshold": 0.60}
+    ],
+    "pass_requires": "all four conditions true",
+    "on_fail": "Momentum is retired as a systematic ranking layer for this universe. No re-specification, no alternative formation window, no alternative holding period. The conclusion is that public price-based ranking does not survive costs here, and the systematic stock-selection line of research closes.",
+    "on_pass": "Momentum is adopted ONLY as a prioritisation layer on top of the constraint universe, to narrow the shortlist for manual review. It is not a buy signal and does not size positions. Next step would be a single confirmatory run on data after 2026-09-08 accumulated prospectively."
+  },
+  "known_limitations": [
+    "Universe is today's stocks.csv applied historically: survivorship bias remains and inflates results.",
+    "Window overlaps the period used to mine the retired V6.2 rules. Momentum was not among the mined features, but the outcome data is not fresh.",
+    "Weekly sampling, not daily live cadence.",
+    "No market-impact scaling with position size; flat cost buckets only.",
+    "56-signal-day style clustering does not apply here (momentum fires on every sample date), so the effective sample is larger than the R2 test."
+  ]
+}
