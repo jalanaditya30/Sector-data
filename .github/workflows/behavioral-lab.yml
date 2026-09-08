@@ -1,0 +1,36 @@
+name: behavioral-market-lab
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "25 11 * * 1-5"   # ~16:55 IST, completed NSE bars
+permissions:
+  contents: write
+concurrency:
+  group: behavioral-market-lab
+  cancel-in-progress: false
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install "yfinance>=0.2.40" "pandas>=2.0" "numpy>=1.24"
+      - name: Generate behavioral evidence snapshot
+        run: python early/behavioral_lab.py
+      - name: Commit snapshot
+        run: |
+          git config user.name "early-radar-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add -f early/behavioral.json
+          git diff --cached --quiet && exit 0
+          git commit -m "early: behavioral snapshot $(date -u +%FT%TZ)"
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+            git rebase origin/main || { git rebase --abort || true; sleep 4; continue; }
+            git push origin HEAD:main && exit 0
+            sleep $((attempt * 4))
+          done
+          exit 1
