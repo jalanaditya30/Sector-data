@@ -1,0 +1,661 @@
+{
+  "generated": "2026-09-08T11:11:37+00:00",
+  "probe_only": true,
+  "explicit_non_goals": [
+    "no pipeline",
+    "no feature engineering",
+    "no returns",
+    "no signal testing"
+  ],
+  "runner_context": "true",
+  "universe_symbols": 1861,
+  "probe_dates": [
+    "2023-01-16",
+    "2023-02-15",
+    "2023-04-18",
+    "2023-06-14",
+    "2023-08-17",
+    "2023-10-16",
+    "2023-11-20",
+    "2023-12-18",
+    "2024-01-18",
+    "2024-03-14",
+    "2024-05-16",
+    "2024-07-18",
+    "2024-09-19",
+    "2024-11-18",
+    "2024-12-19",
+    "2025-01-16",
+    "2025-03-17",
+    "2025-05-19",
+    "2025-07-17",
+    "2025-09-18",
+    "2025-11-17",
+    "2025-12-18",
+    "2026-01-19",
+    "2026-03-19",
+    "2026-05-18",
+    "2026-06-18",
+    "2026-07-20",
+    "2026-08-17",
+    "2026-08-20",
+    "2026-09-03"
+  ],
+  "summary": {
+    "days_requested": 30,
+    "days_fetched_successfully": 30,
+    "days_failed_or_malformed": 0,
+    "distinct_universe_symbols_seen_in_nse_files": 1860,
+    "symbol_match_fraction_of_current_universe": 0.999463,
+    "distinct_symbols_joining_cleanly_to_yahoo_ohlcv_on_same_probe_dates": 1812,
+    "same_date_symbol_pairs_nse": 44927,
+    "same_date_symbol_pairs_joined_to_ohlcv": 44181,
+    "same_date_pair_join_rate": 0.983395,
+    "blank_deliv_per_rows_all_fetched_files": 7874,
+    "eq_rows_all_fetched_files": 62706,
+    "be_rows_all_fetched_files": 6988
+  },
+  "daily": [
+    {
+      "date": "2023-01-16",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_16012023.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_16012023.csv",
+          "status": 200,
+          "bytes": 266588,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 2360,
+      "matched_universe_symbols": 1225,
+      "blank_deliv_per_rows": 176,
+      "blank_deliv_per_matched_rows": 31,
+      "eq_rows": 1856,
+      "be_rows": 141,
+      "other_series_rows": 363
+    },
+    {
+      "date": "2023-02-15",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_15022023.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_15022023.csv",
+          "status": 200,
+          "bytes": 261030,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 2312,
+      "matched_universe_symbols": 1226,
+      "blank_deliv_per_rows": 165,
+      "blank_deliv_per_matched_rows": 33,
+      "eq_rows": 1848,
+      "be_rows": 135,
+      "other_series_rows": 329
+    },
+    {
+      "date": "2023-04-18",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_18042023.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_18042023.csv",
+          "status": 200,
+          "bytes": 266449,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 2350,
+      "matched_universe_symbols": 1229,
+      "blank_deliv_per_rows": 92,
+      "blank_deliv_per_matched_rows": 27,
+      "eq_rows": 1918,
+      "be_rows": 69,
+      "other_series_rows": 363
+    },
+    {
+      "date": "2023-06-14",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_14062023.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_14062023.csv",
+          "status": 200,
+          "bytes": 273912,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 2409,
+      "matched_universe_symbols": 1241,
+      "blank_deliv_per_rows": 206,
+      "blank_deliv_per_matched_rows": 52,
+      "eq_rows": 1827,
+      "be_rows": 181,
+      "other_series_rows": 401
+    },
+    {
+      "date": "2023-08-17",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_17082023.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_17082023.csv",
+          "status": 200,
+          "bytes": 268811,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 2361,
+      "matched_universe_symbols": 1237,
+      "blank_deliv_per_rows": 280,
+      "blank_deliv_per_matched_rows": 69,
+      "eq_rows": 1695,
+      "be_rows": 263,
+      "other_series_rows": 403
+    },
+    {
+      "date": "2023-10-16",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_16102023.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_16102023.csv",
+          "status": 200,
+          "bytes": 289901,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 2555,
+      "matched_universe_symbols": 1298,
+      "blank_deliv_per_rows": 361,
+      "blank_deliv_per_matched_rows": 81,
+      "eq_rows": 1762,
+      "be_rows": 331,
+      "other_series_rows": 462
+    },
+    {
+      "date": "2023-11-20",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_20112023.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_20112023.csv",
+          "status": 200,
+          "bytes": 294781,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 2591,
+      "matched_universe_symbols": 1304,
+      "blank_deliv_per_rows": 314,
+      "blank_deliv_per_matched_rows": 71,
+      "eq_rows": 1810,
+      "be_rows": 279,
+      "other_series_rows": 502
+    },
+    {
+      "date": "2023-12-18",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_18122023.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_18122023.csv",
+          "status": 200,
+          "bytes": 299637,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 2623,
+      "matched_universe_symbols": 1310,
+      "blank_deliv_per_rows": 321,
+      "blank_deliv_per_matched_rows": 74,
+      "eq_rows": 1810,
+      "be_rows": 286,
+      "other_series_rows": 527
+    },
+    {
+      "date": "2024-01-18",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_18012024.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_18012024.csv",
+          "status": 200,
+          "bytes": 294110,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 2566,
+      "matched_universe_symbols": 1325,
+      "blank_deliv_per_rows": 326,
+      "blank_deliv_per_matched_rows": 66,
+      "eq_rows": 1791,
+      "be_rows": 309,
+      "other_series_rows": 466
+    },
+    {
+      "date": "2024-03-14",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_14032024.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_14032024.csv",
+          "status": 200,
+          "bytes": 301667,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 2641,
+      "matched_universe_symbols": 1348,
+      "blank_deliv_per_rows": 355,
+      "blank_deliv_per_matched_rows": 78,
+      "eq_rows": 1801,
+      "be_rows": 334,
+      "other_series_rows": 506
+    },
+    {
+      "date": "2024-05-16",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_16052024.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_16052024.csv",
+          "status": 200,
+          "bytes": 290995,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 2546,
+      "matched_universe_symbols": 1362,
+      "blank_deliv_per_rows": 283,
+      "blank_deliv_per_matched_rows": 60,
+      "eq_rows": 1886,
+      "be_rows": 262,
+      "other_series_rows": 398
+    },
+    {
+      "date": "2024-07-18",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_18072024.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_18072024.csv",
+          "status": 200,
+          "bytes": 302137,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 2620,
+      "matched_universe_symbols": 1384,
+      "blank_deliv_per_rows": 266,
+      "blank_deliv_per_matched_rows": 66,
+      "eq_rows": 1920,
+      "be_rows": 252,
+      "other_series_rows": 448
+    },
+    {
+      "date": "2024-09-19",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_19092024.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_19092024.csv",
+          "status": 200,
+          "bytes": 309683,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 2694,
+      "matched_universe_symbols": 1415,
+      "blank_deliv_per_rows": 398,
+      "blank_deliv_per_matched_rows": 97,
+      "eq_rows": 1833,
+      "be_rows": 380,
+      "other_series_rows": 481
+    },
+    {
+      "date": "2024-11-18",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_18112024.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_18112024.csv",
+          "status": 200,
+          "bytes": 316665,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 2774,
+      "matched_universe_symbols": 1450,
+      "blank_deliv_per_rows": 333,
+      "blank_deliv_per_matched_rows": 77,
+      "eq_rows": 1956,
+      "be_rows": 292,
+      "other_series_rows": 526
+    },
+    {
+      "date": "2024-12-19",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_19122024.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_19122024.csv",
+          "status": 200,
+          "bytes": 315032,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 2748,
+      "matched_universe_symbols": 1457,
+      "blank_deliv_per_rows": 300,
+      "blank_deliv_per_matched_rows": 83,
+      "eq_rows": 1964,
+      "be_rows": 280,
+      "other_series_rows": 504
+    },
+    {
+      "date": "2025-01-16",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_16012025.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_16012025.csv",
+          "status": 200,
+          "bytes": 312916,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 2744,
+      "matched_universe_symbols": 1477,
+      "blank_deliv_per_rows": 294,
+      "blank_deliv_per_matched_rows": 77,
+      "eq_rows": 1987,
+      "be_rows": 270,
+      "other_series_rows": 487
+    },
+    {
+      "date": "2025-03-17",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_17032025.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_17032025.csv",
+          "status": 200,
+          "bytes": 325250,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 2867,
+      "matched_universe_symbols": 1502,
+      "blank_deliv_per_rows": 296,
+      "blank_deliv_per_matched_rows": 79,
+      "eq_rows": 2048,
+      "be_rows": 255,
+      "other_series_rows": 564
+    },
+    {
+      "date": "2025-05-19",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_19052025.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_19052025.csv",
+          "status": 200,
+          "bytes": 329556,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 2885,
+      "matched_universe_symbols": 1515,
+      "blank_deliv_per_rows": 263,
+      "blank_deliv_per_matched_rows": 64,
+      "eq_rows": 2106,
+      "be_rows": 220,
+      "other_series_rows": 559
+    },
+    {
+      "date": "2025-07-17",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_17072025.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_17072025.csv",
+          "status": 200,
+          "bytes": 331303,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 2911,
+      "matched_universe_symbols": 1548,
+      "blank_deliv_per_rows": 334,
+      "blank_deliv_per_matched_rows": 106,
+      "eq_rows": 2042,
+      "be_rows": 310,
+      "other_series_rows": 559
+    },
+    {
+      "date": "2025-09-18",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_18092025.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_18092025.csv",
+          "status": 200,
+          "bytes": 341125,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 2984,
+      "matched_universe_symbols": 1588,
+      "blank_deliv_per_rows": 197,
+      "blank_deliv_per_matched_rows": 57,
+      "eq_rows": 2229,
+      "be_rows": 169,
+      "other_series_rows": 586
+    },
+    {
+      "date": "2025-11-17",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_17112025.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_17112025.csv",
+          "status": 200,
+          "bytes": 352421,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 3087,
+      "matched_universe_symbols": 1632,
+      "blank_deliv_per_rows": 196,
+      "blank_deliv_per_matched_rows": 50,
+      "eq_rows": 2304,
+      "be_rows": 153,
+      "other_series_rows": 630
+    },
+    {
+      "date": "2025-12-18",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_18122025.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_18122025.csv",
+          "status": 200,
+          "bytes": 347897,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 3061,
+      "matched_universe_symbols": 1647,
+      "blank_deliv_per_rows": 145,
+      "blank_deliv_per_matched_rows": 41,
+      "eq_rows": 2369,
+      "be_rows": 114,
+      "other_series_rows": 578
+    },
+    {
+      "date": "2026-01-19",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_19012026.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_19012026.csv",
+          "status": 200,
+          "bytes": 353808,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 3115,
+      "matched_universe_symbols": 1661,
+      "blank_deliv_per_rows": 152,
+      "blank_deliv_per_matched_rows": 36,
+      "eq_rows": 2400,
+      "be_rows": 109,
+      "other_series_rows": 606
+    },
+    {
+      "date": "2026-03-19",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_19032026.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_19032026.csv",
+          "status": 200,
+          "bytes": 357304,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 3144,
+      "matched_universe_symbols": 1685,
+      "blank_deliv_per_rows": 130,
+      "blank_deliv_per_matched_rows": 36,
+      "eq_rows": 2434,
+      "be_rows": 101,
+      "other_series_rows": 609
+    },
+    {
+      "date": "2026-05-18",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_18052026.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_18052026.csv",
+          "status": 200,
+          "bytes": 369831,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 3261,
+      "matched_universe_symbols": 1764,
+      "blank_deliv_per_rows": 279,
+      "blank_deliv_per_matched_rows": 69,
+      "eq_rows": 2421,
+      "be_rows": 240,
+      "other_series_rows": 600
+    },
+    {
+      "date": "2026-06-18",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_18062026.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_18062026.csv",
+          "status": 200,
+          "bytes": 368896,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 3245,
+      "matched_universe_symbols": 1770,
+      "blank_deliv_per_rows": 275,
+      "blank_deliv_per_matched_rows": 96,
+      "eq_rows": 2420,
+      "be_rows": 249,
+      "other_series_rows": 576
+    },
+    {
+      "date": "2026-07-20",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_20072026.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_20072026.csv",
+          "status": 200,
+          "bytes": 368145,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 3252,
+      "matched_universe_symbols": 1781,
+      "blank_deliv_per_rows": 336,
+      "blank_deliv_per_matched_rows": 111,
+      "eq_rows": 2383,
+      "be_rows": 297,
+      "other_series_rows": 572
+    },
+    {
+      "date": "2026-08-17",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_17082026.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_17082026.csv",
+          "status": 200,
+          "bytes": 391920,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 3457,
+      "matched_universe_symbols": 1843,
+      "blank_deliv_per_rows": 267,
+      "blank_deliv_per_matched_rows": 93,
+      "eq_rows": 2624,
+      "be_rows": 229,
+      "other_series_rows": 604
+    },
+    {
+      "date": "2026-08-20",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_20082026.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_20082026.csv",
+          "status": 200,
+          "bytes": 393028,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 3468,
+      "matched_universe_symbols": 1849,
+      "blank_deliv_per_rows": 256,
+      "blank_deliv_per_matched_rows": 93,
+      "eq_rows": 2630,
+      "be_rows": 228,
+      "other_series_rows": 610
+    },
+    {
+      "date": "2026-09-03",
+      "ok": true,
+      "source_url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_03092026.csv",
+      "attempts": [
+        {
+          "url": "https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_03092026.csv",
+          "status": 200,
+          "bytes": 395114,
+          "content_type": "text/csv"
+        }
+      ],
+      "rows": 3490,
+      "matched_universe_symbols": 1854,
+      "blank_deliv_per_rows": 278,
+      "blank_deliv_per_matched_rows": 95,
+      "eq_rows": 2632,
+      "be_rows": 250,
+      "other_series_rows": 608
+    }
+  ],
+  "verdict": "PASS if GitHub Actions can fetch a substantial majority of days with parseable delivery fields and high symbol/date join coverage; otherwise FAIL and do not build ingestion pipeline."
+}
