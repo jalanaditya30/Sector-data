@@ -1,39 +1,12 @@
-name: refresh-v62-live
+name: refresh-v62-live-retired
 on:
-  schedule:
-    # Run after the normal V2 refresh and after completed NSE daily bars.
-    - cron: "5 11 * * 1-5"   # ~16:35 IST
   workflow_dispatch:
 permissions:
-  contents: write
-concurrency:
-  group: refresh-v62-live
-  cancel-in-progress: false
+  contents: read
 jobs:
-  build:
+  retired:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - run: pip install "yfinance>=0.2.40" "pandas>=2.0" "numpy>=1.24"
-      - name: build V6.2 live candidates and prospective outcomes
-        run: python early/v62_live.py
-      - name: commit immutable signals and dashboards safely
-        run: |
-          git config user.name "early-radar-bot"
-          git config user.email "bot@users.noreply.github.com"
-          git add -f early/v62_live.json early/v62_prospective.json early/v62_history/
-          if git diff --cached --quiet; then exit 0; fi
-          git commit -m "early: V6.2 live refresh $(date -u +%FT%TZ)"
-          for attempt in 1 2 3 4; do
-            git fetch origin main
-            git rebase origin/main || { git rebase --abort || true; sleep 4; continue; }
-            if git push origin HEAD:main; then exit 0; fi
-            sleep $((attempt * 4))
-          done
-          exit 1
+      - run: |
+          echo "V6.2 R2/R5 live candidate generation was retired on 2026-09-08."
+          echo "This workflow is intentionally manual-only and does not generate or commit signals."
