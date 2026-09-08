@@ -14,9 +14,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install "yfinance>=0.2.40" "pandas>=2.0" "numpy>=1.24" "requests>=2.31"
+      - run: pip install "yfinance>=0.2.40" "pandas>=2.0" "numpy>=1.24" "requests>=2.31" "cloudscraper>=1.2.71"
       - name: run V6.2 frozen pre-discovery validation
-        run: python early/v6_2_validation.py
+        run: python early/v6_2_bootstrap.py
       - name: commit V6.2 validation results safely
         run: |
           git config user.name "early-radar-bot"
