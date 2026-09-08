@@ -35,8 +35,8 @@ import portfolio_sim as base
 
 SPEC_PATH = os.path.join(HERE, "momentum_decision_rule.json")
 OUT = os.path.join(HERE, "momentum_test_result.json")
-PANEL_CACHE = os.path.join(HERE, ".cache", "momentum_panel.pkl")
-RAW_FRAME_CACHE = os.path.join(HERE, ".cache", "momentum_frames_raw.pkl")
+PANEL_CACHE = os.path.join(HERE, ".cache", "momentum_panel_v2.pkl")
+RAW_FRAME_CACHE = os.path.join(HERE, ".cache", "momentum_frames_raw_v2.pkl")
 
 
 def load_spec() -> dict:
@@ -55,11 +55,22 @@ def _norm_df(d):
     d = d.copy()
     d.index = pd.DatetimeIndex(d.index).tz_localize(None)
     d = d[~d.index.duplicated(keep="last")].sort_index()
-    return d.dropna(subset=["Close"])
+    d = d.dropna(subset=["Close"])
+    # Preserve raw traded close strictly for cash-turnover calculation.
+    d["TurnClose"] = d["Close"]
+    # Use split/dividend-adjusted execution prices so corporate actions do not
+    # create fake P&L jumps during a held position.
+    if "Adj Close" in d.columns:
+        f = (d["Adj Close"] / d["Close"]).replace([np.inf, -np.inf], np.nan).ffill().bfill().fillna(1.0)
+    else:
+        f = pd.Series(1.0, index=d.index)
+    d["Open"] = d["Open"] * f
+    d["Close"] = d["Close"] * f
+    return d
 
 
 def fetch_raw(tickers):
-    """Fetch unadjusted OHLCV for trade prices/turnover, retaining Adj Close for momentum."""
+    """Fetch raw OHLCV, retain raw close for turnover, adjust execution prices."""
     os.makedirs(os.path.dirname(RAW_FRAME_CACHE), exist_ok=True)
     tickers = list(dict.fromkeys(tickers))
     cached = {}
@@ -135,7 +146,7 @@ def build_panel(frames, universe, meta, mid, small, spec):
             p = base.pos(d, day)
             if p < need_hist:
                 continue
-            c_raw = d["Close"].to_numpy(float)[:p + 1]
+            c_raw = d["TurnClose"].to_numpy(float)[:p + 1]
             v = d["Volume"].to_numpy(float)[:p + 1]
             turn = median_turnover_cr(c_raw, v, inv["turnover_window_sessions"])
             if turn is None or turn < inv["min_turnover_cr_per_day"]:
@@ -143,10 +154,8 @@ def build_panel(frames, universe, meta, mid, small, spec):
             m = meta.get(t) or {}
             if float(m.get("mcap", 0.0)) < inv["min_mcap_cr"]:
                 continue
-            # 12-1 momentum uses adjusted close for splits/dividends; turnover and
-            # execution use raw traded prices from the same auto_adjust=False frame.
-            mom_col = "Adj Close" if "Adj Close" in d.columns else "Close"
-            c_mom = d[mom_col].to_numpy(float)[:p + 1]
+            # 12-1 momentum uses the already adjusted Close series.
+            c_mom = d["Close"].to_numpy(float)[:p + 1]
             base_px, end_px = c_mom[-(form + skip)], c_mom[-(skip + 1)]
             if not (np.isfinite(base_px) and base_px > 0 and np.isfinite(end_px)):
                 continue
