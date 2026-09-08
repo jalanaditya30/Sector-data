@@ -1,0 +1,22 @@
+{
+  "created_before_result_review": true,
+  "test": "R2 nuisance-seed robustness vs sector+120D-location matched random controls",
+  "primary_cap": 20,
+  "primary_statistic": "r2_median_percentile_in_control",
+  "interpretation": "one-sided permutation-style percentile: higher is better; 95 corresponds to p<=0.05 under the matched-control reference distribution",
+  "pass_requires_all": {
+    "N20_r2_median_percentile_in_control_gte": 95.0,
+    "N10_r2_median_percentile_in_control_gte": 50.0,
+    "N40_r2_median_percentile_in_control_gte": 50.0,
+    "N20_prob_r2_seed_beats_random_control_gte": 0.60
+  },
+  "fail_rule": "Anything else retires R2 as a stock-selection rule, including cases where a non-primary cap clears 95 while N=20 does not.",
+  "what_a_pass_allows": "Proceed to a genuinely clean out-of-sample protocol with rule discovery confined to pre-2023 data and one-time evaluation on 2023-present.",
+  "what_a_pass_does_not_allow": "Deployment or claims of validated alpha. The current window overlaps the rule-mining period, uses today's universe historically, and samples weekly rather than the live daily cadence.",
+  "secondary_descriptive_statistic": "prob_r2_seed_beats_random_control",
+  "notes": [
+    "Primary statistic and thresholds are fixed before reading the seed-robustness result.",
+    "The matched control must preserve signal date, sector, 120-day-high location bucket, liquidity floor, holding period, and transaction-cost assumptions.",
+    "No threshold changes are permitted after result inspection."
+  ]
+}
