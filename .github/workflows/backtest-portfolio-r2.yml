@@ -1,0 +1,47 @@
+name: backtest-portfolio-r2
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'early/portfolio_sim.py'
+      - '.github/workflows/backtest-portfolio-r2.yml'
+permissions:
+  contents: write
+concurrency:
+  group: backtest-portfolio-r2
+  cancel-in-progress: false
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install "yfinance>=0.2.40" "pandas>=2.0" "numpy>=1.24"
+      - name: restore raw-price cache
+        uses: actions/cache@v4
+        with:
+          path: early/.cache
+          key: r2-portfolio-raw-${{ runner.os }}-${{ hashFiles('trend/universe.txt') }}-${{ github.run_number }}
+          restore-keys: |
+            r2-portfolio-raw-${{ runner.os }}-${{ hashFiles('trend/universe.txt') }}-
+      - name: run Section-1 R2 portfolio test
+        run: python early/portfolio_sim.py
+      - name: commit result only
+        run: |
+          git config user.name "early-radar-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add -f early/portfolio_sim_result.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "research: R2 portfolio simulation result $(date -u +%FT%TZ)"
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+            git rebase origin/main || { git rebase --abort || true; sleep 4; continue; }
+            if git push origin HEAD:main; then exit 0; fi
+            sleep $((attempt * 4))
+          done
+          exit 1
