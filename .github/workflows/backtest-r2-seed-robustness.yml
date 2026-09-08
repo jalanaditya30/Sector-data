@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - early/seed_robustness.py
+      - .github/workflows/backtest-r2-seed-robustness.yml
 permissions:
   contents: write
 concurrency:
