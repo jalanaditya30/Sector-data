@@ -39,6 +39,9 @@ jobs:
       - name: Build shortlist
         run: python early/shortlist.py
 
+      - name: Archive it and diff against last week
+        run: python early/shortlist_history.py
+
       - name: Commit outputs
         run: |
           git config user.name  "github-actions[bot]"
@@ -46,6 +49,8 @@ jobs:
           git add early/screen/constraint_universe.txt \
                   early/screen/constraint_report.json \
                   early/screen/shortlist.json \
-                  early/screen/shortlist.md
+                  early/screen/shortlist.md \
+                  early/screen/changes.json \
+                  early/screen/history/
           git diff --staged --quiet || git commit -m "weekly shortlist $(date -u +%Y-%m-%d)"
           git push

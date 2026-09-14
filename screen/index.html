@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shortlist · NSE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>/* set the theme before first paint, so the page never flashes light */
+(function(){try{var t=localStorage.getItem("sector-data:theme");if(!t)t=window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+<link rel="stylesheet" href="../boards.css">
+<style>
+  :root{
+    --bg:#ffffff; --panel:#ffffff; --panel2:#fafafa; --line:#e6e6e6;
+    --ink:#1f2937; --dim:#6b7280; --dim2:#9ca3af;
+    --accent:#1a73e8; --up:#3fa34d; --down:#e05a4f; --warn:#c98a1a;
+    --headbg:#f2f3f5;
+    --mono:"JetBrains Mono","SF Mono",ui-monospace,"Cascadia Mono",Menlo,Consolas,monospace;
+    --sans:"Inter",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  :root[data-theme=dark]{
+    --bg:#0e1117; --panel:#161a21; --panel2:#131820; --line:#222833;
+    --ink:#e6e9ef; --dim:#9aa4b2; --dim2:#6d7885;
+    --accent:#5b9cf6; --up:#2ea36a; --down:#e5564a; --warn:#d3a04a;
+    --headbg:#1b212b;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;font-size:13px}
+  .wrap{max-width:1180px;margin:0 auto;padding:18px 16px 70px}
+  .boards{padding:0 0 12px;border-bottom:none;background:transparent}
+
+  header.top{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+    border-bottom:1px solid var(--line);padding-bottom:12px}
+  .brand{font-family:var(--mono);font-weight:600;font-size:15px;letter-spacing:.5px}
+  .brand b{color:var(--accent)}
+  .meta{color:var(--dim);font-family:var(--mono);font-size:11px}
+  .spacer{flex:1}
+
+  /* the one loud element on the page: what this list is not */
+  .standing{
+    margin:16px 0 0;padding:13px 15px;border:1px solid var(--line);
+    border-left:3px solid var(--warn);border-radius:6px;background:var(--panel2);
+    max-width:72ch;line-height:1.55}
+  .standing b{font-weight:600}
+  .standing .sub{color:var(--dim);margin-top:5px}
+
+  .strap{display:flex;gap:26px;flex-wrap:wrap;margin:18px 0 4px}
+  .stat .n{font-family:var(--mono);font-size:19px;font-weight:600}
+  .stat .l{color:var(--dim);font-size:11px;margin-top:1px}
+
+  /* week-on-week movement */
+  .changes{margin:18px 0 0;border:1px solid var(--line);border-radius:6px;
+    background:var(--panel);overflow:hidden}
+  .changes h2{margin:0;padding:10px 14px;font-size:12px;font-weight:600;
+    background:var(--headbg);border-bottom:1px solid var(--line)}
+  .changes h2 span{color:var(--dim);font-weight:400;font-family:var(--mono);font-size:11px}
+  .chgrid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+  .chcol{padding:11px 14px}
+  .chcol+.chcol{border-left:1px solid var(--line)}
+  .chcol h3{margin:0 0 7px;font-size:11px;font-weight:600;color:var(--dim)}
+  .pill{display:inline-block;font-family:var(--mono);font-size:11.5px;
+    padding:3px 7px;border-radius:4px;margin:0 5px 5px 0;border:1px solid var(--line)}
+  .pill.in{color:var(--up);border-color:color-mix(in srgb,var(--up) 40%,transparent)}
+  .pill.out{color:var(--down);border-color:color-mix(in srgb,var(--down) 40%,transparent)}
+  .pill.mv{color:var(--dim)}
+  .none{color:var(--dim2);font-size:11.5px}
+
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:20px 0 10px}
+  .controls input,.controls select{
+    font:inherit;font-size:12px;padding:6px 9px;border-radius:7px;
+    border:1px solid var(--line);background:var(--panel);color:var(--ink)}
+  .controls input{min-width:150px}
+  .btn{font:inherit;font-size:12px;font-weight:600;padding:6px 11px;border-radius:7px;
+    border:1px solid var(--line);background:var(--panel);color:var(--dim);cursor:pointer}
+  .btn[aria-pressed=true]{color:var(--accent);border-color:var(--accent)}
+  .btn:focus-visible,.controls input:focus-visible,.controls select:focus-visible{
+    outline:2px solid var(--accent);outline-offset:2px}
+  .count{color:var(--dim);font-family:var(--mono);font-size:11px;margin-left:auto}
+
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  thead th{position:sticky;top:0;background:var(--headbg);text-align:right;
+    font-weight:600;font-size:11px;color:var(--dim);padding:8px 9px;
+    border-bottom:1px solid var(--line);white-space:nowrap;cursor:pointer;user-select:none}
+  thead th:nth-child(-n+4){text-align:left}
+  thead th[aria-sort]{color:var(--accent)}
+  tbody td{padding:8px 9px;border-bottom:1px solid var(--line);text-align:right;
+    font-family:var(--mono);white-space:nowrap}
+  tbody td:nth-child(-n+4){text-align:left;font-family:var(--sans)}
+  tbody tr:hover{background:var(--panel2)}
+  td.rk{color:var(--dim2);font-family:var(--mono)}
+  td.sym{font-family:var(--mono);font-weight:600}
+  td.nm{color:var(--dim)}
+  td.sec{color:var(--dim);font-size:11.5px}
+  td.mom{font-weight:600}
+  .neg{color:var(--down)} .pos{color:var(--up)}
+  tr.new td.sym::after{content:"new";margin-left:7px;font-size:9.5px;font-weight:600;
+    color:var(--up);border:1px solid color-mix(in srgb,var(--up) 40%,transparent);
+    border-radius:3px;padding:1px 4px;vertical-align:middle}
+
+  details.caveats{margin-top:22px;border-top:1px solid var(--line);padding-top:12px}
+  details.caveats summary{cursor:pointer;font-size:12px;color:var(--dim);font-weight:600}
+  details.caveats ul{max-width:76ch;line-height:1.6;color:var(--dim);padding-left:18px}
+  .err{padding:14px;border:1px solid var(--down);border-radius:6px;color:var(--down);
+    max-width:70ch;line-height:1.5}
+
+  /* The last cell in each row restates mcap/turnover/from-high for the phone
+     layout, where those columns are dropped. On a wide screen those columns are
+     right there, so it is a duplicate — and an unstyled 11th column that pushes
+     the table sideways. Hidden here, switched back on in the breakpoint. */
+  td.foot{display:none}
+
+  @media (max-width:760px){
+    .chgrid{grid-template-columns:1fr}
+    .chcol+.chcol{border-left:none;border-top:1px solid var(--line)}
+    thead{display:none}
+    tbody tr{display:grid;grid-template-columns:auto 1fr auto;gap:2px 9px;
+      padding:10px 2px;border-bottom:1px solid var(--line);align-items:baseline}
+    tbody tr:hover{background:transparent}
+    tbody td{border:none;padding:0}
+    td.rk{grid-row:1}
+    td.sym{grid-row:1}
+    td.mom{grid-row:1;text-align:right;color:var(--accent)}
+    td.nm{grid-column:2;font-size:11.5px}
+    td.sec{grid-column:2;font-size:11px}
+    td.hide{display:none}
+    td.foot{display:block;grid-column:1/-1;font-size:11px;color:var(--dim);
+      font-family:var(--mono);margin-top:4px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav class="boards" aria-label="boards">
+    <a class="bbtn" href="../">◧ Sectoral Heatmap</a>
+    <a class="bbtn" href="../trend/">Trend Scanner</a>
+    <a class="bbtn" href="../quiet/">Quiet Climbers</a>
+    <span class="bbtn" aria-current="page">Shortlist</span>
+    <span class="sep"></span>
+    <button class="bbtn thbtn" type="button" id="theme" aria-pressed="false"
+            title="Switch between day and night"><span class="ic">◐</span></button>
+  </nav>
+
+  <header class="top">
+    <div class="brand"><b>Shortlist</b> · what to read this week</div>
+    <span class="spacer"></span>
+    <div class="meta" id="meta">loading…</div>
+  </header>
+
+  <div id="body" hidden>
+
+    <p class="standing">
+      <b>This is an attention budget, not a buy signal.</b>
+      It narrows the NSE universe to the names worth your own reading time. Nothing here
+      says buy, and rank 3 is not established to be better than rank 40.
+      <span class="sub" id="ruleline"></span>
+    </p>
+
+    <div class="strap">
+      <div class="stat"><div class="n" id="s-universe">—</div><div class="l">names after constraints</div></div>
+      <div class="stat"><div class="n" id="s-decile">—</div><div class="l">in the ranked decile</div></div>
+      <div class="stat"><div class="n" id="s-in">—</div><div class="l">entered this week</div></div>
+      <div class="stat"><div class="n" id="s-out">—</div><div class="l">dropped out</div></div>
+    </div>
+
+    <section class="changes" id="changes">
+      <h2>Since last week <span id="chprev"></span></h2>
+      <div class="chgrid">
+        <div class="chcol"><h3>Entered</h3><div id="ch-in"></div></div>
+        <div class="chcol"><h3>Dropped out</h3><div id="ch-out"></div></div>
+      </div>
+      <div class="chcol" id="ch-moved-wrap" style="border-top:1px solid var(--line)" hidden>
+        <h3 id="ch-moved-h">Big rank moves</h3><div id="ch-moved"></div>
+      </div>
+    </section>
+
+    <div class="controls">
+      <input id="q" type="search" placeholder="Filter by symbol or name" aria-label="Filter by symbol or name">
+      <select id="sector" aria-label="Filter by sector"><option value="">All sectors</option></select>
+      <button class="btn" id="scope" type="button" aria-pressed="true">Top 25</button>
+      <span class="count" id="count"></span>
+    </div>
+
+    <table>
+      <thead><tr>
+        <th data-k="rank" title="Rank within the decile">#</th>
+        <th data-k="nse">Symbol</th>
+        <th data-k="name">Name</th>
+        <th data-k="sector">Sector</th>
+        <th data-k="momentum_12_1_pct" title="12-month return excluding the most recent month">12-1 mom</th>
+        <th data-k="mcap_cr" class="hide">Mcap cr</th>
+        <th data-k="turnover_cr" class="hide">Turn cr</th>
+        <th data-k="from_high120_pct" class="hide">From 120D hi</th>
+        <th data-k="return_20d_pct" class="hide">20D</th>
+        <th data-k="max_daily_move_20d_pct" class="hide">Max 1D 20D</th>
+      </tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+
+    <details class="caveats">
+      <summary>What this rule does not account for</summary>
+      <ul id="caveatlist"></ul>
+    </details>
+  </div>
+
+  <div id="error" class="err" hidden></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var KEY="sector-data:theme", root=document.documentElement, btn=document.getElementById("theme");
+  function paint(){var d=root.getAttribute("data-theme")==="dark";
+    btn.setAttribute("aria-pressed",d?"true":"false");
+    btn.firstElementChild.textContent=d?"☾":"☀";}
+  btn.addEventListener("click",function(){
+    var n=root.getAttribute("data-theme")==="dark"?"light":"dark";
+    root.setAttribute("data-theme",n);try{localStorage.setItem(KEY,n);}catch(e){}paint();});
+  paint();
+
+  var DATA=[], CHANGES=null, entered={}, scope=25, sortKey="rank", sortAsc=true;
+
+  function num(v,d){return (v===null||v===undefined||isNaN(v))?"—":Number(v).toFixed(d===undefined?1:d);}
+  function signed(v){ if(v===null||v===undefined||isNaN(v)) return "—";
+    return (v>0?"+":"")+Number(v).toFixed(1)+"%"; }
+  function cls(v){return v<0?"neg":(v>0?"pos":"");}
+  function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+
+  function pills(list,kind,label){
+    if(!list||!list.length) return '<span class="none">'+label+'</span>';
+    return list.map(function(r){
+      var extra = r.delta!==undefined ? " "+(r.delta>0?"▲":"▼")+Math.abs(r.delta) : "";
+      return '<span class="pill '+kind+'">'+esc(r.nse)+extra+'</span>';
+    }).join("");
+  }
+
+  function render(){
+    var q=document.getElementById("q").value.trim().toLowerCase();
+    var sec=document.getElementById("sector").value;
+    var rows=DATA.filter(function(r){
+      if(sec && r.sector!==sec) return false;
+      if(q && (r.nse+" "+(r.name||"")).toLowerCase().indexOf(q)<0) return false;
+      return true;
+    });
+    rows.sort(function(a,b){
+      var x=a[sortKey], y=b[sortKey];
+      if(typeof x==="string"){x=x.toLowerCase();y=(y||"").toLowerCase();}
+      if(x===y) return a.rank-b.rank;
+      return (x>y?1:-1)*(sortAsc?1:-1);
+    });
+    var shown = scope? rows.slice(0,scope) : rows;
+
+    document.getElementById("rows").innerHTML = shown.map(function(r){
+      return '<tr'+(entered[r.nse]?' class="new"':'')+'>'+
+        '<td class="rk">'+r.rank+'</td>'+
+        '<td class="sym">'+esc(r.nse)+'</td>'+
+        '<td class="nm">'+esc(r.name)+'</td>'+
+        '<td class="sec">'+esc(r.sector)+'</td>'+
+        '<td class="mom">'+num(r.momentum_12_1_pct)+'%</td>'+
+        '<td class="hide">'+num(r.mcap_cr,0)+'</td>'+
+        '<td class="hide">'+num(r.turnover_cr)+'</td>'+
+        '<td class="hide '+cls(r.from_high120_pct)+'">'+signed(r.from_high120_pct)+'</td>'+
+        '<td class="hide '+cls(r.return_20d_pct)+'">'+signed(r.return_20d_pct)+'</td>'+
+        '<td class="hide">'+num(r.max_daily_move_20d_pct)+'%</td>'+
+        '<td class="foot">mcap '+num(r.mcap_cr,0)+'cr · turn '+num(r.turnover_cr)+
+          'cr · '+signed(r.from_high120_pct)+' from 120D high</td>'+
+      '</tr>';
+    }).join("");
+
+    document.getElementById("count").textContent =
+      shown.length+" of "+rows.length+(rows.length!==DATA.length?" (filtered)":"");
+  }
+
+  function boot(list, changes){
+    DATA=list; CHANGES=changes;
+    (changes && changes.entered || []).forEach(function(r){entered[r.nse]=true;});
+    render();
+  }
+
+  Promise.all([
+    fetch("../early/screen/shortlist.json",{cache:"no-store"}).then(function(r){
+      if(!r.ok) throw new Error("shortlist.json returned "+r.status); return r.json();}),
+    fetch("../early/screen/changes.json",{cache:"no-store"})
+      .then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+  ]).then(function(res){
+    var d=res[0], ch=res[1];
+
+    document.getElementById("meta").textContent =
+      "generated " + String(d.generated||"").slice(0,10);
+    document.getElementById("ruleline").textContent =
+      "Rule " + (d.rule||"—") + ". Context columns are descriptive and were not filters in the tested rule.";
+    document.getElementById("s-universe").textContent = d.universe_size!=null?d.universe_size:"—";
+    document.getElementById("s-decile").textContent = d.decile_size!=null?d.decile_size:(d.decile||[]).length;
+
+    var ins=(ch&&ch.entered)||[], outs=(ch&&ch.exited)||[], mv=(ch&&ch.moved)||[];
+    document.getElementById("s-in").textContent  = ch? ins.length : "—";
+    document.getElementById("s-out").textContent = ch? outs.length : "—";
+    document.getElementById("chprev").textContent =
+      !ch ? "" : (ch.first_run ? "— first archived list, changes appear next week"
+                               : "vs " + ch.previous);
+    document.getElementById("ch-in").innerHTML  = pills(ins,"in","Nothing new this week");
+    document.getElementById("ch-out").innerHTML = pills(outs,"out","Nothing dropped out");
+    if(mv.length){
+      document.getElementById("ch-moved-wrap").hidden=false;
+      document.getElementById("ch-moved-h").textContent =
+        "Moved "+(ch.big_move_threshold||15)+" places or more";
+      document.getElementById("ch-moved").innerHTML = pills(mv,"mv","");
+    }
+
+    var secs={}; (d.decile||[]).forEach(function(r){ if(r.sector) secs[r.sector]=(secs[r.sector]||0)+1; });
+    var sel=document.getElementById("sector");
+    Object.keys(secs).sort().forEach(function(s){
+      var o=document.createElement("option"); o.value=s; o.textContent=s+" ("+secs[s]+")"; sel.appendChild(o);});
+
+    document.getElementById("caveatlist").innerHTML =
+      (d.caveats||[]).map(function(c){return "<li>"+esc(c)+"</li>";}).join("") ||
+      "<li>None recorded.</li>";
+
+    document.getElementById("body").hidden=false;
+    boot(d.decile||[], ch);
+  }).catch(function(e){
+    var el=document.getElementById("error");
+    el.hidden=false;
+    el.textContent = "Could not load the shortlist. "+e.message+
+      " The weekly workflow writes early/screen/shortlist.json — check that its last run succeeded.";
+  });
+
+  document.getElementById("q").addEventListener("input",render);
+  document.getElementById("sector").addEventListener("change",render);
+  document.getElementById("scope").addEventListener("click",function(){
+    scope = scope? 0 : 25;
+    this.textContent = scope? "Top 25" : "Full decile";
+    this.setAttribute("aria-pressed", scope? "true":"false");
+    render();
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("thead th"),function(th){
+    th.addEventListener("click",function(){
+      var k=th.dataset.k; if(!k) return;
+      if(sortKey===k){sortAsc=!sortAsc;} else {sortKey=k; sortAsc=(k==="rank"||k==="nse"||k==="name"||k==="sector");}
+      Array.prototype.forEach.call(document.querySelectorAll("thead th"),function(o){o.removeAttribute("aria-sort");});
+      th.setAttribute("aria-sort",sortAsc?"ascending":"descending");
+      render();
+    });
+  });
+})();
+</script>
+</body>
+</html>
