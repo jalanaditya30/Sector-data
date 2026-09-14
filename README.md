@@ -8,13 +8,13 @@ breadth.
 Every stock on every board is identified by its **ISIN**, from the registry in
 [`stocks.csv`](stocks.csv) — **1,861 NSE-listed companies**. Tickers get renamed
 (MACROTECH → LODHA), so the ticker is only how a price is fetched; the ISIN is
-what a row *is*. The filter box on all three boards searches it.
+what a row *is*. The filter box on every board searches it.
 
 The registry was cut to NSE-only: 138 rows were dropped, 128 listed on BSE alone
 and 10 on neither. They had no NSE ticker, which meant no usable Screener or
 TradingView link and thinner coverage on the price feed.
 
-## Three independent boards in this repo
+## The four boards
 
 Each has its own script, data file, page and refresh workflow. What they share is
 deliberately small: the ISIN registry (`stocks.csv`) that says which company a row
@@ -23,17 +23,40 @@ is, and the board switcher in `boards.css`.
 | board | path | what it answers | refresh |
 |---|---|---|---|
 | **Sectoral Heatmap** | [`/`](https://jalanaditya30.github.io/Sector-data/) | which *sectors* are moving, across 8 horizons | `refresh-heatmap` |
-| **Trend Scanner** | [`/trend/`](https://jalanaditya30.github.io/Sector-data/trend/) | which stocks are moving *cleanly* (drift × consistency², 10/5 sessions) | `refresh-trend` |
-| **Quiet Climbers** | [`/quiet/`](https://jalanaditya30.github.io/Sector-data/quiet/) | which stocks rise *a little, most days, for weeks* (5 / 15 / 30 sessions, pure counting) | `refresh-quiet` |
+| **Trend Scanner** | [`/trend/`](https://jalanaditya30.github.io/Sector-data/trend/) | which stocks are moving *cleanly* — drift × consistency² over 15 / 10 / 5 sessions. Labels each name **trending up/down · turning · cooling · choppy** | `refresh-trend` |
+| **Quiet Climbers** | [`/quiet/`](https://jalanaditya30.github.io/Sector-data/quiet/) | which stocks rise *a little, most days, for weeks* — up-day counts and biggest single day over 30 / 15 / 5 sessions, pure counting. Labels each name **quiet climb · quiet slide · one big day · no pattern** | `refresh-quiet` |
+| **Shortlist** | [`/screen/`](https://jalanaditya30.github.io/Sector-data/screen/) | which names are worth reading *this week* — the constrained universe narrowed to a ranked decile, opening on the top 25, with what entered, left and moved since last week | `weekly-shortlist` |
 
-Both stock boards scan the same universe — **every NSE-listed company** in
+A working set, roughly: the heatmap for sector context, the two stock boards for
+pattern reads, the Shortlist for the weekly names.
+
+The two stock boards scan the same universe — **every NSE-listed company** in
 `stocks.csv` (1,861 names), written out as `trend/universe.txt` and
-`quiet/universe.txt` by `python build_universe.py`.
+`quiet/universe.txt` by `python build_universe.py`. The Shortlist starts from its
+own constrained universe (`early/screen/constraint_universe.txt`) and ranks the
+top decile on 12-1 momentum.
 
-Every board carries a row of buttons switching between the three, and a
+Every board carries a row of buttons switching between the four, and a
 **day/night toggle**. The theme is remembered and applied before first paint, so
 no page flashes white on the way in; with nothing chosen it follows the operating
 system.
+
+## Kept as a record, not in the nav
+
+Three pages are still served but deliberately left out of the switcher. They are
+the research trail, not part of the working set — reachable by URL so that what
+was tried, and what failed, stays on the record.
+
+| page | path | what it is | refresh |
+|---|---|---|---|
+| **Early Momentum Radar** | [`/early/`](https://jalanaditya30.github.io/Sector-data/early/) | the original radar page, superseded by the Shortlist | `refresh-early` |
+| **V6.2 Historical Research Artifact** | [`/early/v62.html`](https://jalanaditya30.github.io/Sector-data/early/v62.html) | the 8 Sep retirement page. The pre-committed nuisance-seed robustness gate failed 3 of 4 conditions; the outputs are retained as a research record, not a live signal | none |
+| **Behavioral Market Lab** | [`/early/behavioral.html`](https://jalanaditya30.github.io/Sector-data/early/behavioral.html) | standing behavioural measurements | `behavioral-lab` |
+
+**Known gap:** `v62.html` carries a dated header saying what it was and that it is
+no longer maintained. `/early/` and `/early/behavioral.html` do not — someone
+landing on either has no way to tell they are superseded. Worth either giving them
+the same header or retiring them outright; not urgent, but it is a real trap.
 
 ## The one thing that matters: the data feed
 
@@ -57,8 +80,11 @@ symbol intact. What's left is a price feed, and that dictates every design choic
 | `build_universe.py` | regenerates `trend/universe.txt` and `quiet/universe.txt` from the registry. |
 | `sectors_config.json` | sector → constituents → NSE ticker + weight. The curated Tijori export; left untouched. |
 | `build_heatmap.py` | pulls prices, computes returns, aggregates both taxonomies, writes `data.json`. |
-| `boards.css`, `theme.js` | the shared board switcher and the day/night toggle, used by all three pages. |
+| `boards.css`, `theme.js` | the shared board switcher and the day/night toggle, used by every page. |
 | `.github/workflows/refresh.yml` | GitHub Actions cron: rebuild after close, commit `data.json`. |
+| `screen/index.html` | the Shortlist UI. Reads `early/screen/shortlist.json` and `changes.json`. |
+| `early/shortlist.py` | builds the ranked decile from the constrained universe. |
+| `early/shortlist_history.py` | archives each week's decile and diffs it against the previous one. |
 | `requirements.txt` | `yfinance`, `pandas`. |
 
 ## Two taxonomies on the heatmap
