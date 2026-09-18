@@ -31,6 +31,7 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       # installed inline rather than from requirements.txt so this workflow
@@ -45,4 +46,4 @@ jobs:
           git config user.email "bot@users.noreply.github.com"
           git add -f trend/trend.json
           git diff --cached --quiet || git commit -m "trend: refresh $(date -u +%FT%TZ)"
-          git push
+          bash scripts/push-generated.sh

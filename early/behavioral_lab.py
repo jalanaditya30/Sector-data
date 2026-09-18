@@ -48,7 +48,7 @@ def metrics(df):
     tv=c*v; base=float(np.median(tv[-70:-10])); recent=float(np.median(tv[-10:]));
     if base<=0:return None
     persist=float(np.mean(tv[-10:]>base)); expansion=recent/base
-    prior120=float(np.max(c[-121:-1])); loc=(c[-1]/prior120-1)*100
+    prior120=float(np.max(c[-121:-1])); loc=float((c[-1]/prior120-1)*100)
     r5,r10,r20,r60=[ret(c,n) for n in (5,10,20,60)]
     # Acceptance: buyers repeatedly pay up and price holds those higher levels.
     last10=c[-10:]; higher_closes=float(np.mean(np.diff(last10)>0));
@@ -67,7 +67,7 @@ def metrics(df):
     event=float(np.max(np.abs(np.diff(c[-21:])/c[-21:-1]))*100)
     extension=max(r5 or 0,0)+max((r20 or 0)/4,0)
     # Stability / willingness to defend: shallow pullback from recent 20D high.
-    high20=float(np.max(c[-20:])); draw_from20=(c[-1]/high20-1)*100
+    high20=float(np.max(c[-20:])); draw_from20=float((c[-1]/high20-1)*100)
     turnover_cr=recent/1e7
     return dict(last=float(c[-1]),r5=r5,r10=r10,r20=r20,r60=r60,turnover_expansion=expansion,
       persistence=persist,from_high120=loc,higher_close_rate=higher_closes,close_location=close_location,
@@ -88,6 +88,8 @@ def classify(x,sector_ret,sector_breadth,market):
       'higher_price_acceptance':acceptance,'buyer_control':buyer_control,
       'seller_absorption':absorption,'near_major_anchor':structure,'sector_social_proof':sector,
       'supportive_risk_regime':market=='bull','crowding_warning':crowded}
+    # NumPy comparisons can produce np.bool_, which json.dump cannot encode.
+    evidence={key:bool(value) for key,value in evidence.items()}
     positives=sum(evidence[k] for k in evidence if k!='crowding_warning')
     if crowded and positives>=4: stage='FOMO / Crowded'
     elif positives>=7 and structure: stage='Recognition'
