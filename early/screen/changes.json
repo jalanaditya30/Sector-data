@@ -1,9 +1,329 @@
 {
- "current": "2026-09-12",
- "previous": null,
- "first_run": true,
- "entered": [],
- "exited": [],
- "moved": [],
- "note": "First archived list. Changes appear from the next run."
+ "current": "2026-09-19",
+ "previous": "2026-09-12",
+ "first_run": false,
+ "entered": [
+  {
+   "nse": "HAPPYFORGE",
+   "name": "Happy Forgings",
+   "sector": "Industrial Products",
+   "rank": 9,
+   "momentum_12_1_pct": 146.3
+  },
+  {
+   "nse": "ACUTAAS",
+   "name": "Acutaas Chemical",
+   "sector": "Pharmaceuticals & Biotechnology",
+   "rank": 14,
+   "momentum_12_1_pct": 130.2
+  },
+  {
+   "nse": "MARINE",
+   "name": "Marine Electric.",
+   "sector": "Industrial Manufacturing",
+   "rank": 21,
+   "momentum_12_1_pct": 117.3
+  },
+  {
+   "nse": "RATNAVEER",
+   "name": "Ratnaveer Precis",
+   "sector": "Industrial Products",
+   "rank": 51,
+   "momentum_12_1_pct": 85.4
+  },
+  {
+   "nse": "DYNAMATECH",
+   "name": "Dynamatic Tech.",
+   "sector": "Industrial Manufacturing",
+   "rank": 64,
+   "momentum_12_1_pct": 77.7
+  },
+  {
+   "nse": "SGFIN",
+   "name": "SG Finserve",
+   "sector": "Finance",
+   "rank": 66,
+   "momentum_12_1_pct": 77.0
+  },
+  {
+   "nse": "DREDGECORP",
+   "name": "Dredging Corpn.",
+   "sector": "Engineering Services",
+   "rank": 68,
+   "momentum_12_1_pct": 76.4
+  },
+  {
+   "nse": "MARKSANS",
+   "name": "Marksans Pharma",
+   "sector": "Pharmaceuticals & Biotechnology",
+   "rank": 73,
+   "momentum_12_1_pct": 74.6
+  },
+  {
+   "nse": "GAEL",
+   "name": "Guj. Ambuja Exp",
+   "sector": "Agricultural Food & other Products",
+   "rank": 74,
+   "momentum_12_1_pct": 74.2
+  },
+  {
+   "nse": "UJJIVANSFB",
+   "name": "Ujjivan Small",
+   "sector": "Banks",
+   "rank": 75,
+   "momentum_12_1_pct": 73.6
+  },
+  {
+   "nse": "CEMPRO",
+   "name": "Cemindia Project",
+   "sector": "Construction",
+   "rank": 77,
+   "momentum_12_1_pct": 72.7
+  },
+  {
+   "nse": "QPOWER",
+   "name": "Quality Power El",
+   "sector": "Electrical Equipment",
+   "rank": 84,
+   "momentum_12_1_pct": 69.4
+  },
+  {
+   "nse": "VINDHYATEL",
+   "name": "Vindhya Telelink",
+   "sector": "Construction",
+   "rank": 85,
+   "momentum_12_1_pct": 69.4
+  },
+  {
+   "nse": "ADOR",
+   "name": "Ador Welding",
+   "sector": "Industrial Products",
+   "rank": 86,
+   "momentum_12_1_pct": 68.9
+  }
+ ],
+ "exited": [
+  {
+   "nse": "RICOAUTO",
+   "name": "Rico Auto Inds",
+   "sector": "Auto Components",
+   "rank": 43,
+   "momentum_12_1_pct": 94.8
+  },
+  {
+   "nse": "BELRISE",
+   "name": "Belrise Industri",
+   "sector": "Auto Components",
+   "rank": 46,
+   "momentum_12_1_pct": 91.6
+  },
+  {
+   "nse": "HONASA",
+   "name": "Honasa Consumer",
+   "sector": "Personal Products",
+   "rank": 56,
+   "momentum_12_1_pct": 85.3
+  },
+  {
+   "nse": "ROSSTECH",
+   "name": "Rossell Techsys",
+   "sector": "Aerospace & Defense",
+   "rank": 69,
+   "momentum_12_1_pct": 77.3
+  },
+  {
+   "nse": "HSCL",
+   "name": "Himadri Special",
+   "sector": "Chemicals & Petrochemicals",
+   "rank": 72,
+   "momentum_12_1_pct": 74.5
+  },
+  {
+   "nse": "ADANIPOWER",
+   "name": "Adani Power",
+   "sector": "Power",
+   "rank": 74,
+   "momentum_12_1_pct": 73.5
+  },
+  {
+   "nse": "NAVINFLUOR",
+   "name": "Navin Fluo.Intl.",
+   "sector": "Chemicals & Petrochemicals",
+   "rank": 75,
+   "momentum_12_1_pct": 72.7
+  },
+  {
+   "nse": "ANANDRATHI",
+   "name": "Anand Rathi Wea.",
+   "sector": "Capital Markets",
+   "rank": 79,
+   "momentum_12_1_pct": 69.8
+  },
+  {
+   "nse": "JAYNECOIND",
+   "name": "Jayaswal Neco",
+   "sector": "Industrial Products",
+   "rank": 81,
+   "momentum_12_1_pct": 67.9
+  },
+  {
+   "nse": "BBOX",
+   "name": "Black Box",
+   "sector": "IT - Services",
+   "rank": 82,
+   "momentum_12_1_pct": 66.9
+  },
+  {
+   "nse": "RADICO",
+   "name": "Radico Khaitan",
+   "sector": "Beverages",
+   "rank": 83,
+   "momentum_12_1_pct": 65.9
+  },
+  {
+   "nse": "CRAFTSMAN",
+   "name": "Craftsman Auto",
+   "sector": "Auto Components",
+   "rank": 84,
+   "momentum_12_1_pct": 65.8
+  }
+ ],
+ "moved": [
+  {
+   "nse": "BHARATSE",
+   "name": "Bharat Seats",
+   "sector": "Auto Components",
+   "rank": 78,
+   "momentum_12_1_pct": 72.5,
+   "prev_rank": 22,
+   "delta": -56
+  },
+  {
+   "nse": "PFOCUS",
+   "name": "Prime Focus",
+   "sector": "Entertainment",
+   "rank": 40,
+   "momentum_12_1_pct": 93.3,
+   "prev_rank": 77,
+   "delta": 37
+  },
+  {
+   "nse": "IMFA",
+   "name": "Indian Metals",
+   "sector": "Ferrous Metals",
+   "rank": 65,
+   "momentum_12_1_pct": 77.1,
+   "prev_rank": 37,
+   "delta": -28
+  },
+  {
+   "nse": "MOTHERSON",
+   "name": "Samvardh. Mothe.",
+   "sector": "Auto Components",
+   "rank": 80,
+   "momentum_12_1_pct": 71.4,
+   "prev_rank": 55,
+   "delta": -25
+  },
+  {
+   "nse": "AVALON",
+   "name": "Avalon Tech",
+   "sector": "Electrical Equipment",
+   "rank": 4,
+   "momentum_12_1_pct": 161.8,
+   "prev_rank": 24,
+   "delta": 20
+  },
+  {
+   "nse": "ARVIND",
+   "name": "Arvind Ltd",
+   "sector": "Textiles & Apparels",
+   "rank": 70,
+   "momentum_12_1_pct": 76.1,
+   "prev_rank": 50,
+   "delta": -20
+  },
+  {
+   "nse": "FCL",
+   "name": "Fineotex Chem",
+   "sector": "Chemicals & Petrochemicals",
+   "rank": 83,
+   "momentum_12_1_pct": 70.1,
+   "prev_rank": 63,
+   "delta": -20
+  },
+  {
+   "nse": "GVPIL",
+   "name": "GE Power",
+   "sector": "Electrical Equipment",
+   "rank": 34,
+   "momentum_12_1_pct": 99.0,
+   "prev_rank": 15,
+   "delta": -19
+  },
+  {
+   "nse": "EBGNG",
+   "name": "GNG Electronics",
+   "sector": "IT - Hardware",
+   "rank": 47,
+   "momentum_12_1_pct": 87.7,
+   "prev_rank": 66,
+   "delta": 19
+  },
+  {
+   "nse": "INOXINDIA",
+   "name": "Inox India",
+   "sector": "Industrial Products",
+   "rank": 60,
+   "momentum_12_1_pct": 79.2,
+   "prev_rank": 78,
+   "delta": 18
+  },
+  {
+   "nse": "INDOTECH",
+   "name": "Indo Tech.Trans.",
+   "sector": "Electrical Equipment",
+   "rank": 38,
+   "momentum_12_1_pct": 94.6,
+   "prev_rank": 21,
+   "delta": -17
+  },
+  {
+   "nse": "RATEGAIN",
+   "name": "Rategain Travel",
+   "sector": "IT - Software",
+   "rank": 43,
+   "momentum_12_1_pct": 91.2,
+   "prev_rank": 26,
+   "delta": -17
+  },
+  {
+   "nse": "KRISHANA",
+   "name": "Krishana Phosch.",
+   "sector": "Fertilizers & Agrochemicals",
+   "rank": 76,
+   "momentum_12_1_pct": 72.9,
+   "prev_rank": 60,
+   "delta": -16
+  },
+  {
+   "nse": "UNIPARTS",
+   "name": "Uniparts India",
+   "sector": "Auto Components",
+   "rank": 19,
+   "momentum_12_1_pct": 119.8,
+   "prev_rank": 4,
+   "delta": -15
+  },
+  {
+   "nse": "IZMO",
+   "name": "IZMO",
+   "sector": "IT - Services",
+   "rank": 26,
+   "momentum_12_1_pct": 113.8,
+   "prev_rank": 11,
+   "delta": -15
+  }
+ ],
+ "big_move_threshold": 15
 }
