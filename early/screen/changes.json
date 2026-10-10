@@ -1,56 +1,72 @@
 {
- "current": "2026-10-03",
- "previous": "2026-09-26",
+ "current": "2026-10-10",
+ "previous": "2026-10-03",
  "first_run": false,
  "entered": [
   {
-   "nse": "RPTECH",
-   "name": "Rashi Peripheral",
-   "sector": "IT - Hardware",
-   "rank": 4,
-   "momentum_12_1_pct": 187.7
+   "nse": "GRANULES",
+   "name": "Granules India",
+   "sector": "Pharmaceuticals & Biotechnology",
+   "rank": 73,
+   "momentum_12_1_pct": 76.7
   },
   {
-   "nse": "CPPLUS",
-   "name": "Aditya Infotech",
-   "sector": "Industrial Manufacturing",
-   "rank": 6,
-   "momentum_12_1_pct": 184.1
+   "nse": "LUMAXTECH",
+   "name": "Lumax Auto Tech.",
+   "sector": "Auto Components",
+   "rank": 75,
+   "momentum_12_1_pct": 74.2
   },
   {
-   "nse": "KIRLOSENG",
-   "name": "Kirloskar Oil",
+   "nse": "NRBBEARING",
+   "name": "NRB Bearings",
+   "sector": "Auto Components",
+   "rank": 76,
+   "momentum_12_1_pct": 74.1
+  },
+  {
+   "nse": "QPOWER",
+   "name": "Quality Power El",
+   "sector": "Electrical Equipment",
+   "rank": 79,
+   "momentum_12_1_pct": 72.3
+  },
+  {
+   "nse": "AEROENTER",
+   "name": "Aeroflex Enter.",
    "sector": "Industrial Products",
-   "rank": 15,
-   "momentum_12_1_pct": 136.7
+   "rank": 82,
+   "momentum_12_1_pct": 72.1
   },
   {
-   "nse": "SBC",
-   "name": "SBC Exports",
-   "sector": "Textiles & Apparels",
-   "rank": 27,
-   "momentum_12_1_pct": 115.9
+   "nse": "PTCIL",
+   "name": "PTC Industries",
+   "sector": "Industrial Products",
+   "rank": 83,
+   "momentum_12_1_pct": 71.9
   },
   {
-   "nse": "PARAS",
-   "name": "Paras Defence",
-   "sector": "Aerospace & Defense",
-   "rank": 34,
-   "momentum_12_1_pct": 111.1
+   "nse": "SMSPHARMA",
+   "name": "SMS Pharma.",
+   "sector": "Pharmaceuticals & Biotechnology",
+   "rank": 86,
+   "momentum_12_1_pct": 70.9
+  }
+ ],
+ "exited": [
+  {
+   "nse": "AVADHSUGAR",
+   "name": "Avadh Sugar",
+   "sector": "Agricultural Food & other Products",
+   "rank": 44,
+   "momentum_12_1_pct": 96.0
   },
   {
-   "nse": "IFCI",
-   "name": "IFCI",
-   "sector": "Finance",
-   "rank": 54,
-   "momentum_12_1_pct": 85.1
-  },
-  {
-   "nse": "EBGNG",
-   "name": "GNG Electronics",
-   "sector": "IT - Hardware",
-   "rank": 62,
-   "momentum_12_1_pct": 81.7
+   "nse": "SJS",
+   "name": "SJS Enterprises",
+   "sector": "Auto Components",
+   "rank": 65,
+   "momentum_12_1_pct": 81.2
   },
   {
    "nse": "GHCLTEXTIL",
@@ -60,25 +76,11 @@
    "momentum_12_1_pct": 80.3
   },
   {
-   "nse": "RISHABH",
-   "name": "Rishabh Instrum.",
-   "sector": "Electrical Equipment",
-   "rank": 70,
-   "momentum_12_1_pct": 80.0
-  },
-  {
-   "nse": "AEGISLOG",
-   "name": "Aegis Logistics",
-   "sector": "Gas",
-   "rank": 72,
-   "momentum_12_1_pct": 79.6
-  },
-  {
-   "nse": "WELSPUNLIV",
-   "name": "Welspun Living",
-   "sector": "Textiles & Apparels",
-   "rank": 75,
-   "momentum_12_1_pct": 77.8
+   "nse": "DREDGECORP",
+   "name": "Dredging Corpn.",
+   "sector": "Engineering Services",
+   "rank": 82,
+   "momentum_12_1_pct": 73.3
   },
   {
    "nse": "BELRISE",
@@ -95,250 +97,110 @@
    "momentum_12_1_pct": 71.3
   },
   {
-   "nse": "SUVEN",
-   "name": "Suven Life Scie.",
-   "sector": "Healthcare Services",
-   "rank": 86,
-   "momentum_12_1_pct": 70.8
-  }
- ],
- "exited": [
-  {
-   "nse": "MANINDS",
-   "name": "Man Industries",
-   "sector": "Industrial Products",
-   "rank": 39,
-   "momentum_12_1_pct": 96.4
-  },
-  {
-   "nse": "GRANULES",
-   "name": "Granules India",
-   "sector": "Pharmaceuticals & Biotechnology",
-   "rank": 59,
-   "momentum_12_1_pct": 81.0
-  },
-  {
-   "nse": "KERNEX",
-   "name": "Kernex Microsys.",
-   "sector": "Transport Services",
-   "rank": 62,
-   "momentum_12_1_pct": 79.6
-  },
-  {
-   "nse": "MOTHERSON",
-   "name": "Samvardh. Mothe.",
-   "sector": "Auto Components",
-   "rank": 64,
-   "momentum_12_1_pct": 79.4
-  },
-  {
-   "nse": "NEULANDLAB",
-   "name": "Neuland Labs.",
-   "sector": "Pharmaceuticals & Biotechnology",
-   "rank": 66,
-   "momentum_12_1_pct": 78.7
-  },
-  {
-   "nse": "QPOWER",
-   "name": "Quality Power El",
+   "nse": "POWERINDIA",
+   "name": "Hitachi Energy",
    "sector": "Electrical Equipment",
-   "rank": 69,
-   "momentum_12_1_pct": 75.3
-  },
-  {
-   "nse": "PRICOLLTD",
-   "name": "Pricol Ltd",
-   "sector": "Auto Components",
-   "rank": 71,
-   "momentum_12_1_pct": 74.8
-  },
-  {
-   "nse": "RATEGAIN",
-   "name": "Rategain Travel",
-   "sector": "IT - Software",
-   "rank": 72,
-   "momentum_12_1_pct": 74.2
-  },
-  {
-   "nse": "JAYNECOIND",
-   "name": "Jayaswal Neco",
-   "sector": "Industrial Products",
-   "rank": 77,
-   "momentum_12_1_pct": 71.9
-  },
-  {
-   "nse": "IDEAFORGE",
-   "name": "Ideaforge Tech",
-   "sector": "Aerospace & Defense",
-   "rank": 81,
-   "momentum_12_1_pct": 70.4
-  },
-  {
-   "nse": "LUMAXTECH",
-   "name": "Lumax Auto Tech.",
-   "sector": "Auto Components",
-   "rank": 83,
-   "momentum_12_1_pct": 70.1
-  },
-  {
-   "nse": "ROSSTECH",
-   "name": "Rossell Techsys",
-   "sector": "Aerospace & Defense",
-   "rank": 84,
-   "momentum_12_1_pct": 69.5
+   "rank": 85,
+   "momentum_12_1_pct": 71.2
   }
  ],
  "moved": [
   {
-   "nse": "ADANIPOWER",
-   "name": "Adani Power",
-   "sector": "Power",
+   "nse": "SOTL",
+   "name": "Savita Oil Tech",
+   "sector": "Petroleum Products",
    "rank": 87,
-   "momentum_12_1_pct": 70.7,
+   "momentum_12_1_pct": 70.8,
    "prev_rank": 55,
    "delta": -32
   },
   {
-   "nse": "DREDGECORP",
-   "name": "Dredging Corpn.",
-   "sector": "Engineering Services",
-   "rank": 82,
-   "momentum_12_1_pct": 73.3,
-   "prev_rank": 53,
-   "delta": -29
-  },
-  {
-   "nse": "ADANIENSOL",
-   "name": "Adani Energy Sol",
-   "sector": "Power",
-   "rank": 61,
-   "momentum_12_1_pct": 83.0,
-   "prev_rank": 33,
-   "delta": -28
-  },
-  {
-   "nse": "AZAD",
-   "name": "Azad Engineering",
-   "sector": "Electrical Equipment",
-   "rank": 81,
-   "momentum_12_1_pct": 73.3,
-   "prev_rank": 54,
-   "delta": -27
-  },
-  {
-   "nse": "NATIONALUM",
-   "name": "Natl. Aluminium",
-   "sector": "Non - Ferrous Metals",
-   "rank": 48,
-   "momentum_12_1_pct": 93.3,
-   "prev_rank": 22,
-   "delta": -26
-  },
-  {
-   "nse": "SAILIFE",
-   "name": "Sai Life",
-   "sector": "Pharmaceuticals & Biotechnology",
-   "rank": 50,
-   "momentum_12_1_pct": 92.3,
-   "prev_rank": 76,
-   "delta": 26
-  },
-  {
-   "nse": "INOXINDIA",
-   "name": "Inox India",
+   "nse": "KRN",
+   "name": "KRN Heat Exchan",
    "sector": "Industrial Products",
-   "rank": 71,
-   "momentum_12_1_pct": 79.7,
-   "prev_rank": 46,
-   "delta": -25
-  },
-  {
-   "nse": "SOTL",
-   "name": "Savita Oil Tech",
-   "sector": "Petroleum Products",
-   "rank": 55,
-   "momentum_12_1_pct": 85.1,
-   "prev_rank": 79,
-   "delta": 24
+   "rank": 53,
+   "momentum_12_1_pct": 88.2,
+   "prev_rank": 80,
+   "delta": 27
   },
   {
    "nse": "DATAPATTNS",
    "name": "Data Pattern",
    "sector": "Aerospace & Defense",
-   "rank": 74,
-   "momentum_12_1_pct": 77.8,
-   "prev_rank": 50,
-   "delta": -24
+   "rank": 49,
+   "momentum_12_1_pct": 94.1,
+   "prev_rank": 74,
+   "delta": 25
   },
   {
-   "nse": "ICIL",
-   "name": "Indo Count Inds.",
-   "sector": "Textiles & Apparels",
-   "rank": 46,
-   "momentum_12_1_pct": 94.5,
-   "prev_rank": 68,
-   "delta": 22
+   "nse": "FCL",
+   "name": "Fineotex Chem",
+   "sector": "Chemicals & Petrochemicals",
+   "rank": 12,
+   "momentum_12_1_pct": 144.7,
+   "prev_rank": 36,
+   "delta": 24
+  },
+  {
+   "nse": "IFCI",
+   "name": "IFCI",
+   "sector": "Finance",
+   "rank": 77,
+   "momentum_12_1_pct": 73.5,
+   "prev_rank": 54,
+   "delta": -23
+  },
+  {
+   "nse": "NETWEB",
+   "name": "Netweb Technol.",
+   "sector": "IT - Services",
+   "rank": 39,
+   "momentum_12_1_pct": 101.5,
+   "prev_rank": 18,
+   "delta": -21
+  },
+  {
+   "nse": "INOXINDIA",
+   "name": "Inox India",
+   "sector": "Industrial Products",
+   "rank": 51,
+   "momentum_12_1_pct": 92.6,
+   "prev_rank": 71,
+   "delta": 20
   },
   {
    "nse": "SYRMA",
    "name": "Syrma SGS Tech.",
    "sector": "Industrial Manufacturing",
-   "rank": 53,
-   "momentum_12_1_pct": 89.2,
-   "prev_rank": 32,
-   "delta": -21
+   "rank": 34,
+   "momentum_12_1_pct": 107.7,
+   "prev_rank": 53,
+   "delta": 19
   },
   {
-   "nse": "SONACOMS",
-   "name": "Sona BLW Precis.",
-   "sector": "Auto Components",
-   "rank": 77,
-   "momentum_12_1_pct": 77.0,
-   "prev_rank": 56,
-   "delta": -21
+   "nse": "PFOCUS",
+   "name": "Prime Focus",
+   "sector": "Entertainment",
+   "rank": 26,
+   "momentum_12_1_pct": 118.6,
+   "prev_rank": 42,
+   "delta": 16
   },
   {
-   "nse": "SGFIN",
-   "name": "SG Finserve",
-   "sector": "Finance",
-   "rank": 76,
-   "momentum_12_1_pct": 77.5,
-   "prev_rank": 57,
-   "delta": -19
-  },
-  {
-   "nse": "NAVINFLUOR",
-   "name": "Navin Fluo.Intl.",
-   "sector": "Chemicals & Petrochemicals",
-   "rank": 60,
-   "momentum_12_1_pct": 83.2,
-   "prev_rank": 78,
-   "delta": 18
+   "nse": "RRKABEL",
+   "name": "R R Kabel",
+   "sector": "Industrial Products",
+   "rank": 37,
+   "momentum_12_1_pct": 103.3,
+   "prev_rank": 21,
+   "delta": -16
   },
   {
    "nse": "DIVGIITTS",
    "name": "Divgi Torq",
    "sector": "Auto Components",
-   "rank": 49,
-   "momentum_12_1_pct": 92.9,
-   "prev_rank": 65,
-   "delta": 16
-  },
-  {
-   "nse": "VINDHYATEL",
-   "name": "Vindhya Telelink",
-   "sector": "Construction",
-   "rank": 57,
-   "momentum_12_1_pct": 84.0,
-   "prev_rank": 73,
-   "delta": 16
-  },
-  {
-   "nse": "SHRIRAMFIN",
-   "name": "Shriram Finance",
-   "sector": "Finance",
    "rank": 64,
-   "momentum_12_1_pct": 81.2,
+   "momentum_12_1_pct": 82.6,
    "prev_rank": 49,
    "delta": -15
   }
